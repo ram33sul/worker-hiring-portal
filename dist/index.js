@@ -7,12 +7,14 @@ const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const database_1 = __importDefault(require("./config/database"));
 const account_1 = __importDefault(require("./routes/account"));
+const profile_1 = __importDefault(require("./routes/profile"));
 dotenv_1.default.config();
 database_1.default.connect();
 const PORT = process.env.PORT;
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use('/', account_1.default);
+app.use('/', profile_1.default);
 app.listen(PORT, () => {
     console.log(`app listening on ${PORT}`);
 });

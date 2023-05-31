@@ -3,11 +3,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.events = exports.eventHandler = void 0;
 const account_1 = require("../services/account");
 const events_1 = require("./events");
+const profile_1 = require("../services/profile");
 const eventHandler = (action) => {
     return (req, res) => {
         try {
             const event = (0, exports.events)(action);
-            event(Object.assign(Object.assign(Object.assign({}, req.body), req.query), req.headers)).then((response) => {
+            event(Object.assign(Object.assign(Object.assign(Object.assign({}, req.body), req.query), req.headers), { userId: req.verifiedUserId })).then((response) => {
                 const { data, headers } = response;
                 res.header(headers);
                 res.send({
@@ -40,6 +41,14 @@ const events = (action) => {
             return account_1.refreshTokenService;
         case events_1.VERIFY_USER:
             return account_1.verifyUserService;
+        case events_1.EDIT_PROFILE:
+            return profile_1.editProfileService;
+        case events_1.REGISTER_AS_WORKER:
+            return profile_1.registerAsWorkerService;
+        case events_1.OPEN_TO_WORK_ON:
+            return profile_1.openToWorkOnService;
+        case events_1.OPEN_TO_WORK_OFF:
+            return profile_1.openToWorkOffService;
         default:
             return () => Promise.reject("Internal error occured!");
     }

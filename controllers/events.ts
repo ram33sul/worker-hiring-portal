@@ -2,3 +2,7 @@ export const SEND_SMS_OTP = 'SEND_SMS_OTP';
 export const VERIFY_SMS_OTP = 'VERIFY_SMS_OTP';
 export const REFRESH_TOKEN = 'REFRESH_TOKEN';
 export const VERIFY_USER = 'VERIFY_USER';
+export const EDIT_PROFILE = 'EDIT_PROFILE';
+export const REGISTER_AS_WORKER = 'REGISTER_AS_WORKER';
+export const OPEN_TO_WORK_ON = 'OPEN_TO_WORK_ON';
+export const OPEN_TO_WORK_OFF = 'OPEN_TO_WORK_OFF';
