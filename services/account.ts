@@ -135,4 +135,4 @@ export const refreshTokenService = ({token}:{token: string}) => {
             reject("Internal error occured!")
         }
     })
-}
+};
