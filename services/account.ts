@@ -4,11 +4,11 @@ import mongoose, { mongo } from 'mongoose';
 import jwt, {JwtPayload} from 'jsonwebtoken'
 import { jwtSignAccess, jwtSignRefresh } from '../authentication/jwt';
 
-export const sendSmsOtpService = ({mobile, countryCode}: {mobile: string, countryCode: string}) => {
+export const sendSmsOtpService = ({phone, countryCode}: {phone: string, countryCode: string}) => {
     return new Promise(async (resolve, reject) => {
         try {
             const errors = []
-            if(!mobile){
+            if(!phone){
                 errors.push(`"mobile" is required!`)
             }
             if(!countryCode){
@@ -24,12 +24,12 @@ export const sendSmsOtpService = ({mobile, countryCode}: {mobile: string, countr
             client.verify.v2
                 .services(verifySid)
                 .verifications.create({
-                    to: countryCode + mobile,
+                    to: countryCode + phone,
                     channel: "sms"
                 })
                 .then((verification) => console.log(verification.status))
                 .then(() => {
-                    resolve({data: countryCode + mobile})
+                    resolve({data: countryCode + phone})
                 })
                 .catch((error) => {
                     reject("Can't send OTP!");
@@ -40,11 +40,11 @@ export const sendSmsOtpService = ({mobile, countryCode}: {mobile: string, countr
     })
 }
 
-export const verifySmsOtpService = ({mobile, countryCode, otpCode}: {mobile: string, countryCode: string, otpCode: string}) => {
+export const verifySmsOtpService = ({phone, countryCode, otpCode}: {phone: string, countryCode: string, otpCode: string}) => {
     return new Promise((resolve, reject) => {
         try {
             const errors = []
-            if(!mobile){
+            if(!phone){
                 errors.push(`'mobile' is required!`)
             }
             if(!countryCode){
@@ -62,13 +62,13 @@ export const verifySmsOtpService = ({mobile, countryCode, otpCode}: {mobile: str
             const client = twilio(accountSid, authToken);
             client.verify.v2
                 .services(verifySid)
-                .verificationChecks.create({ to: countryCode+mobile, code: otpCode })
+                .verificationChecks.create({ to: countryCode+phone, code: otpCode })
                 .then(async (verification_check) => {
                     if(verification_check.status === 'approved'){
-                        const userData: mongoose.AnyObject | null = await User.findOne({mobile: mobile, countryCode: countryCode});
+                        const userData: mongoose.AnyObject | null = await User.findOne({phone: phone, countryCode: countryCode});
                         if(!userData || !Object.keys(userData).length){
                             User.create({
-                                mobile: mobile,
+                                phone: phone,
                                 countryCode: countryCode
                             }).then((response) => {
                                 const accessToken = jwtSignAccess({userId: response._id});

@@ -18,11 +18,11 @@ const userSchema_1 = __importDefault(require("../model/userSchema"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const jwt_1 = require("../authentication/jwt");
-const sendSmsOtpService = ({ mobile, countryCode }) => {
+const sendSmsOtpService = ({ phone, countryCode }) => {
     return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const errors = [];
-            if (!mobile) {
+            if (!phone) {
                 errors.push(`"mobile" is required!`);
             }
             if (!countryCode) {
@@ -38,12 +38,12 @@ const sendSmsOtpService = ({ mobile, countryCode }) => {
             client.verify.v2
                 .services(verifySid)
                 .verifications.create({
-                to: countryCode + mobile,
+                to: countryCode + phone,
                 channel: "sms"
             })
                 .then((verification) => console.log(verification.status))
                 .then(() => {
-                resolve({ data: countryCode + mobile });
+                resolve({ data: countryCode + phone });
             })
                 .catch((error) => {
                 reject("Can't send OTP!");
@@ -55,11 +55,11 @@ const sendSmsOtpService = ({ mobile, countryCode }) => {
     }));
 };
 exports.sendSmsOtpService = sendSmsOtpService;
-const verifySmsOtpService = ({ mobile, countryCode, otpCode }) => {
+const verifySmsOtpService = ({ phone, countryCode, otpCode }) => {
     return new Promise((resolve, reject) => {
         try {
             const errors = [];
-            if (!mobile) {
+            if (!phone) {
                 errors.push(`'mobile' is required!`);
             }
             if (!countryCode) {
@@ -77,13 +77,13 @@ const verifySmsOtpService = ({ mobile, countryCode, otpCode }) => {
             const client = (0, twilio_1.default)(accountSid, authToken);
             client.verify.v2
                 .services(verifySid)
-                .verificationChecks.create({ to: countryCode + mobile, code: otpCode })
+                .verificationChecks.create({ to: countryCode + phone, code: otpCode })
                 .then((verification_check) => __awaiter(void 0, void 0, void 0, function* () {
                 if (verification_check.status === 'approved') {
-                    const userData = yield userSchema_1.default.findOne({ mobile: mobile, countryCode: countryCode });
+                    const userData = yield userSchema_1.default.findOne({ phone: phone, countryCode: countryCode });
                     if (!userData || !Object.keys(userData).length) {
                         userSchema_1.default.create({
-                            mobile: mobile,
+                            phone: phone,
                             countryCode: countryCode
                         }).then((response) => {
                             const accessToken = (0, jwt_1.jwtSignAccess)({ userId: response._id });
