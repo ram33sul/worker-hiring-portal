@@ -88,7 +88,7 @@ const verifySmsOtpService = ({ phone, countryCode, otpCode }) => {
                         }).then((response) => {
                             const accessToken = (0, jwt_1.jwtSignAccess)({ userId: response._id });
                             const refreshToken = (0, jwt_1.jwtSignRefresh)({ userId: response._id });
-                            resolve({ data: response, headers: { accessToken, refreshToken } });
+                            resolve({ data: response, headers: { "access-token": accessToken, "refresh-token": refreshToken } });
                         }).catch((error) => {
                             reject("Error occured in database!");
                         });
@@ -100,7 +100,7 @@ const verifySmsOtpService = ({ phone, countryCode, otpCode }) => {
                         else {
                             const accessToken = (0, jwt_1.jwtSignAccess)({ userId: userData._id });
                             const refreshToken = (0, jwt_1.jwtSignRefresh)({ userId: userData._id });
-                            resolve({ data: userData, headers: { accessToken, refreshToken } });
+                            resolve({ data: userData, headers: { "access-token": accessToken, "refresh-token": refreshToken } });
                         }
                     }
                 }
@@ -150,7 +150,7 @@ const refreshTokenService = ({ token }) => {
                 }
                 else {
                     const accessToken = (0, jwt_1.jwtSignAccess)({ userId: data.userId });
-                    resolve({ data: { userId: data.userId }, headers: { accessToken } });
+                    resolve({ data: { userId: data.userId }, headers: { "access-token": accessToken } });
                 }
             }));
         }
@@ -160,13 +160,13 @@ const refreshTokenService = ({ token }) => {
     }));
 };
 exports.refreshTokenService = refreshTokenService;
-const authenticateService = ({ Authorization }) => {
+const authenticateService = ({ token }) => {
     return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            if (!Authorization) {
+            if (!token) {
                 return reject('Token is missing!');
             }
-            jsonwebtoken_1.default.verify(Authorization, process.env.ACCESS_TOKEN_KEY, (error, data) => __awaiter(void 0, void 0, void 0, function* () {
+            jsonwebtoken_1.default.verify(token, process.env.ACCESS_TOKEN_KEY, (error, data) => __awaiter(void 0, void 0, void 0, function* () {
                 if (error) {
                     reject("Token is not valid or expired!");
                 }

@@ -73,7 +73,7 @@ export const verifySmsOtpService = ({phone, countryCode, otpCode}: {phone: strin
                             }).then((response) => {
                                 const accessToken = jwtSignAccess({userId: response._id});
                                 const refreshToken = jwtSignRefresh({userId: response._id});
-                                resolve({data: response, headers: {accessToken, refreshToken}});
+                                resolve({data: response, headers: {"access-token":accessToken, "refresh-token":refreshToken}});
                             }).catch((error) => {
                                 reject("Error occured in database!")
                             })
@@ -83,7 +83,7 @@ export const verifySmsOtpService = ({phone, countryCode, otpCode}: {phone: strin
                             } else {
                                 const accessToken = jwtSignAccess({userId: userData._id});
                                 const refreshToken = jwtSignRefresh({userId: userData._id});
-                                resolve({data: userData, headers: {accessToken, refreshToken}});
+                                resolve({data: userData, headers: {"access-token":accessToken, "refresh-token":refreshToken}});
                             }
                         }
                     } else {
@@ -128,7 +128,7 @@ export const refreshTokenService = ({token}:{token: string}) => {
                     reject("Token is not valid or expired!");
                 } else {
                     const accessToken = jwtSignAccess({userId: (data as JwtPayload).userId})
-                    resolve({data: {userId: (data as JwtPayload).userId}, headers:{accessToken}});
+                    resolve({data: {userId: (data as JwtPayload).userId}, headers:{"access-token":accessToken}});
                 }
             });
         } catch (error) {
@@ -137,13 +137,13 @@ export const refreshTokenService = ({token}:{token: string}) => {
     })
 };
 
-export const authenticateService = ({Authorization}:{Authorization: string}) => {
+export const authenticateService = ({token}:{token: string}) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if(!Authorization){
+            if(!token){
                 return reject('Token is missing!');
             }
-            jwt.verify(Authorization, process.env.ACCESS_TOKEN_KEY!, async (error, data) => {
+            jwt.verify(token, process.env.ACCESS_TOKEN_KEY!, async (error, data) => {
                 if(error) {
                     reject("Token is not valid or expired!");
                 } else {
