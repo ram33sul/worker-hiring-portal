@@ -6,3 +6,4 @@ export const EDIT_PROFILE = 'EDIT_PROFILE';
 export const REGISTER_AS_WORKER = 'REGISTER_AS_WORKER';
 export const OPEN_TO_WORK_ON = 'OPEN_TO_WORK_ON';
 export const OPEN_TO_WORK_OFF = 'OPEN_TO_WORK_OFF';
+export const AUTHENTICATE = 'AUTHENTICATE';

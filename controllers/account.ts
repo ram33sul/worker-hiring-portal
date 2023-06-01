@@ -1,6 +1,6 @@
-import { refreshTokenService, sendSmsOtpService, verifySmsOtpService, verifyUserService } from "../services/account"
+import { authenticateService, refreshTokenService, sendSmsOtpService, verifySmsOtpService, verifyUserService } from "../services/account"
 import { Request, Response } from "express";
-import { EDIT_PROFILE, OPEN_TO_WORK_OFF, OPEN_TO_WORK_ON, REFRESH_TOKEN, REGISTER_AS_WORKER, SEND_SMS_OTP, VERIFY_SMS_OTP, VERIFY_USER } from "./events";
+import { AUTHENTICATE, EDIT_PROFILE, OPEN_TO_WORK_OFF, OPEN_TO_WORK_ON, REFRESH_TOKEN, REGISTER_AS_WORKER, SEND_SMS_OTP, VERIFY_SMS_OTP, VERIFY_USER } from "./events";
 import { editProfileService, openToWorkOffService, openToWorkOnService, registerAsWorkerService } from "../services/profile";
 
 export const eventHandler = (action: string) => {
@@ -47,6 +47,8 @@ export const events = (action: string) => {
             return openToWorkOnService;
         case OPEN_TO_WORK_OFF:
             return openToWorkOffService;
+        case AUTHENTICATE:
+            return authenticateService;
         default:
             return () => Promise.reject("Internal error occured!")
     }

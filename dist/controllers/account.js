@@ -49,6 +49,8 @@ const events = (action) => {
             return profile_1.openToWorkOnService;
         case events_1.OPEN_TO_WORK_OFF:
             return profile_1.openToWorkOffService;
+        case events_1.AUTHENTICATE:
+            return account_1.authenticateService;
         default:
             return () => Promise.reject("Internal error occured!");
     }

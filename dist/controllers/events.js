@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OPEN_TO_WORK_OFF = exports.OPEN_TO_WORK_ON = exports.REGISTER_AS_WORKER = exports.EDIT_PROFILE = exports.VERIFY_USER = exports.REFRESH_TOKEN = exports.VERIFY_SMS_OTP = exports.SEND_SMS_OTP = void 0;
+exports.AUTHENTICATE = exports.OPEN_TO_WORK_OFF = exports.OPEN_TO_WORK_ON = exports.REGISTER_AS_WORKER = exports.EDIT_PROFILE = exports.VERIFY_USER = exports.REFRESH_TOKEN = exports.VERIFY_SMS_OTP = exports.SEND_SMS_OTP = void 0;
 exports.SEND_SMS_OTP = 'SEND_SMS_OTP';
 exports.VERIFY_SMS_OTP = 'VERIFY_SMS_OTP';
 exports.REFRESH_TOKEN = 'REFRESH_TOKEN';
@@ -9,3 +9,4 @@ exports.EDIT_PROFILE = 'EDIT_PROFILE';
 exports.REGISTER_AS_WORKER = 'REGISTER_AS_WORKER';
 exports.OPEN_TO_WORK_ON = 'OPEN_TO_WORK_ON';
 exports.OPEN_TO_WORK_OFF = 'OPEN_TO_WORK_OFF';
+exports.AUTHENTICATE = 'AUTHENTICATE';

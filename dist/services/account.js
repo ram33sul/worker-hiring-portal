@@ -12,9 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.refreshTokenService = exports.verifyUserService = exports.verifySmsOtpService = exports.sendSmsOtpService = void 0;
+exports.authenticateService = exports.refreshTokenService = exports.verifyUserService = exports.verifySmsOtpService = exports.sendSmsOtpService = void 0;
 const twilio_1 = __importDefault(require("twilio"));
 const userSchema_1 = __importDefault(require("../model/userSchema"));
+const mongoose_1 = __importDefault(require("mongoose"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const jwt_1 = require("../authentication/jwt");
 const sendSmsOtpService = ({ mobile, countryCode }) => {
@@ -159,3 +160,29 @@ const refreshTokenService = ({ token }) => {
     }));
 };
 exports.refreshTokenService = refreshTokenService;
+const authenticateService = ({ token }) => {
+    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            if (!token) {
+                return reject('Token is missing!');
+            }
+            jsonwebtoken_1.default.verify(token, process.env.ACCESS_TOKEN_KEY, (error, data) => __awaiter(void 0, void 0, void 0, function* () {
+                if (error) {
+                    reject("Token is not valid or expired!");
+                }
+                else {
+                    const _id = new mongoose_1.default.Types.ObjectId(data.userId);
+                    userSchema_1.default.findOne({ _id }).then((response) => {
+                        resolve({ data: response });
+                    }).catch((error) => {
+                        reject("Database error occured!");
+                    });
+                }
+            }));
+        }
+        catch (error) {
+            reject('Internal error occured!');
+        }
+    }));
+};
+exports.authenticateService = authenticateService;

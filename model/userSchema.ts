@@ -11,11 +11,11 @@ const userSchema = new mongoose.Schema({
     profilePicture: { type: String, default: ''},
     bio: { type: String, default: ''},
     age: { type: Number, default: 0},
-    skillsList: { type: Array, default: []},
+    categoryList: { type: Array, default: []},
     sampleWorkImages: { type: Array, default: []},
     dailyWage: { type: Number, default: 0},
     hourlyWage: { type: Number, default: 0},
-    primarySkill: { type: mongoose.Types.ObjectId, default: null},
+    primaryCategory: { type: mongoose.Types.ObjectId, default: null},
     openToWork: { type: Boolean, default: false}
 })
 

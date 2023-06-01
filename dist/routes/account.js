@@ -10,4 +10,5 @@ const router = express_1.default.Router();
 router.post('/send-sms-otp', (0, account_1.eventHandler)(events_1.SEND_SMS_OTP));
 router.post('/verify-sms-otp', (0, account_1.eventHandler)(events_1.VERIFY_SMS_OTP));
 router.get('/refresh-token', (0, account_1.eventHandler)(events_1.REFRESH_TOKEN));
+router.get('/authenticate', (0, account_1.eventHandler)(events_1.AUTHENTICATE));
 exports.default = router;

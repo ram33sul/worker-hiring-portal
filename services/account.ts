@@ -1,6 +1,6 @@
 import twilio from 'twilio';
 import User from '../model/userSchema';
-import mongoose from 'mongoose';
+import mongoose, { mongo } from 'mongoose';
 import jwt, {JwtPayload} from 'jsonwebtoken'
 import { jwtSignAccess, jwtSignRefresh } from '../authentication/jwt';
 
@@ -136,3 +136,27 @@ export const refreshTokenService = ({token}:{token: string}) => {
         }
     })
 };
+
+export const authenticateService = ({token}:{token: string}) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if(!token){
+                return reject('Token is missing!');
+            }
+            jwt.verify(token, process.env.ACCESS_TOKEN_KEY!, async (error, data) => {
+                if(error) {
+                    reject("Token is not valid or expired!");
+                } else {
+                    const _id = new mongoose.Types.ObjectId((data as JwtPayload).userId);
+                    User.findOne({_id}).then((response) => {
+                        resolve({data: response})
+                    }).catch((error) => {
+                        reject("Database error occured!")
+                    })
+                }
+            });
+        } catch (error) {
+            reject('Internal error occured!');
+        }
+    })
+}

@@ -59,33 +59,33 @@ export const editProfileService = ({
 interface RegisterAsWorkerService {
     bio: string, 
     age: number,
-    skillsList: string[],
+    categoryList: string[],
     sampleWorkImages: string[],
     dailyWage: number,
     hourlyWage: number,
-    primarySkill: string,
+    primaryCategory: string,
     userId: mongoose.Types.ObjectId
 }
 
-export const registerAsWorkerService = ({bio, age, skillsList, sampleWorkImages, dailyWage, hourlyWage, primarySkill, userId}: RegisterAsWorkerService) => {
+export const registerAsWorkerService = ({bio, age, categoryList, sampleWorkImages, dailyWage, hourlyWage, primaryCategory, userId}: RegisterAsWorkerService) => {
     return new Promise((resolve, reject) => {
         try {
-            if(!(validateBio(bio) && validateAge(age) && validateStringArray(skillsList) && validateStringArray(sampleWorkImages) && validatePositiveNumber(dailyWage) && validatePositiveNumber(hourlyWage) && validateString(primarySkill))){
+            if(!(validateBio(bio) && validateAge(age) && validateStringArray(categoryList) && validateStringArray(sampleWorkImages) && validatePositiveNumber(dailyWage) && validatePositiveNumber(hourlyWage) && validateString(primaryCategory))){
                 return reject("Validation failed!")
             }
             userId = new mongoose.Types.ObjectId(userId);
-            const primarySkillObject = new mongoose.Types.ObjectId(primarySkill);
+            const primaryCategoryObject = new mongoose.Types.ObjectId(primaryCategory);
             User.updateOne({
                 _id: userId
             },{
                 $set: {
                     bio,
                     age,
-                    skillsList,
+                    categoryList,
                     sampleWorkImages,
                     dailyWage,
                     hourlyWage,
-                    primarySkill: primarySkillObject
+                    primaryCategory: primaryCategoryObject
                 }
             }).then(() => {
                 return User.findOne({_id: userId})
@@ -140,6 +140,21 @@ export const openToWorkOffService = ({userId}: {userId: mongoose.Types.ObjectId}
                 resolve({data: response})
             }).catch((error) => {
                 reject("Database error occured!")
+            })
+        } catch (error) {
+            reject("Internal error occured!")
+        }
+    })
+}
+
+export const userDetailsService = ({userId}: {userId: mongoose.Types.ObjectId}) => {
+    return new Promise((resolve, reject) => {
+        try {
+            userId = new mongoose.Types.ObjectId(userId);
+            User.findOne({_id: userId}).then((response) => {
+                resolve({data: response})
+            }).catch((error) => {
+                reject("Database error occcured!")
             })
         } catch (error) {
             reject("Internal error occured!")
