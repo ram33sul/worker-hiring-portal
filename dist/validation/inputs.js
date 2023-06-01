@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateAge = exports.validateBio = exports.validateGender = exports.validateName = void 0;
+exports.validateEmail = exports.validateAge = exports.validateBio = exports.validateGender = exports.validateName = void 0;
 const validateName = (name) => {
     return (typeof name === 'string') && name.length < 16 && name.length > 1;
 };
@@ -17,3 +17,11 @@ const validateAge = (age) => {
     return (typeof age === 'number') && age > 0 && age < 150;
 };
 exports.validateAge = validateAge;
+const validateEmail = (email) => {
+    const test = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+    if (email.toLowerCase().match(test)) {
+        return true;
+    }
+    return false;
+};
+exports.validateEmail = validateEmail;

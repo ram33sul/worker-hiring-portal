@@ -14,3 +14,11 @@ export const validateBio = (bio: string) => {
 export const validateAge = (age: number) => {
     return (typeof age === 'number') && age > 0 && age < 150; 
 }
+
+export const validateEmail = (email: string) => {
+    const test = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+    if(email.toLowerCase().match(test)){
+        return true;
+    }
+    return false;
+}

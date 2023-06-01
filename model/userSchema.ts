@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
     phone: { type: String, require: true},
     countryCode: { type: String, require: true},
     status: { type: Boolean, default: true},
+    email: { type: String, default: ''},
     isWorker: { type: Boolean, default: false},
     gender: { type: String, default: ''},
     profilePicture: { type: String, default: ''},

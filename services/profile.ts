@@ -1,5 +1,5 @@
 import mongoose, { mongo } from "mongoose"
-import { validateAge, validateBio, validateGender, validateName } from "../validation/inputs"
+import { validateAge, validateBio, validateEmail, validateGender, validateName } from "../validation/inputs"
 import { validateBoolean, validatePositiveNumber, validateString, validateStringArray } from "../validation/types"
 import User from "../model/userSchema";
 import { validate } from "../validation/general";
@@ -8,6 +8,7 @@ interface EditProfileService {
     firstName: string,
     lastName: string,
     gender: string,
+    email: string,
     profilePicture: string,
     isWorker: boolean,
     userId: string | mongoose.Types.ObjectId;
@@ -16,6 +17,7 @@ export const editProfileService = ({
     firstName,
     lastName,
     gender,
+    email,
     profilePicture,
     isWorker,
     userId
@@ -27,7 +29,8 @@ export const editProfileService = ({
                 [ 'lastname', validateString, lastName ],
                 [ 'gender', validateGender, gender ],
                 [ 'profilePicture', validateString, profilePicture ],
-                [ 'isWorker', validateBoolean, isWorker ]
+                [ 'isWorker', validateBoolean, isWorker ],
+                [ 'email', validateEmail, email]
             ]);
             if(errors.length){
                 return reject(errors);
@@ -41,7 +44,8 @@ export const editProfileService = ({
                     lastName: lastName,
                     gender: gender,
                     profilePicture: profilePicture,
-                    isWorker: isWorker
+                    isWorker: isWorker,
+                    email: email
                 }
             }).then(() => {
                 return User.findOne({_id: userId})

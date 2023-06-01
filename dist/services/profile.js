@@ -9,7 +9,7 @@ const inputs_1 = require("../validation/inputs");
 const types_1 = require("../validation/types");
 const userSchema_1 = __importDefault(require("../model/userSchema"));
 const general_1 = require("../validation/general");
-const editProfileService = ({ firstName, lastName, gender, profilePicture, isWorker, userId }) => {
+const editProfileService = ({ firstName, lastName, gender, email, profilePicture, isWorker, userId }) => {
     return new Promise((resolve, reject) => {
         try {
             const errors = (0, general_1.validate)([
@@ -17,7 +17,8 @@ const editProfileService = ({ firstName, lastName, gender, profilePicture, isWor
                 ['lastname', types_1.validateString, lastName],
                 ['gender', inputs_1.validateGender, gender],
                 ['profilePicture', types_1.validateString, profilePicture],
-                ['isWorker', types_1.validateBoolean, isWorker]
+                ['isWorker', types_1.validateBoolean, isWorker],
+                ['email', inputs_1.validateEmail, email]
             ]);
             if (errors.length) {
                 return reject(errors);
@@ -31,7 +32,8 @@ const editProfileService = ({ firstName, lastName, gender, profilePicture, isWor
                     lastName: lastName,
                     gender: gender,
                     profilePicture: profilePicture,
-                    isWorker: isWorker
+                    isWorker: isWorker,
+                    email: email
                 }
             }).then(() => {
                 return userSchema_1.default.findOne({ _id: userId });
