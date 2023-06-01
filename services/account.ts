@@ -45,7 +45,7 @@ export const verifySmsOtpService = ({phone, countryCode, otpCode}: {phone: strin
         try {
             const errors = []
             if(!phone){
-                errors.push(`'mobile' is required!`)
+                errors.push(`'phone' is required!`)
             }
             if(!countryCode){
                 errors.push(`'countryCode' is required!`)
@@ -137,13 +137,13 @@ export const refreshTokenService = ({token}:{token: string}) => {
     })
 };
 
-export const authenticateService = ({token}:{token: string}) => {
+export const authenticateService = ({Authorization}:{Authorization: string}) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if(!token){
+            if(!Authorization){
                 return reject('Token is missing!');
             }
-            jwt.verify(token, process.env.ACCESS_TOKEN_KEY!, async (error, data) => {
+            jwt.verify(Authorization, process.env.ACCESS_TOKEN_KEY!, async (error, data) => {
                 if(error) {
                     reject("Token is not valid or expired!");
                 } else {

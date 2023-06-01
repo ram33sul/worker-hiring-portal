@@ -60,7 +60,7 @@ const verifySmsOtpService = ({ phone, countryCode, otpCode }) => {
         try {
             const errors = [];
             if (!phone) {
-                errors.push(`'mobile' is required!`);
+                errors.push(`'phone' is required!`);
             }
             if (!countryCode) {
                 errors.push(`'countryCode' is required!`);
@@ -160,13 +160,13 @@ const refreshTokenService = ({ token }) => {
     }));
 };
 exports.refreshTokenService = refreshTokenService;
-const authenticateService = ({ token }) => {
+const authenticateService = ({ Authorization }) => {
     return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            if (!token) {
+            if (!Authorization) {
                 return reject('Token is missing!');
             }
-            jsonwebtoken_1.default.verify(token, process.env.ACCESS_TOKEN_KEY, (error, data) => __awaiter(void 0, void 0, void 0, function* () {
+            jsonwebtoken_1.default.verify(Authorization, process.env.ACCESS_TOKEN_KEY, (error, data) => __awaiter(void 0, void 0, void 0, function* () {
                 if (error) {
                     reject("Token is not valid or expired!");
                 }
