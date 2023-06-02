@@ -33,7 +33,7 @@ export const editProfileService = ({
                 [ 'email', validateEmail, email]
             ]);
             if(errors.length){
-                return reject(errors);
+                return reject({errors, status: 400, error: new Error("invalid inputs!")});
             }
             userId = new mongoose.Types.ObjectId(userId);
             User.updateOne({
@@ -52,10 +52,10 @@ export const editProfileService = ({
             }).then((response) => {
                 resolve({data: response})
             }).catch((error) => {
-                reject("Database error occured!")
+                reject({status: 502, error: new Error("Database error occured!")})
             })
         } catch (error) {
-            reject("Internal error occured!")
+            reject({status: 500, error: new Error("Internal error occured!")})
         }
     })
 }
@@ -75,7 +75,7 @@ export const registerAsWorkerService = ({bio, age, categoryList, sampleWorkImage
     return new Promise((resolve, reject) => {
         try {
             if(!(validateBio(bio) && validateAge(age) && validateStringArray(categoryList) && validateStringArray(sampleWorkImages) && validatePositiveNumber(dailyWage) && validatePositiveNumber(hourlyWage) && validateString(primaryCategory))){
-                return reject("Validation failed!")
+                return reject({status: 400, error: new Error("invalid inputs!")})
             }
             userId = new mongoose.Types.ObjectId(userId);
             const primaryCategoryObject = new mongoose.Types.ObjectId(primaryCategory);
@@ -97,10 +97,10 @@ export const registerAsWorkerService = ({bio, age, categoryList, sampleWorkImage
                 resolve({data: response})
             }).catch((error) => {
                 console.log(error)
-                reject("Database error occured!")
+                reject({status: 502, error: new Error("Database error occured!")})
             })
         } catch (error) {
-            reject("Internal error occured!")
+            reject({status: 500, error: new Error("Internal error occured!")})
         }
     })
 }
@@ -120,10 +120,10 @@ export const openToWorkOnService = ({userId}: {userId: mongoose.Types.ObjectId})
             }).then((response) => {
                 resolve({data: response})
             }).catch((error) => {
-                reject("Database error occured!")
+                reject({status: 502, error: new Error("Database error occured!")})
             })
         } catch (error) {
-            reject("Internal error occured!")
+            reject({status: 500, error: new Error("Internal error occured!")})
         }
     })
 }
@@ -143,10 +143,10 @@ export const openToWorkOffService = ({userId}: {userId: mongoose.Types.ObjectId}
             }).then((response) => {
                 resolve({data: response})
             }).catch((error) => {
-                reject("Database error occured!")
+                reject({status: 502, error: new Error("Database error occured!")})
             })
         } catch (error) {
-            reject("Internal error occured!")
+            reject({status: 500, error: new Error("Internal error occured!")})
         }
     })
 }
@@ -158,10 +158,10 @@ export const userDetailsService = ({userId}: {userId: mongoose.Types.ObjectId}) 
             User.findOne({_id: userId}).then((response) => {
                 resolve({data: response})
             }).catch((error) => {
-                reject("Database error occcured!")
+                reject({status: 502, error: new Error("Database error occured!")})
             })
         } catch (error) {
-            reject("Internal error occured!")
+            reject({status: 500, error: new Error("Internal error occured!")})
         }
     })
 }

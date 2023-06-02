@@ -9,13 +9,13 @@ export const sendSmsOtpService = ({phone, countryCode}: {phone: string, countryC
         try {
             const errors = []
             if(!phone){
-                errors.push(`"mobile" is required!`)
+                errors.push("phone is required!")
             }
             if(!countryCode){
-                errors.push(`"countryCode" is required!`)
+                errors.push("countryCode is required!")
             }
             if(errors.length){
-                return reject(errors);
+                return reject({errors, error: new Error("Invalid inputs!"), status: 400});
             }
             const accountSid: string = process.env.TWILIO_SID!;
             const authToken: string = process.env.TWILIO_TOKEN!;
@@ -32,10 +32,10 @@ export const sendSmsOtpService = ({phone, countryCode}: {phone: string, countryC
                     resolve({data: countryCode + phone})
                 })
                 .catch((error) => {
-                    reject("Can't send OTP!");
+                    reject({status: 400, error: new Error("Can't send OTP to that number!")});
                 })
         } catch (error) {
-            reject("Internal error occured at sendSmsOtpService!");
+            reject({status: 500, error: new Error("Internal error occured!")});
         }
     })
 }
@@ -45,16 +45,16 @@ export const verifySmsOtpService = ({phone, countryCode, otpCode}: {phone: strin
         try {
             const errors = []
             if(!phone){
-                errors.push(`'phone' is required!`)
+                errors.push(`phone is required!`)
             }
             if(!countryCode){
-                errors.push(`'countryCode' is required!`)
+                errors.push(`countryCode is required!`)
             }
             if(!otpCode){
-                errors.push(`'otpCode' is required`)
+                errors.push(`otpCode is required`)
             }
             if(errors.length){
-                return reject(errors);
+                return reject({errors, error: new Error("Invalid inputs"), status: 400});
             }
             const accountSid: string = process.env.TWILIO_SID!;
             const authToken: string = process.env.TWILIO_TOKEN!;
@@ -75,11 +75,11 @@ export const verifySmsOtpService = ({phone, countryCode, otpCode}: {phone: strin
                                 const refreshToken = jwtSignRefresh({userId: response._id});
                                 resolve({data: response, headers: {"access-token":accessToken, "refresh-token":refreshToken}});
                             }).catch((error) => {
-                                reject("Error occured in database!")
+                                reject({status: 502, error: new Error("Database error occured!")})
                             })
                         } else {
                             if(!userData.status){
-                                reject("User is blocked!")
+                                reject({error: new Error("User is blocked!"), status: 403})
                             } else {
                                 const accessToken = jwtSignAccess({userId: userData._id});
                                 const refreshToken = jwtSignRefresh({userId: userData._id});
@@ -87,13 +87,13 @@ export const verifySmsOtpService = ({phone, countryCode, otpCode}: {phone: strin
                             }
                         }
                     } else {
-                        reject("OTP is incorrect!");
+                        reject({error: new Error("OTP is incorrect!"), status: 400});
                     }
                 }).catch((error) => {
-                    reject("OTP expired!");
+                    reject({error: new Error("OTP expired!"), status: 410});
                 })
         } catch (error) {
-            reject("Internal error occured!");
+            reject({status: 500, error: new Error("Internal error occured!")});
         }
     })
 }
@@ -102,17 +102,17 @@ export const verifyUserService = ({token}:{token: string}) => {
     return new Promise(async (resolve, reject) => {
         try {
             if(!token){
-                return reject('Token is missing!');
+                return reject({error: new Error("Token is missing"), status: 401});
             }
             jwt.verify(token, process.env.ACCESS_TOKEN_KEY!, async (error, data) => {
                 if(error) {
-                    reject("Token is not valid or expired!");
+                    reject({error: new Error("Token is not valid or expired!"), status: 401});
                 } else {
                     resolve({data: (data as JwtPayload).userId});
                 }
             });
         } catch (error) {
-            reject('Internal error occured!');
+            reject({status: 500, error: new Error("Internal error occured!")});
         }
     })
 }
@@ -121,18 +121,18 @@ export const refreshTokenService = ({token}:{token: string}) => {
     return new Promise(async (resolve, reject) => {
         try {
             if(!token){
-                return reject("Token is missing!")
+                return reject({error: new Error("Token is missing"), status: 401});
             }
             jwt.verify(token, process.env.REFRESH_TOKEN_KEY!, async (error, data) => {
                 if(error) {
-                    reject("Token is not valid or expired!");
+                    reject({error: new Error("Token is not valid or expired!"), status: 401});
                 } else {
                     const accessToken = jwtSignAccess({userId: (data as JwtPayload).userId})
                     resolve({data: {userId: (data as JwtPayload).userId}, headers:{"access-token":accessToken}});
                 }
             });
         } catch (error) {
-            reject("Internal error occured!")
+            reject({status: 500, error: new Error("Internal error occured!")})
         }
     })
 };
@@ -141,22 +141,22 @@ export const authenticateService = ({token}:{token: string}) => {
     return new Promise(async (resolve, reject) => {
         try {
             if(!token){
-                return reject('Token is missing!');
+                return reject({error: new Error("Token is missing"), status: 401});
             }
             jwt.verify(token, process.env.ACCESS_TOKEN_KEY!, async (error, data) => {
                 if(error) {
-                    reject("Token is not valid or expired!");
+                    reject({error: new Error("Token is not valid or expired!"), status: 401});
                 } else {
                     const _id = new mongoose.Types.ObjectId((data as JwtPayload).userId);
                     User.findOne({_id}).then((response) => {
                         resolve({data: response})
                     }).catch((error) => {
-                        reject("Database error occured!")
+                        reject({status: 502, error: new Error("Database error occured!")})
                     })
                 }
             });
         } catch (error) {
-            reject('Internal error occured!');
+            reject({status: 500, error: new Error("Internal error occured!")});
         }
     })
 }
