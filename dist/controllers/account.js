@@ -16,18 +16,15 @@ const eventHandler = (action) => {
                     status: true,
                     data
                 });
-            }).catch((error) => {
-                res.send({
-                    status: false,
-                    message: error
-                });
+            }).catch(({ error, status, errors }) => {
+                if (errors) {
+                    return res.status(status).send({ error, errors });
+                }
+                res.status(status).send({ error });
             });
         }
         catch (error) {
-            res.send({
-                status: false,
-                message: "Internal error occured!"
-            });
+            res.status(500).send({ error: new Error("Internal error occured!") });
         }
     };
 };

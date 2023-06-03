@@ -13,4 +13,5 @@ router.get('/refresh-token', eventHandler(REFRESH_TOKEN));
 
 router.get('/authenticate', eventHandler(AUTHENTICATE));
 
-export default router;
+const accountRouter = router;
+export default accountRouter;
