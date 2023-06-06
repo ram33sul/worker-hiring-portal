@@ -64,21 +64,20 @@ interface RegisterAsWorkerService {
     bio: string, 
     age: number,
     categoryList: string[],
-    sampleWorkImages: string[],
-    dailyWage: number,
-    hourlyWage: number,
-    primaryCategory: string,
-    userId: mongoose.Types.ObjectId
+    userId: mongoose.Types.ObjectId,
+    firstName: string,
+    lastName: string,
+    email: string,
+    gender: boolean,
+    openToWork: boolean
 }
-
-export const registerAsWorkerService = ({bio, age, categoryList, sampleWorkImages, dailyWage, hourlyWage, primaryCategory, userId}: RegisterAsWorkerService) => {
+export const registerAsWorkerService = ({bio, age, categoryList, userId, firstName, lastName, email, gender, openToWork}: RegisterAsWorkerService) => {
     return new Promise((resolve, reject) => {
         try {
-            if(!(validateBio(bio) && validateAge(age) && validateStringArray(categoryList) && validateStringArray(sampleWorkImages) && validatePositiveNumber(dailyWage) && validatePositiveNumber(hourlyWage) && validateString(primaryCategory))){
-                return reject({status: 400, error: new Error("invalid inputs!")})
+            if(!(validateBio(bio) && validateAge(age) && validateName(firstName) && validateName(lastName) && validateEmail(email) && validateBoolean(gender) && validateBoolean(openToWork))){
+                return reject({status: 400, error: new Error("invalid inputs!")});
             }
             userId = new mongoose.Types.ObjectId(userId);
-            const primaryCategoryObject = new mongoose.Types.ObjectId(primaryCategory);
             User.updateOne({
                 _id: userId
             },{
@@ -86,10 +85,11 @@ export const registerAsWorkerService = ({bio, age, categoryList, sampleWorkImage
                     bio,
                     age,
                     categoryList,
-                    sampleWorkImages,
-                    dailyWage,
-                    hourlyWage,
-                    primaryCategory: primaryCategoryObject
+                    firstName,
+                    lastName,
+                    email,
+                    gender,
+                    openToWork
                 }
             }).then(() => {
                 return User.findOne({_id: userId})
