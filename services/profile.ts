@@ -1,4 +1,4 @@
-import mongoose, { mongo } from "mongoose"
+import mongoose from "mongoose"
 import { validateAge, validateBio, validateEmail, validateGender, validateName } from "../validation/inputs"
 import { validateBoolean, validatePositiveNumber, validateString, validateStringArray } from "../validation/types"
 import User from "../model/userSchema";
@@ -164,7 +164,7 @@ export const openToWorkOffService = ({userId}: {userId: mongoose.Types.ObjectId}
     })
 }
 
-export const userDetailsService = ({userId}: {userId: mongoose.Types.ObjectId}) => {
+export const getUserDetailsService = ({userId}: {userId: mongoose.Types.ObjectId}) => {
     return new Promise((resolve, reject) => {
         try {
             userId = new mongoose.Types.ObjectId(userId);

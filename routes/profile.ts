@@ -1,6 +1,6 @@
 import express from 'express';
 import { eventHandler } from '../controllers/account';
-import { EDIT_PROFILE, OPEN_TO_WORK_OFF, OPEN_TO_WORK_ON, REGISTER_AS_WORKER } from '../controllers/events';
+import { EDIT_PROFILE, GET_USER_DETAILS, OPEN_TO_WORK_OFF, OPEN_TO_WORK_ON, REGISTER_AS_WORKER } from '../controllers/events';
 import { auth } from '../authentication/auth';
 
 const router = express.Router();
@@ -14,6 +14,8 @@ router.put('/register-as-worker', eventHandler(REGISTER_AS_WORKER));
 router.patch('/open-to-work-on', eventHandler(OPEN_TO_WORK_ON));
 
 router.patch('/open-to-work-off', eventHandler(OPEN_TO_WORK_OFF));
+
+router.get('/get-user-details', eventHandler(GET_USER_DETAILS));
 
 const profileRouter = router;
 

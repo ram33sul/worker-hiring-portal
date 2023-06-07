@@ -1,7 +1,7 @@
 import { authenticateService, refreshTokenService, sendSmsOtpService, verifySmsOtpService, verifyUserService } from "../services/account"
 import { Request, Response } from "express";
-import { ADD_WORKER_CATEGORY, AUTHENTICATE, EDIT_PROFILE, GET_WORKER_CATEGORIES, OPEN_TO_WORK_OFF, OPEN_TO_WORK_ON, REFRESH_TOKEN, REGISTER_AS_WORKER, SEND_SMS_OTP, VERIFY_SMS_OTP, VERIFY_USER } from "./events";
-import { editProfileService, openToWorkOffService, openToWorkOnService, registerAsWorkerService } from "../services/profile";
+import { ADD_WORKER_CATEGORY, AUTHENTICATE, EDIT_PROFILE, GET_USER_DETAILS, GET_WORKER_CATEGORIES, OPEN_TO_WORK_OFF, OPEN_TO_WORK_ON, REFRESH_TOKEN, REGISTER_AS_WORKER, SEND_SMS_OTP, VERIFY_SMS_OTP, VERIFY_USER } from "./events";
+import { editProfileService, getUserDetailsService, openToWorkOffService, openToWorkOnService, registerAsWorkerService } from "../services/profile";
 import { addWorkerCategoryService, getWorkerCategoriesService } from "../services/worker";
 
 export const eventHandler = (action: string) => {
@@ -52,6 +52,8 @@ export const events = (action: string) => {
             return getWorkerCategoriesService;
         case ADD_WORKER_CATEGORY:
             return addWorkerCategoryService;
+        case GET_USER_DETAILS:
+            return getUserDetailsService;
         default:
             return () => Promise.reject("Internal error occured!")
     }
