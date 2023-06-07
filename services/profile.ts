@@ -164,11 +164,11 @@ export const openToWorkOffService = ({userId}: {userId: mongoose.Types.ObjectId}
     })
 }
 
-export const getUserDetailsService = ({userId}: {userId: mongoose.Types.ObjectId}) => {
+export const getUserDetailsService = ({id}: {id: mongoose.Types.ObjectId}) => {
     return new Promise((resolve, reject) => {
         try {
-            userId = new mongoose.Types.ObjectId(userId);
-            User.findOne({_id: userId}).then((response) => {
+            id = new mongoose.Types.ObjectId(id);
+            User.findOne({_id: id}).then((response) => {
                 resolve({data: response})
             }).catch((error) => {
                 reject({status: 502, error: new Error("Database error occured!")})

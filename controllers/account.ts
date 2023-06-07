@@ -8,7 +8,7 @@ export const eventHandler = (action: string) => {
     return (req: any, res: Response) => {
         try {
             const event = events(action);
-            req.headers.token = req.headers.Authorization;
+            req.headers.token = req.headers.authorization;
             event({...req.body, ...req.query, ...req.headers, userId: req.verifiedUserId}).then((response) => {
                 const { data, headers} = response as {data: unknown, headers: unknown};
                 res.header(headers);
