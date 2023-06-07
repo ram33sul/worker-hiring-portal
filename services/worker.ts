@@ -4,11 +4,12 @@ import { validateNumber, validateString } from "../validation/types";
 
 interface AddWorkerCategoryService{
     title: string, 
-    minimumWage: number, 
+    dailyMinWage: number,
+    hourlyMinWage: number,
     imageUrl?: string,
     skill: string
 }
-export const addWorkerCategoryService = ({title, minimumWage, skill}: AddWorkerCategoryService) => {
+export const addWorkerCategoryService = ({title, dailyMinWage, hourlyMinWage, skill}: AddWorkerCategoryService) => {
     return new Promise((resolve, reject) => {
         try {
             let errors = [];
@@ -23,7 +24,8 @@ export const addWorkerCategoryService = ({title, minimumWage, skill}: AddWorkerC
             }
             errors = validate([
                 ['title', validateString, title],
-                ['minimumWage', validateNumber, minimumWage],
+                ['minimumWage', validateNumber, dailyMinWage],
+                ['minimumWage', validateNumber, hourlyMinWage],
                 ['skill', validateString, skill]
             ])
             if(errors.length){
@@ -31,7 +33,8 @@ export const addWorkerCategoryService = ({title, minimumWage, skill}: AddWorkerC
             }
             Worker.create({
                 title: title,
-                minimumWage: minimumWage,
+                dailyMinWage: dailyMinWage,
+                hourlyMinWage: hourlyMinWage,
                 skill: skill
             }).then((response) => {
                 resolve({data: response})

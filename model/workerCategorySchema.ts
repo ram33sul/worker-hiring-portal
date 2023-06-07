@@ -3,7 +3,8 @@ import mongoose from "mongoose";
 const workerCategorySchema = new mongoose.Schema({
     title: { type: String, require: true},
     skill: { type: String, require: true},
-    minimumWage: { type: Number, default: 0},
+    dailyMinWage: { type: Number, default: 0},
+    hourlyMinWage: { type: Number, default: 0},
     imageUrl: { type: String, default: ''}
 })
 
