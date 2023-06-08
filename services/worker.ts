@@ -47,15 +47,56 @@ export const addWorkerCategoryService = ({title, dailyMinWage, hourlyMinWage, sk
     })
 }
 
-
 export const getWorkerCategoriesService = () => {
     return new Promise((resolve, reject) => {
         try {
             Worker.find().then((response) => {
                 resolve({data: response});
+            }).catch((error) => {
+                reject({status: 502, error: "Database error occured!"})
             })
         } catch (error) {
             reject({status: 500, error: new Error("Internal error occured!")})
+        }
+    })
+}
+
+export const getSuggestedCategoriesService = () => {
+    return new Promise((resolve, reject) => {
+        try {
+            Worker.find().limit(10).then((response) => {
+                resolve({data: response})
+            }).catch((error) => {
+                reject({status: 502, error: "Database error occured!"})
+            })
+        } catch (error) {
+            reject({status: 500, error: "Internal error occured!"})
+        }
+    })
+}
+
+export const getCategorySearchService = ({key}: {key: string}) => {
+    return new Promise((resolve, reject) => {
+        try {
+            Worker.find({
+                $or: [
+                    {
+                        title: {
+                            $regex: `/${key}/`
+                        }
+                    },{
+                        skill: {
+                            $regex: `/${key}`
+                        }
+                    }
+                ]
+            }).then((response) => {
+                resolve({data: response})
+            }).catch((error) => {
+                reject({status: 502, error: "Database error occured!"})
+            })
+        } catch (error) {
+            reject({status: 500, error: "Internal error occured!"})
         }
     })
 }

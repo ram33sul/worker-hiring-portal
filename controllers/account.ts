@@ -1,8 +1,8 @@
 import { authenticateService, refreshTokenService, sendSmsOtpService, verifySmsOtpService, verifyUserService } from "../services/account"
 import { Request, Response } from "express";
-import { ADD_BANNER, ADD_WORKER_CATEGORY, AUTHENTICATE, EDIT_PROFILE, GET_BANNERS, GET_USER_DETAILS, GET_WORKER_CATEGORIES, OPEN_TO_WORK_OFF, OPEN_TO_WORK_ON, REFRESH_TOKEN, REGISTER_AS_WORKER, SEND_SMS_OTP, VERIFY_SMS_OTP, VERIFY_USER } from "./events";
+import { ADD_BANNER, ADD_WORKER_CATEGORY, AUTHENTICATE, CATEGORY_SEARCH, EDIT_PROFILE, GET_BANNERS, GET_SUGGESTED_CATEGORIES, GET_USER_DETAILS, GET_WORKER_CATEGORIES, OPEN_TO_WORK_OFF, OPEN_TO_WORK_ON, REFRESH_TOKEN, REGISTER_AS_WORKER, SEND_SMS_OTP, VERIFY_SMS_OTP, VERIFY_USER } from "./events";
 import { editProfileService, getUserDetailsService, openToWorkOffService, openToWorkOnService, registerAsWorkerService } from "../services/profile";
-import { addWorkerCategoryService, getWorkerCategoriesService } from "../services/worker";
+import { addWorkerCategoryService, getCategorySearchService, getSuggestedCategoriesService, getWorkerCategoriesService } from "../services/worker";
 import { addBannerService, getBannersService } from "../services/banner";
 
 export const eventHandler = (action: string) => {
@@ -59,6 +59,10 @@ export const events = (action: string) => {
             return addBannerService;
         case GET_BANNERS:
             return getBannersService;
+        case GET_SUGGESTED_CATEGORIES:
+            return getSuggestedCategoriesService;
+        case CATEGORY_SEARCH:
+            return getCategorySearchService;
         default:
             return () => Promise.reject("Internal error occured!")
     }
