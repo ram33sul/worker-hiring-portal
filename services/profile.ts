@@ -110,7 +110,6 @@ export const registerAsWorkerService = ({bio, age, categoryList, userId, firstNa
             }).then((response) => {
                 resolve({data: response})
             }).catch((error) => {
-                console.log(error)
                 reject({status: 502, error: "Database error occured!"})
             })
         } catch (error) {

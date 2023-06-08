@@ -1,8 +1,9 @@
 import { authenticateService, refreshTokenService, sendSmsOtpService, verifySmsOtpService, verifyUserService } from "../services/account"
 import { Request, Response } from "express";
-import { ADD_WORKER_CATEGORY, AUTHENTICATE, EDIT_PROFILE, GET_USER_DETAILS, GET_WORKER_CATEGORIES, OPEN_TO_WORK_OFF, OPEN_TO_WORK_ON, REFRESH_TOKEN, REGISTER_AS_WORKER, SEND_SMS_OTP, VERIFY_SMS_OTP, VERIFY_USER } from "./events";
+import { ADD_BANNER, ADD_WORKER_CATEGORY, AUTHENTICATE, EDIT_PROFILE, GET_BANNERS, GET_USER_DETAILS, GET_WORKER_CATEGORIES, OPEN_TO_WORK_OFF, OPEN_TO_WORK_ON, REFRESH_TOKEN, REGISTER_AS_WORKER, SEND_SMS_OTP, VERIFY_SMS_OTP, VERIFY_USER } from "./events";
 import { editProfileService, getUserDetailsService, openToWorkOffService, openToWorkOnService, registerAsWorkerService } from "../services/profile";
 import { addWorkerCategoryService, getWorkerCategoriesService } from "../services/worker";
+import { addBannerService, getBannersService } from "../services/banner";
 
 export const eventHandler = (action: string) => {
     return (req: any, res: Response) => {
@@ -54,6 +55,10 @@ export const events = (action: string) => {
             return addWorkerCategoryService;
         case GET_USER_DETAILS:
             return getUserDetailsService;
+        case ADD_BANNER:
+            return addBannerService;
+        case GET_BANNERS:
+            return getBannersService;
         default:
             return () => Promise.reject("Internal error occured!")
     }
