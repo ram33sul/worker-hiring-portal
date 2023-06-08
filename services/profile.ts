@@ -74,9 +74,9 @@ interface RegisterAsWorkerService {
     email: string,
     gender: boolean,
     openToWork: boolean,
-    primarySkill: string
+    primaryCategory: string
 }
-export const registerAsWorkerService = ({bio, age, categoryList, userId, firstName, lastName, email, gender, openToWork, primarySkill}: RegisterAsWorkerService) => {
+export const registerAsWorkerService = ({bio, age, categoryList, userId, firstName, lastName, email, gender, openToWork, primaryCategory}: RegisterAsWorkerService) => {
     return new Promise((resolve, reject) => {
         try {
             if(!(validateBio(bio) && validateAge(age) && validateName(firstName) && validateName(lastName) && validateEmail(email) && (gender === undefined || validateBoolean(gender)) && (openToWork === undefined || validateBoolean(openToWork)))){
@@ -86,8 +86,8 @@ export const registerAsWorkerService = ({bio, age, categoryList, userId, firstNa
             if(!Array.isArray(categoryList)){
                 return reject({status: 400, error: "category list must be an array!"});
             }
-            const isPrimarySkill = categoryList.filter((elem) => elem.id === primarySkill);
-            if(primarySkill && isPrimarySkill.length !== 1){
+            const isPrimaryCategory = categoryList.filter((elem) => elem.id === primaryCategory);
+            if(primaryCategory && isPrimaryCategory.length !== 1){
                 return reject({status: 400, error: "Primary skill must be only one and should be included in the category list!"})
             }
             User.updateOne({
@@ -102,7 +102,8 @@ export const registerAsWorkerService = ({bio, age, categoryList, userId, firstNa
                     email,
                     gender,
                     openToWork,
-                    primarySkill: new mongoose.Types.ObjectId(primarySkill)
+                    isWorker: true,
+                    primaryCategory: new mongoose.Types.ObjectId(primaryCategory)
                 }
             }).then(() => {
                 return User.findOne({_id: userId})
