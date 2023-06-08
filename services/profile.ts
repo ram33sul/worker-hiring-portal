@@ -66,7 +66,7 @@ interface RegisterAsWorkerService {
     categoryList: {
         id: string,
         hourlyWage: number,
-        weeklyWage: number
+        dailyWage: number
     }[],
     userId: mongoose.Types.ObjectId,
     firstName: string,
@@ -79,7 +79,7 @@ interface RegisterAsWorkerService {
 export const registerAsWorkerService = ({bio, age, categoryList, userId, firstName, lastName, email, gender, openToWork, primarySkill}: RegisterAsWorkerService) => {
     return new Promise((resolve, reject) => {
         try {
-            if(!(validateBio(bio) && validateAge(age) && validateName(firstName) && validateName(lastName) && validateEmail(email) && validateBoolean(gender) && validateBoolean(openToWork))){
+            if(!(validateBio(bio) && validateAge(age) && validateName(firstName) && validateName(lastName) && validateEmail(email) && (gender === undefined || validateBoolean(gender)) && (openToWork === undefined || validateBoolean(openToWork)))){
                 return reject({status: 400, error: new Error("invalid inputs!")});
             }
             userId = new mongoose.Types.ObjectId(userId);

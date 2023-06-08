@@ -1,5 +1,5 @@
 export const validateName = (name: string) => {
-    return (typeof name === 'string') && name.length < 16 && name.length > 1;
+    return (typeof name === 'string') && name.length < 20;
 }
 
 export const validateGender = (gender: string) => {
@@ -7,15 +7,18 @@ export const validateGender = (gender: string) => {
 }
 
 export const validateBio = (bio: string) => {
-    return (typeof bio === 'string') && bio.length < 256 && (bio.match(/\n/g) || '').length + 1 < 6;
+    return (typeof bio === 'string') && bio.length <= 400 && (bio.match(/\n/g) || '').length + 1 < 6;
  
 }
 
 export const validateAge = (age: number) => {
-    return (typeof age === 'number') && age > 0 && age < 150; 
+    return (typeof age === 'number') && age >= 18 && age < 100; 
 }
 
 export const validateEmail = (email: string) => {
+    if(!email){
+        return false;
+    }
     const test = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
     if(email.toLowerCase().match(test)){
         return true;
