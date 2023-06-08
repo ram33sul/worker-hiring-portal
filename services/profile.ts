@@ -80,15 +80,15 @@ export const registerAsWorkerService = ({bio, age, categoryList, userId, firstNa
     return new Promise((resolve, reject) => {
         try {
             if(!(validateBio(bio) && validateAge(age) && validateName(firstName) && validateName(lastName) && validateEmail(email) && (gender === undefined || validateBoolean(gender)) && (openToWork === undefined || validateBoolean(openToWork)))){
-                return reject({status: 400, error: new Error("invalid inputs!")});
+                return reject({status: 400, error: "invalid inputs!"});
             }
             userId = new mongoose.Types.ObjectId(userId);
             if(!Array.isArray(categoryList)){
-                return reject({status: 400, error: new Error("category list must be an array!")});
+                return reject({status: 400, error: "category list must be an array!"});
             }
             const isPrimarySkill = categoryList.filter((elem) => elem.id === primarySkill);
             if(primarySkill && isPrimarySkill.length !== 1){
-                return reject({status: 400, error: new Error("Primary skill must be only one and should be included in the category list!")})
+                return reject({status: 400, error: "Primary skill must be only one and should be included in the category list!"})
             }
             User.updateOne({
                 _id: userId
@@ -110,10 +110,10 @@ export const registerAsWorkerService = ({bio, age, categoryList, userId, firstNa
                 resolve({data: response})
             }).catch((error) => {
                 console.log(error)
-                reject({status: 502, error: new Error("Database error occured!")})
+                reject({status: 502, error: "Database error occured!"})
             })
         } catch (error) {
-            reject({status: 500, error: new Error("Internal error occured!")})
+            reject({status: 500, error: "Internal error occured!"})
         }
     })
 }
