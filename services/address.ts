@@ -4,6 +4,8 @@ import Address from "../model/addressSchema"
 interface AddAddressService {
     title: string,
     houseName: string,
+    place: string,
+    subLocality: string,
     city: string,
     state: string,
     country: string,
@@ -11,7 +13,7 @@ interface AddAddressService {
     location: number[],
     userId: string | mongoose.Types.ObjectId
 }
-export const addAddressService = ({title, houseName, city, state, country, pin, location, userId}: AddAddressService) => {
+export const addAddressService = ({title, houseName, place, subLocality, city, state, country, pin, location, userId}: AddAddressService) => {
     return new Promise((resolve, reject) => {
         try {
 
@@ -19,6 +21,8 @@ export const addAddressService = ({title, houseName, city, state, country, pin, 
                 userId: new mongoose.Types.ObjectId(userId),
                 title,
                 houseName,
+                place,
+                subLocality,
                 city,
                 state,
                 country,

@@ -14,4 +14,5 @@ router.get('/get-all-addresses', eventHandler(GET_ALL_ADDRESSES));
 router.get('/get-address', eventHandler(GET_ADDRESS));
 
 const addressRouter = router;
+
 export default addressRouter;
