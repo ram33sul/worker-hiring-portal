@@ -112,8 +112,11 @@ export const verifyUserService = ({token}:{token: string}) => {
                     const userData = await User.findOne({
                         _id: new mongoose.Types.ObjectId((data as JwtPayload).userId)
                     })
+                    if(!userData){
+                        return reject({error: new Error("User doesn't exist!"), status: 404})
+                    }
                     if(!userData?.status){
-                        return reject({error: new Error("User doesn't exist or user is blocked!"), status: 404})
+                        return reject({error: new Error("User is blocked!"), status: 403})
                     }
                     resolve({data: (data as JwtPayload).userId});
                 }
