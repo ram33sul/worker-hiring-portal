@@ -2,7 +2,9 @@ import mongoose from "mongoose";
 
 const addressSchema = new mongoose.Schema({
     title: { type: String, default: ''},
-    houseName: { type: String, default: ''},
+    completeAddress: { type: String, default: ''},
+    floor: { type: String, default: ''},
+    landmark: { type: String, default: ''},
     place: { type: String, default: ''},
     subLocality: { type: String, default: ''},
     city: { type: String, default: ''},
