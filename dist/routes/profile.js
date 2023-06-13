@@ -13,5 +13,6 @@ router.put('/edit-profile', (0, account_1.eventHandler)(events_1.EDIT_PROFILE));
 router.put('/register-as-worker', (0, account_1.eventHandler)(events_1.REGISTER_AS_WORKER));
 router.patch('/open-to-work-on', (0, account_1.eventHandler)(events_1.OPEN_TO_WORK_ON));
 router.patch('/open-to-work-off', (0, account_1.eventHandler)(events_1.OPEN_TO_WORK_OFF));
+router.get('/get-user-details', (0, account_1.eventHandler)(events_1.GET_USER_DETAILS));
 const profileRouter = router;
 exports.default = profileRouter;

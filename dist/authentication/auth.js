@@ -4,14 +4,14 @@ exports.auth = void 0;
 const account_1 = require("../services/account");
 const auth = (req, res, next) => {
     var _a, _b;
-    const token = (_b = (_a = req.headers["access-token"]) !== null && _a !== void 0 ? _a : req.body["access-token"]) !== null && _b !== void 0 ? _b : req.query["access-token"];
+    const token = (_b = (_a = req.headers["authorization"]) !== null && _a !== void 0 ? _a : req.body["authorization"]) !== null && _b !== void 0 ? _b : req.query["authorization"];
     (0, account_1.verifyUserService)({ token: token }).then((response) => {
         req.verifiedUserId = response.data;
         next();
     }).catch((error) => {
-        res.send({
+        res.status(error === null || error === void 0 ? void 0 : error.status).send({
             status: false,
-            message: error
+            error
         });
     });
 };

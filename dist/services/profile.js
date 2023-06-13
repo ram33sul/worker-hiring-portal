@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userDetailsService = exports.openToWorkOffService = exports.openToWorkOnService = exports.registerAsWorkerService = exports.editProfileService = void 0;
+exports.getUserDetailsService = exports.openToWorkOffService = exports.openToWorkOnService = exports.registerAsWorkerService = exports.editProfileService = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const inputs_1 = require("../validation/inputs");
 const types_1 = require("../validation/types");
@@ -49,14 +49,20 @@ const editProfileService = ({ firstName, lastName, gender, email, profilePicture
     });
 };
 exports.editProfileService = editProfileService;
-const registerAsWorkerService = ({ bio, age, categoryList, sampleWorkImages, dailyWage, hourlyWage, primaryCategory, userId }) => {
+const registerAsWorkerService = ({ bio, age, categoryList, userId, firstName, lastName, email, gender, openToWork, primaryCategory }) => {
     return new Promise((resolve, reject) => {
         try {
-            if (!((0, inputs_1.validateBio)(bio) && (0, inputs_1.validateAge)(age) && (0, types_1.validateStringArray)(categoryList) && (0, types_1.validateStringArray)(sampleWorkImages) && (0, types_1.validatePositiveNumber)(dailyWage) && (0, types_1.validatePositiveNumber)(hourlyWage) && (0, types_1.validateString)(primaryCategory))) {
-                return reject({ status: 400, error: new Error("invalid inputs!") });
+            if (!((0, inputs_1.validateBio)(bio) && (0, inputs_1.validateAge)(age) && (0, inputs_1.validateName)(firstName) && (0, inputs_1.validateName)(lastName) && (0, inputs_1.validateEmail)(email) && (gender === undefined || (0, inputs_1.validateGender)(gender)) && (openToWork === undefined || (0, types_1.validateBoolean)(openToWork)))) {
+                return reject({ status: 400, error: "invalid inputs!" });
             }
             userId = new mongoose_1.default.Types.ObjectId(userId);
-            const primaryCategoryObject = new mongoose_1.default.Types.ObjectId(primaryCategory);
+            if (!Array.isArray(categoryList)) {
+                return reject({ status: 400, error: "category list must be an array!" });
+            }
+            const isPrimaryCategory = categoryList.filter((elem) => elem.id === primaryCategory);
+            if (primaryCategory && isPrimaryCategory.length !== 1) {
+                return reject({ status: 400, error: "Primary skill must be only one and should be included in the category list!" });
+            }
             userSchema_1.default.updateOne({
                 _id: userId
             }, {
@@ -64,22 +70,24 @@ const registerAsWorkerService = ({ bio, age, categoryList, sampleWorkImages, dai
                     bio,
                     age,
                     categoryList,
-                    sampleWorkImages,
-                    dailyWage,
-                    hourlyWage,
-                    primaryCategory: primaryCategoryObject
+                    firstName,
+                    lastName,
+                    email,
+                    gender,
+                    openToWork,
+                    isWorker: true,
+                    primaryCategory: new mongoose_1.default.Types.ObjectId(primaryCategory)
                 }
             }).then(() => {
                 return userSchema_1.default.findOne({ _id: userId });
             }).then((response) => {
                 resolve({ data: response });
             }).catch((error) => {
-                console.log(error);
-                reject({ status: 502, error: new Error("Database error occured!") });
+                reject({ status: 502, error: "Database error occured!" });
             });
         }
         catch (error) {
-            reject({ status: 500, error: new Error("Internal error occured!") });
+            reject({ status: 500, error: "Internal error occured!" });
         }
     });
 };
@@ -132,11 +140,11 @@ const openToWorkOffService = ({ userId }) => {
     });
 };
 exports.openToWorkOffService = openToWorkOffService;
-const userDetailsService = ({ userId }) => {
+const getUserDetailsService = ({ id }) => {
     return new Promise((resolve, reject) => {
         try {
-            userId = new mongoose_1.default.Types.ObjectId(userId);
-            userSchema_1.default.findOne({ _id: userId }).then((response) => {
+            id = new mongoose_1.default.Types.ObjectId(id);
+            userSchema_1.default.findOne({ _id: id }).then((response) => {
                 resolve({ data: response });
             }).catch((error) => {
                 reject({ status: 502, error: new Error("Database error occured!") });
@@ -147,4 +155,4 @@ const userDetailsService = ({ userId }) => {
         }
     });
 };
-exports.userDetailsService = userDetailsService;
+exports.getUserDetailsService = getUserDetailsService;
