@@ -55,7 +55,6 @@ const registerAsWorkerService = ({ bio, age, categoryList, userId, firstName, la
             if (!((0, inputs_1.validateBio)(bio) && (0, inputs_1.validateAge)(age) && (0, inputs_1.validateName)(firstName) && (0, inputs_1.validateName)(lastName) && (0, inputs_1.validateEmail)(email) && (gender === undefined || (0, inputs_1.validateGender)(gender)) && (openToWork === undefined || (0, types_1.validateBoolean)(openToWork)))) {
                 return reject({ status: 400, error: "invalid inputs!" });
             }
-            userId = new mongoose_1.default.Types.ObjectId(userId);
             if (!Array.isArray(categoryList)) {
                 return reject({ status: 400, error: "category list must be an array!" });
             }
@@ -63,6 +62,7 @@ const registerAsWorkerService = ({ bio, age, categoryList, userId, firstName, la
             if (primaryCategory && isPrimaryCategory.length !== 1) {
                 return reject({ status: 400, error: "Primary skill must be only one and should be included in the category list!" });
             }
+            userId = new mongoose_1.default.Types.ObjectId(userId);
             userSchema_1.default.updateOne({
                 _id: userId
             }, {

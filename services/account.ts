@@ -32,6 +32,7 @@ export const sendSmsOtpService = ({phone, countryCode}: {phone: string, countryC
                     resolve({data: countryCode + phone})
                 })
                 .catch((error) => {
+                    console.log(error.message)
                     reject({status: 400, error: new Error("Can't send OTP to that number!")});
                 })
         } catch (error) {
@@ -108,6 +109,12 @@ export const verifyUserService = ({token}:{token: string}) => {
                 if(error) {
                     reject({error: new Error("Token is not valid or expired!"), status: 401});
                 } else {
+                    const userData = await User.findOne({
+                        _id: new mongoose.Types.ObjectId((data as JwtPayload).userId)
+                    })
+                    if(!userData?.status){
+                        return reject({error: new Error("User doesn't exist or user is blocked!"), status: 404})
+                    }
                     resolve({data: (data as JwtPayload).userId});
                 }
             });

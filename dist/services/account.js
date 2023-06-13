@@ -46,6 +46,7 @@ const sendSmsOtpService = ({ phone, countryCode }) => {
                 resolve({ data: countryCode + phone });
             })
                 .catch((error) => {
+                console.log(error.message);
                 reject({ status: 400, error: new Error("Can't send OTP to that number!") });
             });
         }
@@ -128,6 +129,12 @@ const verifyUserService = ({ token }) => {
                     reject({ error: new Error("Token is not valid or expired!"), status: 401 });
                 }
                 else {
+                    const userData = yield userSchema_1.default.findOne({
+                        _id: new mongoose_1.default.Types.ObjectId(data.userId)
+                    });
+                    if (!(userData === null || userData === void 0 ? void 0 : userData.status)) {
+                        return reject({ error: new Error("User doesn't exist or user is blocked!"), status: 404 });
+                    }
                     resolve({ data: data.userId });
                 }
             }));
