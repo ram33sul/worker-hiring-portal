@@ -64,7 +64,7 @@ interface RegisterAsWorkerService {
     bio: string, 
     age: number,
     categoryList: {
-        id: string,
+        id: string | mongoose.Types.ObjectId,
         hourlyWage: number,
         dailyWage: number
     }[],
@@ -76,7 +76,7 @@ interface RegisterAsWorkerService {
     openToWork: boolean,
     primaryCategory: string
 }
-export const registerAsWorkerService = ({bio, age, categoryList, userId, firstName, lastName, email, gender, openToWork, primaryCategory}: RegisterAsWorkerService) => {
+export const registerAsWorkerService = ({ bio, age, categoryList, userId, firstName, lastName, email, gender, openToWork, primaryCategory }: RegisterAsWorkerService) => {
     return new Promise((resolve, reject) => {
         try {
             if(!(validateBio(bio) && validateAge(age) && validateName(firstName) && validateName(lastName) && validateEmail(email) && (gender === undefined || validateGender(gender)) && (openToWork === undefined || validateBoolean(openToWork)))){
@@ -89,6 +89,7 @@ export const registerAsWorkerService = ({bio, age, categoryList, userId, firstNa
             if(primaryCategory && isPrimaryCategory.length !== 1){
                 return reject({status: 400, error: "Primary skill must be only one and should be included in the category list!"})
             }
+            categoryList = categoryList.map((elem) => ({...elem, id: new mongoose.Types.ObjectId(elem.id)}))
             userId = new mongoose.Types.ObjectId(userId);
             User.updateOne({
                 _id: userId
@@ -189,7 +190,8 @@ export const getUserDetailsService = ({id}: {id: mongoose.Types.ObjectId}) => {
                     }
                 }
             ]).then((response) => {
-                resolve({data: response})
+                response[0].primaryCategory = response[0].primaryCategory[0] ?? null;
+                resolve({data: response[0]})
             }).catch((error) => {
                 reject({status: 502, error: new Error("Database error occured!")})
             })

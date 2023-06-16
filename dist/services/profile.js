@@ -62,6 +62,7 @@ const registerAsWorkerService = ({ bio, age, categoryList, userId, firstName, la
             if (primaryCategory && isPrimaryCategory.length !== 1) {
                 return reject({ status: 400, error: "Primary skill must be only one and should be included in the category list!" });
             }
+            categoryList = categoryList.map((elem) => (Object.assign(Object.assign({}, elem), { id: new mongoose_1.default.Types.ObjectId(elem.id) })));
             userId = new mongoose_1.default.Types.ObjectId(userId);
             userSchema_1.default.updateOne({
                 _id: userId
@@ -165,7 +166,9 @@ const getUserDetailsService = ({ id }) => {
                     }
                 }
             ]).then((response) => {
-                resolve({ data: response });
+                var _a;
+                response[0].primaryCategory = (_a = response[0].primaryCategory[0]) !== null && _a !== void 0 ? _a : null;
+                resolve({ data: response[0] });
             }).catch((error) => {
                 reject({ status: 502, error: new Error("Database error occured!") });
             });

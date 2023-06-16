@@ -15,7 +15,6 @@ app.use('/address', addressRouter);
 app.use('/banner', bannerRouter);
 app.use('/rating', ratingRouter);
 
-
 const apiRouter = app;
 
 export default apiRouter;
