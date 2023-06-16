@@ -18,7 +18,6 @@ interface AddAddressService {
 export const addAddressService = ({title, completeAddress, floor, landmark, place, subLocality, city, state, country, pin, location, userId}: AddAddressService) => {
     return new Promise((resolve, reject) => {
         try {
-
             Address.create({
                 userId: new mongoose.Types.ObjectId(userId),
                 title,

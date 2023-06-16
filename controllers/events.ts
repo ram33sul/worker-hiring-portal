@@ -17,3 +17,5 @@ export const CATEGORY_SEARCH = 'CATEGORY_SEARCH';
 export const ADD_ADDRESS = 'ADD_ADDRESS';
 export const GET_ALL_ADDRESSES = 'GET_ALL_ADDRESSES';
 export const GET_ADDRESS = 'GET_ADDRESS';
+export const ADD_RATING = 'ADD_RATING';
+export const GET_RATINGS = 'GET_RATINGS';

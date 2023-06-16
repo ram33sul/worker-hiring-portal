@@ -144,7 +144,27 @@ const getUserDetailsService = ({ id }) => {
     return new Promise((resolve, reject) => {
         try {
             id = new mongoose_1.default.Types.ObjectId(id);
-            userSchema_1.default.findOne({ _id: id }).then((response) => {
+            userSchema_1.default.aggregate([
+                {
+                    $match: {
+                        _id: id
+                    }
+                }, {
+                    $lookup: {
+                        from: "worker",
+                        localField: "categoryList",
+                        foreignField: "_id",
+                        as: "categoryList"
+                    }
+                }, {
+                    $lookup: {
+                        from: "worker",
+                        localField: "primaryCategory",
+                        foreignField: "_id",
+                        as: "primaryCategory"
+                    }
+                }
+            ]).then((response) => {
                 resolve({ data: response });
             }).catch((error) => {
                 reject({ status: 502, error: new Error("Database error occured!") });

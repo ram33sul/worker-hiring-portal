@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
     status: { type: Boolean, default: true},
     email: { type: String, default: ''},
     isWorker: { type: Boolean, default: false},
+    isVerified: { type: Boolean, default: false},
     gender: { type: String, default: ''},
     profilePicture: { type: String, default: ''},
     bio: { type: String, default: ''},

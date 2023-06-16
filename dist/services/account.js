@@ -132,8 +132,11 @@ const verifyUserService = ({ token }) => {
                     const userData = yield userSchema_1.default.findOne({
                         _id: new mongoose_1.default.Types.ObjectId(data.userId)
                     });
+                    if (!userData) {
+                        return reject({ error: new Error("User doesn't exist!"), status: 404 });
+                    }
                     if (!(userData === null || userData === void 0 ? void 0 : userData.status)) {
-                        return reject({ error: new Error("User doesn't exist or user is blocked!"), status: 404 });
+                        return reject({ error: new Error("User is blocked!"), status: 403 });
                     }
                     resolve({ data: data.userId });
                 }

@@ -168,7 +168,27 @@ export const getUserDetailsService = ({id}: {id: mongoose.Types.ObjectId}) => {
     return new Promise((resolve, reject) => {
         try {
             id = new mongoose.Types.ObjectId(id);
-            User.findOne({_id: id}).then((response) => {
+            User.aggregate([
+                {
+                    $match: {
+                        _id: id
+                    }
+                },{
+                    $lookup: {
+                        from: "worker",
+                        localField: "categoryList",
+                        foreignField: "_id",
+                        as: "categoryList"
+                    }
+                },{
+                    $lookup: {
+                        from: "worker",
+                        localField: "primaryCategory",
+                        foreignField: "_id",
+                        as: "primaryCategory"
+                    }
+                }
+            ]).then((response) => {
                 resolve({data: response})
             }).catch((error) => {
                 reject({status: 502, error: new Error("Database error occured!")})
