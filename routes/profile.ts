@@ -2,14 +2,15 @@ import express from 'express';
 import { eventHandler } from '../controllers/account';
 import { EDIT_PROFILE, GET_USER_DETAILS, OPEN_TO_WORK_OFF, OPEN_TO_WORK_ON, REGISTER_AS_WORKER } from '../controllers/events';
 import { auth } from '../authentication/auth';
+import { fileUploadMulter } from '../services/multer';
 
 const router = express.Router();
 
 router.use(auth);
 
-router.put('/edit-profile', eventHandler(EDIT_PROFILE));
+router.put('/edit-user-profile', fileUploadMulter(), eventHandler(EDIT_PROFILE));
 
-router.put('/register-as-worker', eventHandler(REGISTER_AS_WORKER));
+router.put('/register-as-worker', fileUploadMulter(), eventHandler(REGISTER_AS_WORKER));
 
 router.patch('/open-to-work-on', eventHandler(OPEN_TO_WORK_ON));
 

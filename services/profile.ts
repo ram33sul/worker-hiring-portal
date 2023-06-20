@@ -3,13 +3,14 @@ import { validateAge, validateBio, validateEmail, validateGender, validateName }
 import { validateBoolean, validatePositiveNumber, validateString, validateStringArray } from "../validation/types"
 import User from "../model/userSchema";
 import { validate } from "../validation/general";
+import { uploadToCloudinary } from "./cloudinary";
 
 interface EditProfileService {
     firstName: string,
     lastName: string,
     gender: string,
     email: string,
-    profilePicture: string,
+    profilePicture: unknown,
     isWorker: boolean,
     userId: string | mongoose.Types.ObjectId;
 }
@@ -22,7 +23,7 @@ export const editProfileService = ({
     isWorker,
     userId
 }: EditProfileService) => {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         try {
             const errors = validate([
                 [ 'firstName', validateString, firstName ],
@@ -35,6 +36,15 @@ export const editProfileService = ({
             if(errors.length){
                 return reject({errors, status: 400, error: new Error("invalid inputs!")});
             }
+            let profilePicUrl = ''
+            if(profilePicture){
+                await uploadToCloudinary(`profilePictures/${userId}.png`).then((result: any) => {
+                    profilePicUrl = result.url;
+                }).catch((error) => {
+                    reject([{message: "Can't be uploaded to cloudinary!"}]);
+                    return;
+                });
+            }
             userId = new mongoose.Types.ObjectId(userId);
             User.updateOne({
                 _id: userId
@@ -43,7 +53,7 @@ export const editProfileService = ({
                     firstName: firstName,
                     lastName: lastName,
                     gender: gender,
-                    profilePicture: profilePicture,
+                    profilePicture: profilePicUrl,
                     isWorker: isWorker,
                     email: email
                 }
@@ -74,10 +84,11 @@ interface RegisterAsWorkerService {
     email: string,
     gender: string,
     openToWork: boolean,
-    primaryCategory: string
+    primaryCategory: string,
+    profilePicture: unknown
 }
-export const registerAsWorkerService = ({ bio, age, categoryList, userId, firstName, lastName, email, gender, openToWork, primaryCategory }: RegisterAsWorkerService) => {
-    return new Promise((resolve, reject) => {
+export const registerAsWorkerService = ({ bio, age, categoryList, userId, firstName, lastName, email, gender, openToWork, primaryCategory, profilePicture }: RegisterAsWorkerService) => {
+    return new Promise(async (resolve, reject) => {
         try {
             if(!(validateBio(bio) && validateAge(age) && validateName(firstName) && validateName(lastName) && validateEmail(email) && (gender === undefined || validateGender(gender)) && (openToWork === undefined || validateBoolean(openToWork)))){
                 return reject({status: 400, error: "invalid inputs!"});
@@ -88,6 +99,15 @@ export const registerAsWorkerService = ({ bio, age, categoryList, userId, firstN
             const isPrimaryCategory = categoryList.filter((elem) => elem.id === primaryCategory);
             if(primaryCategory && isPrimaryCategory.length !== 1){
                 return reject({status: 400, error: "Primary skill must be only one and should be included in the category list!"})
+            }
+            let profilePicUrl = ''
+            if(profilePicture){
+                await uploadToCloudinary(`profilePictures/${userId}.png`).then((result: any) => {
+                    profilePicUrl = result.url;
+                }).catch((error) => {
+                    reject([{message: "Can't be uploaded to cloudinary!"}]);
+                    return;
+                });
             }
             categoryList = categoryList.map((elem) => ({...elem, id: new mongoose.Types.ObjectId(elem.id)}))
             userId = new mongoose.Types.ObjectId(userId);
@@ -104,7 +124,8 @@ export const registerAsWorkerService = ({ bio, age, categoryList, userId, firstN
                     gender,
                     openToWork,
                     isWorker: true,
-                    primaryCategory: new mongoose.Types.ObjectId(primaryCategory)
+                    primaryCategory: new mongoose.Types.ObjectId(primaryCategory),
+                    profilePicture: profilePicUrl
                 }
             }).then(() => {
                 return User.findOne({_id: userId})
@@ -130,9 +151,7 @@ export const openToWorkOnService = ({userId}: {userId: mongoose.Types.ObjectId})
                     openToWork: true
                 }
             }).then(() => {
-                return User.findOne({_id: userId})
-            }).then((response) => {
-                resolve({data: response})
+                resolve({data: 'done'})
             }).catch((error) => {
                 reject({status: 502, error: new Error("Database error occured!")})
             })
@@ -153,9 +172,7 @@ export const openToWorkOffService = ({userId}: {userId: mongoose.Types.ObjectId}
                     openToWork: false
                 }
             }).then(() => {
-                return User.findOne({_id: userId})
-            }).then((response) => {
-                resolve({data: response})
+                resolve({data: 'done'})
             }).catch((error) => {
                 reject({status: 502, error: new Error("Database error occured!")})
             })
@@ -179,10 +196,17 @@ export const getUserDetailsService = ({id}: {id: mongoose.Types.ObjectId}) => {
                         from: "workers",
                         localField: "categoryList.id",
                         foreignField: "_id",
-                        as: "categoryList"
+                        as: "categoryListDetails"
                     }
                 }
             ]).then((response) => {
+                for(let i = 0; i < response[0].categoryList.length; i++){
+                    for(let j = 0; i < response[0].categoryListDetails.length; i++){
+                        if(JSON.stringify(response[0].categoryList[i].id) === JSON.stringify(response[0].categoryListDetails[j]._id)){
+                            response[0].categoryList[i] = { ...response[0].categoryList[i], ...response[0].categoryListDetails[j]};
+                        }
+                    }
+                }
                 resolve({data: response[0]})
             }).catch((error) => {
                 reject({status: 502, error: new Error("Database error occured!")})
