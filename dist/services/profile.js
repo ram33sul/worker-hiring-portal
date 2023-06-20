@@ -155,19 +155,22 @@ const getUserDetailsService = ({ id }) => {
                         from: "worker",
                         localField: "categoryList",
                         foreignField: "_id",
-                        as: "categoryList"
+                        as: "categoryListLookup"
                     }
                 }, {
                     $lookup: {
                         from: "worker",
                         localField: "primaryCategory",
                         foreignField: "_id",
-                        as: "primaryCategory"
+                        as: "primaryCategoryLookup"
                     }
                 }
             ]).then((response) => {
                 var _a;
-                response[0].primaryCategory = (_a = response[0].primaryCategory[0]) !== null && _a !== void 0 ? _a : null;
+                response[0].primaryCategory = (_a = response[0].primaryCategoryLookup[0]) !== null && _a !== void 0 ? _a : null;
+                response[0].categoryList = response[0].categoryListLookup;
+                delete response[0].primaryCategoryLookup;
+                delete response[0].categoryListLookup;
                 resolve({ data: response[0] });
             }).catch((error) => {
                 reject({ status: 502, error: new Error("Database error occured!") });

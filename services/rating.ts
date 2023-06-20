@@ -3,17 +3,17 @@ import Rating from "../model/ratingSchema";
 
 interface AddRatingService {
     userId: string | mongoose.Types.ObjectId;
-    id: string | mongoose.Types.ObjectId;
+    ratedUserId: string | mongoose.Types.ObjectId;
     rating: number;
     review: string;
     isWorker: boolean;
 }
-export const AddRatingService = ({ userId, id, rating, review, isWorker }: AddRatingService) => {
+export const AddRatingService = ({ userId, ratedUserId, rating, review, isWorker }: AddRatingService) => {
     return new Promise((resolve, reject) => {
         try {
             Rating.create({
                 userId: new mongoose.Types.ObjectId(userId),
-                ratedUserId: new mongoose.Types.ObjectId(id),
+                ratedUserId: new mongoose.Types.ObjectId(ratedUserId),
                 rating: rating,
                 review: review,
                 isWorker: isWorker
@@ -29,15 +29,15 @@ export const AddRatingService = ({ userId, id, rating, review, isWorker }: AddRa
 }
 
 interface GetRatingsService {
-    id: string;
+    ratedUserId: string;
     page: number;
     pageSize: number;
 }
-export const getRatingsService = ({ id, page, pageSize }: GetRatingsService) => {
+export const getRatingsService = ({ ratedUserId, page, pageSize }: GetRatingsService) => {
     return new Promise((resolve, reject) => {
         try {
             Rating.find({
-                ratedUserId: new mongoose.Types.ObjectId(id)
+                ratedUserId: new mongoose.Types.ObjectId(ratedUserId)
             }).skip(page * pageSize).limit(pageSize).then((response) => {
                 resolve({data: response})
             }).catch((error) => {

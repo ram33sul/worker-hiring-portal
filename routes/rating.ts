@@ -7,9 +7,9 @@ const router = express.Router();
 
 router.use(auth);
 
-router.post('add-rating', eventHandler(ADD_RATING));
+router.post('/add-rating', eventHandler(ADD_RATING));
 
-router.get('get-ratings', eventHandler(GET_RATINGS));
+router.get('/get-ratings', eventHandler(GET_RATINGS));
 
 const ratingRouter = router;
 

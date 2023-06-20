@@ -47,10 +47,10 @@ export const addWorkerCategoryService = ({title, dailyMinWage, hourlyMinWage, sk
     })
 }
 
-export const getWorkerCategoriesService = () => {
+export const getWorkerCategoriesService = ({page, pageSize}: {page: number, pageSize: number}) => {
     return new Promise((resolve, reject) => {
         try {
-            Worker.find().then((response) => {
+            Worker.find().skip(page * pageSize).limit(pageSize).then((response) => {
                 resolve({data: response});
             }).catch((error) => {
                 reject({status: 502, error: "Database error occured!"})
@@ -75,7 +75,7 @@ export const getSuggestedCategoriesService = () => {
     })
 }
 
-export const getCategorySearchService = ({key}: {key: string}) => {
+export const getCategorySearchService = ({key, page, pageSize}: {key: string, page: number, pageSize: number}) => {
     return new Promise((resolve, reject) => {
         try {
             Worker.find({
@@ -90,7 +90,7 @@ export const getCategorySearchService = ({key}: {key: string}) => {
                         }
                     }
                 ]
-            }).then((response) => {
+            }).skip(page * pageSize).limit(pageSize).then((response) => {
                 resolve({data: response})
             }).catch((error) => {
                 reject({status: 502, error: "Database error occured!"})

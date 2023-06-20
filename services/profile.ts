@@ -176,21 +176,13 @@ export const getUserDetailsService = ({id}: {id: mongoose.Types.ObjectId}) => {
                     }
                 },{
                     $lookup: {
-                        from: "worker",
-                        localField: "categoryList",
+                        from: "workers",
+                        localField: "categoryList.id",
                         foreignField: "_id",
                         as: "categoryList"
                     }
-                },{
-                    $lookup: {
-                        from: "worker",
-                        localField: "primaryCategory",
-                        foreignField: "_id",
-                        as: "primaryCategory"
-                    }
                 }
             ]).then((response) => {
-                response[0].primaryCategory = response[0].primaryCategory[0] ?? null;
                 resolve({data: response[0]})
             }).catch((error) => {
                 reject({status: 502, error: new Error("Database error occured!")})
@@ -200,3 +192,4 @@ export const getUserDetailsService = ({id}: {id: mongoose.Types.ObjectId}) => {
         }
     })
 }
+

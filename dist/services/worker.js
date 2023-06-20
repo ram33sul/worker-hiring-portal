@@ -46,10 +46,10 @@ const addWorkerCategoryService = ({ title, dailyMinWage, hourlyMinWage, skill })
     });
 };
 exports.addWorkerCategoryService = addWorkerCategoryService;
-const getWorkerCategoriesService = () => {
+const getWorkerCategoriesService = ({ page, pageSize }) => {
     return new Promise((resolve, reject) => {
         try {
-            workerCategorySchema_1.default.find().then((response) => {
+            workerCategorySchema_1.default.find().skip(page * pageSize).limit(pageSize).then((response) => {
                 resolve({ data: response });
             }).catch((error) => {
                 reject({ status: 502, error: "Database error occured!" });
@@ -76,7 +76,7 @@ const getSuggestedCategoriesService = () => {
     });
 };
 exports.getSuggestedCategoriesService = getSuggestedCategoriesService;
-const getCategorySearchService = ({ key }) => {
+const getCategorySearchService = ({ key, page, pageSize }) => {
     return new Promise((resolve, reject) => {
         try {
             workerCategorySchema_1.default.find({
@@ -91,7 +91,7 @@ const getCategorySearchService = ({ key }) => {
                         }
                     }
                 ]
-            }).then((response) => {
+            }).skip(page * pageSize).limit(pageSize).then((response) => {
                 resolve({ data: response });
             }).catch((error) => {
                 reject({ status: 502, error: "Database error occured!" });
