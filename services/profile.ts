@@ -10,9 +10,9 @@ interface EditProfileServiceData {
     lastName: string,
     gender: string,
     email: string,
-    profilePicture: unknown,
     isWorker: boolean,
-    userId: string | mongoose.Types.ObjectId;
+    userId: string | mongoose.Types.ObjectId,
+    age: number
 }
 
 interface EditProfileService {
@@ -27,16 +27,16 @@ export const editProfileService = ({
     file
 }: EditProfileService) => {
     return new Promise(async (resolve, reject) => {
-        let { firstName, lastName, gender, email, isWorker } = JSON.parse(data);
+        let { firstName, lastName, gender, email, isWorker, age }: EditProfileServiceData = JSON.parse(data);
         const profilePicture = file;
         try {
             const errors = validate([
                 [ 'firstName', validateString, firstName ],
                 [ 'lastname', validateString, lastName ],
                 [ 'gender', validateGender, gender ],
-                [ 'profilePicture', validateString, profilePicture ],
                 [ 'isWorker', validateBoolean, isWorker ],
-                [ 'email', validateEmail, email]
+                [ 'email', validateEmail, email],
+                [ 'age', validateAge, age]
             ]);
             if(errors.length){
                 return reject({errors, status: 400, error: new Error("invalid inputs!")});
