@@ -16,7 +16,7 @@ interface EditProfileServiceData {
 }
 
 interface EditProfileService {
-    data: EditProfileServiceData;
+    data: string;
     file: unknown;
     userId: string | mongoose.Types.ObjectId;
 }
@@ -27,7 +27,7 @@ export const editProfileService = ({
     file
 }: EditProfileService) => {
     return new Promise(async (resolve, reject) => {
-        let { firstName, lastName, gender, email, isWorker } = data;
+        let { firstName, lastName, gender, email, isWorker } = JSON.parse(data);
         const profilePicture = file;
         try {
             const errors = validate([
@@ -58,9 +58,11 @@ export const editProfileService = ({
                     firstName: firstName,
                     lastName: lastName,
                     gender: gender,
-                    profilePicture: profilePicUrl,
                     isWorker: isWorker,
-                    email: email
+                    email: email,
+                    ...(profilePicUrl && {
+                        profilePicture: profilePicUrl
+                    })
                 }
             }).then(() => {
                 return User.findOne({_id: userId})
@@ -93,7 +95,7 @@ interface RegisterAsWorkerServiceData {
 }
 
 interface RegisterAsWorkerService {
-    data: RegisterAsWorkerServiceData,
+    data: string,
     file: unknown,
     userId: string | mongoose.Types.ObjectId
 }
@@ -101,7 +103,7 @@ interface RegisterAsWorkerService {
 export const registerAsWorkerService = ({ data, file, userId }: RegisterAsWorkerService) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let { bio, age, categoryList, firstName, lastName, email, gender, openToWork, primaryCategory } = data;
+            let { bio, age, categoryList, firstName, lastName, email, gender, openToWork, primaryCategory } = JSON.parse(data);
             const profilePicture = file;
             if(!(validateBio(bio) && validateAge(age) && validateName(firstName) && validateName(lastName) && validateEmail(email) && (gender === undefined || validateGender(gender)) && (openToWork === undefined || validateBoolean(openToWork)))){
                 return reject({status: 400, error: "invalid inputs!"});
