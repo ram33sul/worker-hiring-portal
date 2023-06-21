@@ -5,7 +5,7 @@ import User from "../model/userSchema";
 import { validate } from "../validation/general";
 import { uploadToCloudinary } from "./cloudinary";
 
-interface EditProfileService {
+interface EditProfileServiceData {
     firstName: string,
     lastName: string,
     gender: string,
@@ -14,16 +14,21 @@ interface EditProfileService {
     isWorker: boolean,
     userId: string | mongoose.Types.ObjectId;
 }
+
+interface EditProfileService {
+    data: EditProfileServiceData;
+    file: unknown;
+    userId: string | mongoose.Types.ObjectId;
+}
+
 export const editProfileService = ({
-    firstName,
-    lastName,
-    gender,
-    email,
-    profilePicture,
-    isWorker,
-    userId
+    userId,
+    data,
+    file
 }: EditProfileService) => {
     return new Promise(async (resolve, reject) => {
+        let { firstName, lastName, gender, email, isWorker } = data;
+        const profilePicture = file;
         try {
             const errors = validate([
                 [ 'firstName', validateString, firstName ],
@@ -78,7 +83,6 @@ interface RegisterAsWorkerServiceData {
         hourlyWage: number,
         dailyWage: number
     }[],
-    userId: mongoose.Types.ObjectId,
     firstName: string,
     lastName: string,
     email: string,
@@ -90,13 +94,15 @@ interface RegisterAsWorkerServiceData {
 
 interface RegisterAsWorkerService {
     data: RegisterAsWorkerServiceData,
-    profilePicture: unknown
+    file: unknown,
+    userId: string | mongoose.Types.ObjectId
 }
 
-export const registerAsWorkerService = ({ data, profilePicture }: RegisterAsWorkerService) => {
+export const registerAsWorkerService = ({ data, file, userId }: RegisterAsWorkerService) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let { bio, age, categoryList, userId, firstName, lastName, email, gender, openToWork, primaryCategory } = data
+            let { bio, age, categoryList, firstName, lastName, email, gender, openToWork, primaryCategory } = data;
+            const profilePicture = file;
             if(!(validateBio(bio) && validateAge(age) && validateName(firstName) && validateName(lastName) && validateEmail(email) && (gender === undefined || validateGender(gender)) && (openToWork === undefined || validateBoolean(openToWork)))){
                 return reject({status: 400, error: "invalid inputs!"});
             }
@@ -112,7 +118,7 @@ export const registerAsWorkerService = ({ data, profilePicture }: RegisterAsWork
                 await uploadToCloudinary(`profilePictures/${userId}.png`).then((result: any) => {
                     profilePicUrl = result.url;
                 }).catch((error) => {
-                    reject([{message: "Can't be uploaded to cloudinary!"}]);
+                    reject([{error: "Can't be uploaded to cloudinary!", status: 400}]);
                     return;
                 });
             }
@@ -132,7 +138,9 @@ export const registerAsWorkerService = ({ data, profilePicture }: RegisterAsWork
                     openToWork,
                     isWorker: true,
                     primaryCategory: new mongoose.Types.ObjectId(primaryCategory),
-                    profilePicture: profilePicUrl
+                    ...(profilePicUrl && {
+                        profilePicture: profilePicUrl
+                    })
                 }
             }).then(() => {
                 return User.findOne({_id: userId})
@@ -215,6 +223,53 @@ export const getUserDetailsService = ({id}: {id: mongoose.Types.ObjectId}) => {
                     }
                 }
                 resolve({data: response[0]})
+            }).catch((error) => {
+                reject({status: 502, error: new Error("Database error occured!")})
+            })
+        } catch (error) {
+            reject({status: 500, error: new Error("Internal error occured!")})
+        }
+    })
+}
+
+interface AddSampleWorkServiceData {
+    title: string,
+    description: string
+}
+
+interface AddSampleWorkService {
+    data: AddSampleWorkServiceData,
+    userId: string,
+    file: unknown
+}
+export const addSampleWorkService = ({data, userId, file}:  AddSampleWorkService) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let imageUrl = ''
+            const image = file;
+            if(image){
+                await uploadToCloudinary(`sampleWorks/${userId}.png`).then((result: any) => {
+                    imageUrl = result.url;
+                }).catch((error) => {
+                    reject([{error: "Can't be uploaded to cloudinary!", status: 400}]);
+                    return;
+                });
+            }
+            User.updateOne({
+                _id: userId
+            },{
+                $push: {
+                    sampleWorks : (
+                        imageUrl ? {
+                            ...data,
+                            imageUrl
+                        } : {
+                            ...data
+                        }
+                    )
+                }
+            }).then(() => {
+                resolve({data: 'done'})
             }).catch((error) => {
                 reject({status: 502, error: new Error("Database error occured!")})
             })

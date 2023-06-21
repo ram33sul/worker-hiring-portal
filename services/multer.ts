@@ -12,10 +12,10 @@ export const fileUploadMulter = () => {
             }
         }),
         fileFilter: function(req: any, file, cb) {
-            if (file.mimetype !== 'image/png' && file.mimetype !== 'image/jpeg') {
-              req.fileValidationError = 'Only PNG and JPEG files are allowed';
-              return cb(null, false);
-            }
+            // if (file.mimetype !== 'image/png' && file.mimetype !== 'image/jpeg') {
+            //   req.fileValidationError = 'Only PNG and JPEG files are allowed';
+            //   return cb(null, false);
+            // }
             cb(null, true);
         }
     }).single('profilePicture')

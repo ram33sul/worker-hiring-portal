@@ -1,18 +1,19 @@
 import { authenticateService, refreshTokenService, sendSmsOtpService, verifySmsOtpService, verifyUserService } from "../services/account"
 import { Request, Response } from "express";
-import { ADD_ADDRESS, ADD_BANNER, ADD_RATING, ADD_WORKER_CATEGORY, AUTHENTICATE, CATEGORY_SEARCH, EDIT_PROFILE, GET_ADDRESS, GET_ALL_ADDRESSES, GET_BANNERS, GET_RATINGS, GET_SUGGESTED_CATEGORIES, GET_USER_DETAILS, GET_WORKER_CATEGORIES, OPEN_TO_WORK_OFF, OPEN_TO_WORK_ON, REFRESH_TOKEN, REGISTER_AS_WORKER, SEND_SMS_OTP, VERIFY_SMS_OTP, VERIFY_USER } from "./events";
+import { ADD_ADDRESS, ADD_BANNER, ADD_RATING, ADD_TO_FAVOURITES, ADD_WORKER_CATEGORY, AUTHENTICATE, CATEGORY_SEARCH, EDIT_PROFILE, GET_ADDRESS, GET_ALL_ADDRESSES, GET_BANNERS, GET_FAVOURITES, GET_RATINGS, GET_SUGGESTED_CATEGORIES, GET_USER_DETAILS, GET_WORKER_CATEGORIES, OPEN_TO_WORK_OFF, OPEN_TO_WORK_ON, REFRESH_TOKEN, REGISTER_AS_WORKER, SEND_SMS_OTP, VERIFY_SMS_OTP, VERIFY_USER } from "./events";
 import { editProfileService, getUserDetailsService, openToWorkOffService, openToWorkOnService, registerAsWorkerService } from "../services/profile";
 import { addWorkerCategoryService, getCategorySearchService, getSuggestedCategoriesService, getWorkerCategoriesService } from "../services/worker";
 import { addBannerService, getBannersService } from "../services/banner";
 import { addAddressService, getAddressService, getAllAddressesService } from "../services/address";
 import { AddRatingService, getRatingsService } from "../services/rating";
+import { addToFavouritesService, getFavouritesService } from "../services/favourites";
 
 export const eventHandler = (action: string) => {
     return (req: any, res: Response) => {
         try {
             const event = events(action);
             req.headers.token = req.headers.authorization;
-            event({...req.body, ...req.query, ...req.headers, userId: req.verifiedUserId}).then((response) => {
+            event({...req.body, ...req.query, file: req.file, ...req.headers, userId: req.verifiedUserId}).then((response) => {
                 const { data, headers} = response as {data: unknown, headers: unknown};
                 res.header(headers);
                 res.send({
@@ -75,6 +76,10 @@ export const events = (action: string) => {
             return AddRatingService;
         case GET_RATINGS:
             return getRatingsService;
+        case ADD_TO_FAVOURITES:
+            return addToFavouritesService;
+        case GET_FAVOURITES:
+            return getFavouritesService;
         default:
             return () => Promise.reject("Internal error occured!")
     }
