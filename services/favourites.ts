@@ -23,6 +23,22 @@ export const addToFavouritesService = ({addedUserId, userId}: {addedUserId: stri
     })
 }
 
+export const removeFavouritesService = ({removedUserId}: {removedUserId: string | mongoose.Types.ObjectId }) => {
+    return new Promise((resolve, reject) => {
+        try {
+            Favourites.deleteOne({
+                addedUserIdId: new mongoose.Types.ObjectId(removedUserId)
+            }).then((response) => {
+                resolve({data: 'done'})
+            }).catch((error) => {
+                reject({status: 500, error: "Database error occured!"})
+            })
+        } catch (error) {
+            reject({status: 500, error: "Interal error occured!"})
+        }
+    })
+}
+
 export const getFavouritesService = ({userId, page, pageSize}: {userId: string | mongoose.Types.ObjectId, page: number, pageSize: number}) => {
     return new Promise((resolve, reject) => {
         try {

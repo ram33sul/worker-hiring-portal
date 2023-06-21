@@ -8,12 +8,13 @@ const worker_1 = require("../services/worker");
 const banner_1 = require("../services/banner");
 const address_1 = require("../services/address");
 const rating_1 = require("../services/rating");
+const favourites_1 = require("../services/favourites");
 const eventHandler = (action) => {
     return (req, res) => {
         try {
             const event = (0, exports.events)(action);
             req.headers.token = req.headers.authorization;
-            event(Object.assign(Object.assign(Object.assign(Object.assign({}, req.body), req.query), req.headers), { userId: req.verifiedUserId })).then((response) => {
+            event(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, req.body), req.query), { file: req.file }), req.headers), { userId: req.verifiedUserId })).then((response) => {
                 const { data, headers } = response;
                 res.header(headers);
                 res.send({
@@ -77,6 +78,10 @@ const events = (action) => {
             return rating_1.AddRatingService;
         case events_1.GET_RATINGS:
             return rating_1.getRatingsService;
+        case events_1.ADD_TO_FAVOURITES:
+            return favourites_1.addToFavouritesService;
+        case events_1.GET_FAVOURITES:
+            return favourites_1.getFavouritesService;
         default:
             return () => Promise.reject("Internal error occured!");
     }

@@ -27,11 +27,11 @@ const AddRatingService = ({ userId, ratedUserId, rating, review, isWorker }) => 
     });
 };
 exports.AddRatingService = AddRatingService;
-const getRatingsService = ({ id, page, pageSize }) => {
+const getRatingsService = ({ ratedUserId, page, pageSize }) => {
     return new Promise((resolve, reject) => {
         try {
             ratingSchema_1.default.find({
-                ratedUserId: new mongoose_1.default.Types.ObjectId(id)
+                ratedUserId: new mongoose_1.default.Types.ObjectId(ratedUserId)
             }).skip(page * pageSize).limit(pageSize).then((response) => {
                 resolve({ data: response });
             }).catch((error) => {

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GET_RATINGS = exports.ADD_RATING = exports.GET_ADDRESS = exports.GET_ALL_ADDRESSES = exports.ADD_ADDRESS = exports.CATEGORY_SEARCH = exports.GET_SUGGESTED_CATEGORIES = exports.GET_BANNERS = exports.ADD_BANNER = exports.GET_USER_DETAILS = exports.ADD_WORKER_CATEGORY = exports.GET_WORKER_CATEGORIES = exports.AUTHENTICATE = exports.OPEN_TO_WORK_OFF = exports.OPEN_TO_WORK_ON = exports.REGISTER_AS_WORKER = exports.EDIT_PROFILE = exports.VERIFY_USER = exports.REFRESH_TOKEN = exports.VERIFY_SMS_OTP = exports.SEND_SMS_OTP = void 0;
+exports.GET_FAVOURITES = exports.ADD_TO_FAVOURITES = exports.GET_RATINGS = exports.ADD_RATING = exports.GET_ADDRESS = exports.GET_ALL_ADDRESSES = exports.ADD_ADDRESS = exports.CATEGORY_SEARCH = exports.GET_SUGGESTED_CATEGORIES = exports.GET_BANNERS = exports.ADD_BANNER = exports.GET_USER_DETAILS = exports.ADD_WORKER_CATEGORY = exports.GET_WORKER_CATEGORIES = exports.AUTHENTICATE = exports.OPEN_TO_WORK_OFF = exports.OPEN_TO_WORK_ON = exports.REGISTER_AS_WORKER = exports.EDIT_PROFILE = exports.VERIFY_USER = exports.REFRESH_TOKEN = exports.VERIFY_SMS_OTP = exports.SEND_SMS_OTP = void 0;
 exports.SEND_SMS_OTP = 'SEND_SMS_OTP';
 exports.VERIFY_SMS_OTP = 'VERIFY_SMS_OTP';
 exports.REFRESH_TOKEN = 'REFRESH_TOKEN';
@@ -22,3 +22,5 @@ exports.GET_ALL_ADDRESSES = 'GET_ALL_ADDRESSES';
 exports.GET_ADDRESS = 'GET_ADDRESS';
 exports.ADD_RATING = 'ADD_RATING';
 exports.GET_RATINGS = 'GET_RATINGS';
+exports.ADD_TO_FAVOURITES = 'ADD_TO_FAVOURITES';
+exports.GET_FAVOURITES = 'GET_FAVOURITES';
