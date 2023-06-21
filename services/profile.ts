@@ -208,7 +208,7 @@ export const getUserDetailsService = ({id}: {id: mongoose.Types.ObjectId}) => {
                 }
             ]).then((response) => {
                 for(let i = 0; i < response[0].categoryList.length; i++){
-                    for(let j = 0; i < response[0].categoryListDetails.length; i++){
+                    for(let j = 0; j < response[0].categoryListDetails.length; j++){
                         if(JSON.stringify(response[0].categoryList[i].id) === JSON.stringify(response[0].categoryListDetails[j]._id)){
                             response[0].categoryList[i] = { ...response[0].categoryList[i], ...response[0].categoryListDetails[j]};
                         }
