@@ -70,7 +70,7 @@ export const editProfileService = ({
     })
 }
 
-interface RegisterAsWorkerService {
+interface RegisterAsWorkerServiceData {
     bio: string, 
     age: number,
     categoryList: {
@@ -87,9 +87,16 @@ interface RegisterAsWorkerService {
     primaryCategory: string,
     profilePicture: unknown
 }
-export const registerAsWorkerService = ({ bio, age, categoryList, userId, firstName, lastName, email, gender, openToWork, primaryCategory, profilePicture }: RegisterAsWorkerService) => {
+
+interface RegisterAsWorkerService {
+    data: RegisterAsWorkerServiceData,
+    profilePicture: unknown
+}
+
+export const registerAsWorkerService = ({ data, profilePicture }: RegisterAsWorkerService) => {
     return new Promise(async (resolve, reject) => {
         try {
+            let { bio, age, categoryList, userId, firstName, lastName, email, gender, openToWork, primaryCategory } = data
             if(!(validateBio(bio) && validateAge(age) && validateName(firstName) && validateName(lastName) && validateEmail(email) && (gender === undefined || validateGender(gender)) && (openToWork === undefined || validateBoolean(openToWork)))){
                 return reject({status: 400, error: "invalid inputs!"});
             }
