@@ -199,14 +199,14 @@ export const openToWorkOffService = ({userId}: {userId: mongoose.Types.ObjectId}
     })
 }
 
-export const getUserDetailsService = ({id}: {id: mongoose.Types.ObjectId}) => {
+export const getUserDetailsService = ({id, userId, needSampleWork}: {id: string, userId: string, needSampleWork: boolean}) => {
     return new Promise((resolve, reject) => {
         try {
-            id = new mongoose.Types.ObjectId(id);
+            const _id = new mongoose.Types.ObjectId(id);
             User.aggregate([
                 {
                     $match: {
-                        _id: id
+                        _id: _id
                     }
                 },{
                     $lookup: {
@@ -223,6 +223,12 @@ export const getUserDetailsService = ({id}: {id: mongoose.Types.ObjectId}) => {
                             response[0].categoryList[i] = { ...response[0].categoryList[i], ...response[0].categoryListDetails[j]};
                         }
                     }
+                }
+                if(id !== userId){
+                    delete response[0].identityUrl;
+                }
+                if(!needSampleWork){
+                    delete response[0].sampleWorks;
                 }
                 resolve({data: response[0]})
             }).catch((error) => {
