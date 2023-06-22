@@ -19,6 +19,8 @@ const userSchema = new mongoose.Schema({
     hourlyWage: { type: Number, default: 0},
     primaryCategory: { type: mongoose.Types.ObjectId, default: null},
     openToWork: { type: Boolean, default: false},
+    selectedAddress: { type: mongoose.Types.ObjectId, default: null},
+    identityUrl: { type: String, default: ''}
 })
 
 const User = mongoose.model("user", userSchema);

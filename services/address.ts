@@ -1,5 +1,6 @@
 import mongoose from "mongoose"
 import Address from "../model/addressSchema"
+import User from "../model/userSchema"
 
 interface AddAddressService {
     title: string,
@@ -65,6 +66,35 @@ export const getAddressService = ({id}: {id: string}) => {
                 _id: new mongoose.Types.ObjectId(id),
             }).then((response) => {
                 resolve({data: response})
+            }).catch((error) => {
+                reject({status: 502, error: new Error("Database error occured!")})
+            })
+        } catch (error){
+            reject({status: 500, error: new Error("Internal error occured!")})
+        }
+    })
+}
+
+export const setSelectedAddressService = ({addressId, userId}: { addressId: string, userId: string }) => {
+    return new Promise((resolve, reject) => {
+        try {
+            Address.findOne({
+                _id: new mongoose.Types.ObjectId(addressId),
+            }).then((response) => {
+                if(!response){
+                    return reject({status: 404, error: "Address matching the addressId cannot be found!"})
+                }
+                User.updateOne({
+                    _id: new mongoose.Types.ObjectId(userId)
+                },{
+                    $set: {
+                        selectedAddress: new mongoose.Types.ObjectId(addressId)
+                    }
+                }).then((response) => {
+                    resolve({data: response})
+                }).catch((error) => {
+                    reject({status: 502, error: new Error("Database error occured!")})
+                })
             }).catch((error) => {
                 reject({status: 502, error: new Error("Database error occured!")})
             })

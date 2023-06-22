@@ -27,7 +27,7 @@ export const removeFavouritesService = ({removedUserId}: {removedUserId: string 
     return new Promise((resolve, reject) => {
         try {
             Favourites.deleteOne({
-                addedUserIdId: new mongoose.Types.ObjectId(removedUserId)
+                addedUserId: new mongoose.Types.ObjectId(removedUserId)
             }).then((response) => {
                 resolve({data: 'done'})
             }).catch((error) => {
