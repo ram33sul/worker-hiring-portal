@@ -84,11 +84,11 @@ export const getCategorySearchService = ({key, page, pageSize}: {key: string, pa
                         $or: [
                             {
                                 title: {
-                                    $regex: `/${key}/`
+                                    $regex: `${key}`
                                 }
                             },{
                                 skill: {
-                                    $regex: `/${key}/`
+                                    $regex: `${key}`
                                 }
                             }
                         ]
