@@ -1,6 +1,6 @@
 import multer from 'multer';
 
-export const fileUploadMulter = () => {
+export const fileUploadMulter = (imageName: string) => {
     return multer({
         storage: multer.diskStorage({
             destination: (req, file, cb) => {

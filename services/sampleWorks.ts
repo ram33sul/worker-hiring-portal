@@ -8,7 +8,7 @@ interface AddSampleWorkServiceData {
 }
 
 interface AddSampleWorkService {
-    data: AddSampleWorkServiceData,
+    data: string ,
     userId: string,
     file: unknown
 }
@@ -17,6 +17,7 @@ export const addSampleWorkService = ({data, userId, file}:  AddSampleWorkService
         try {
             let imageUrl = ''
             const image = file;
+            const { title, description }: AddSampleWorkServiceData = JSON.parse(data);
             if(image){
                 await uploadToCloudinary(`sampleWorks/${userId}.png`).then((result: any) => {
                     imageUrl = result.url;
@@ -26,7 +27,8 @@ export const addSampleWorkService = ({data, userId, file}:  AddSampleWorkService
                 });
             }
             SampleWorks.create({
-                ...data,
+                title,
+                description,
                 imageUrl,
                 userId: new mongoose.Types.ObjectId(userId),
                 timestamp: new Date()

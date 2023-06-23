@@ -8,9 +8,9 @@ const router = express.Router();
 
 router.use(auth);
 
-router.put('/edit-user-profile', fileUploadMulter(), eventHandler(EDIT_PROFILE));
+router.put('/edit-user-profile', fileUploadMulter('profilePicture'), eventHandler(EDIT_PROFILE));
 
-router.put('/register-as-worker', fileUploadMulter(), eventHandler(REGISTER_AS_WORKER));
+router.put('/register-as-worker', fileUploadMulter('profilePicture'), eventHandler(REGISTER_AS_WORKER));
 
 router.patch('/open-to-work-on', eventHandler(OPEN_TO_WORK_ON));
 
