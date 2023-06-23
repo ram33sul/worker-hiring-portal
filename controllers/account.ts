@@ -1,12 +1,13 @@
 import { authenticateService, refreshTokenService, sendSmsOtpService, verifySmsOtpService, verifyUserService } from "../services/account"
 import { Request, Response } from "express";
-import { ADD_ADDRESS, ADD_BANNER, ADD_RATING, ADD_TO_FAVOURITES, ADD_WORKER_CATEGORY, AUTHENTICATE, CATEGORY_SEARCH, EDIT_PROFILE, GET_ADDRESS, GET_ALL_ADDRESSES, GET_BANNERS, GET_FAVOURITES, GET_RATINGS, GET_SUGGESTED_CATEGORIES, GET_USER_DETAILS, GET_WORKER_CATEGORIES, OPEN_TO_WORK_OFF, OPEN_TO_WORK_ON, REFRESH_TOKEN, REGISTER_AS_WORKER, REMOVE_FROM_FAVOURITES, SEND_SMS_OTP, SET_SELECTED_ADDRESS, VERIFY_SMS_OTP, VERIFY_USER } from "./events";
+import { ADD_ADDRESS, ADD_BANNER, ADD_RATING, ADD_SAMPLE_WORK, ADD_TO_FAVOURITES, ADD_WORKER_CATEGORY, AUTHENTICATE, CATEGORY_SEARCH, DELETE_SAMPLE_WORK, EDIT_PROFILE, GET_ADDRESS, GET_ALL_ADDRESSES, GET_BANNERS, GET_FAVOURITES, GET_RATINGS, GET_SAMPLE_WORK, GET_SAMPLE_WORKS, GET_SUGGESTED_CATEGORIES, GET_USER_DETAILS, GET_WORKER_CATEGORIES, OPEN_TO_WORK_OFF, OPEN_TO_WORK_ON, REFRESH_TOKEN, REGISTER_AS_WORKER, REMOVE_FROM_FAVOURITES, SEND_SMS_OTP, SET_SELECTED_ADDRESS, VERIFY_SMS_OTP, VERIFY_USER } from "./events";
 import { editProfileService, getUserDetailsService, openToWorkOffService, openToWorkOnService, registerAsWorkerService } from "../services/profile";
 import { addWorkerCategoryService, getCategorySearchService, getSuggestedCategoriesService, getWorkerCategoriesService } from "../services/worker";
 import { addBannerService, getBannersService } from "../services/banner";
 import { addAddressService, getAddressService, getAllAddressesService, setSelectedAddressService } from "../services/address";
 import { AddRatingService, getRatingsService } from "../services/rating";
 import { addToFavouritesService, getFavouritesService, removeFavouritesService } from "../services/favourites";
+import { addSampleWorkService, deleteSampleWorkService, getSampleWorkService } from "../services/sampleWorks";
 
 export const eventHandler = (action: string) => {
     return (req: any, res: Response) => {
@@ -84,6 +85,14 @@ export const events = (action: string) => {
             return removeFavouritesService;
         case SET_SELECTED_ADDRESS:
             return setSelectedAddressService;
+        case ADD_SAMPLE_WORK:
+            return addSampleWorkService;
+        case GET_SAMPLE_WORKS:
+            return getSampleWorkService;
+        case GET_SAMPLE_WORK:
+            return getSampleWorkService;
+        case DELETE_SAMPLE_WORK:
+            return deleteSampleWorkService;
         default:
             return () => Promise.reject("Internal error occured!")
     }

@@ -3,9 +3,9 @@ import fs from 'fs';
 
 export const uploadToCloudinary = async (localFilePath: any) => {
     cloudinary.config({
-        cloud_name: "doazsqomm",
-        api_key: "711717321567629",
-        api_secret: "vhsVlza-eayvedmDMG6GOCL-qnk"      
+        cloud_name: process.env.CLOUDINARY_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET     
       });
     const mainFolderName = "main";
     const filePathOnCloudinary = mainFolderName + '/' + localFilePath;
@@ -20,5 +20,19 @@ export const uploadToCloudinary = async (localFilePath: any) => {
         return ({
             message: "Can't be uploaded to cloudinary!"
         })
+    })
+}
+
+export const deleteFromCloudinary = async (filePath: string) => {
+    cloudinary.config({
+        cloud_name: process.env.CLOUDINARY_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET      
+      });
+    return cloudinary.uploader.destroy(`main/${filePath}`)
+    .then((result) => {
+        return true;
+    }).catch((error) => {
+        return false;
     })
 }

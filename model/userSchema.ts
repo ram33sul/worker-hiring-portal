@@ -14,7 +14,6 @@ const userSchema = new mongoose.Schema({
     bio: { type: String, default: ''},
     age: { type: Number, default: 0},
     categoryList: { type: Array, default: []},
-    sampleWorks: { type: Array, default: []},
     dailyWage: { type: Number, default: 0},
     hourlyWage: { type: Number, default: 0},
     primaryCategory: { type: mongoose.Types.ObjectId, default: null},
