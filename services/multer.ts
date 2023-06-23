@@ -18,5 +18,5 @@ export const fileUploadMulter = (imageName: string) => {
             // }
             cb(null, true);
         }
-    }).single('profilePicture')
+    }).single(imageName)
 }
