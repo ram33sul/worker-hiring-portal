@@ -6,6 +6,7 @@ import addressRouter from './address';
 import bannerRouter from './banner';
 import ratingRouter from './rating';
 import favouritesRouter from './favourites';
+import sampleWorkRouter from './sampleWorks';
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use('/address', addressRouter);
 app.use('/banner', bannerRouter);
 app.use('/rating', ratingRouter);
 app.use('/favourites', favouritesRouter);
+app.use('/sample-work', sampleWorkRouter);
 
 const apiRouter = app;
 

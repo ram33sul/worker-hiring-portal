@@ -15,4 +15,6 @@ router.get('/get-sample-work', eventHandler(GET_SAMPLE_WORK));
 
 router.delete('/delete-sample-work', eventHandler(DELETE_SAMPLE_WORK));
 
-export default router;
+const sampleWorkRouter = router;
+
+export default sampleWorkRouter;
