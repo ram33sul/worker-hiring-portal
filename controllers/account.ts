@@ -29,11 +29,11 @@ export const eventHandler = (action: string) => {
                     return res.status(status).send({error, errors})
                 }
                 res.status(status).send({error})
-                console.log(`Error occured: ${action}`)
+                console.log(`Error occured: ${action} - ${error}`)
             })
         } catch (error) {
             res.status(500).send({error: new Error("Internal error occured!")})
-            console.log(`Internal error: ${action}`)
+            console.log(`Internal error: ${action} - ${error}`)
         }
     }
 }

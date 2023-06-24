@@ -83,7 +83,8 @@ export const deleteSampleWorkService = ({id, userId}: {id: string, userId: strin
     return new Promise((resolve, reject) => {
         try {
             SampleWorks.deleteOne({
-                _id: new mongoose.Types.ObjectId(id)
+                _id: new mongoose.Types.ObjectId(id),
+                userId
             }).then((response) => {
                 resolve({data: 'done'})
             }).catch((error) => {
