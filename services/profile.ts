@@ -93,15 +93,19 @@ interface RegisterAsWorkerServiceData {
 
 interface RegisterAsWorkerService {
     data: string,
-    file: unknown,
+    files: {
+        profilePicture: File,
+        identity: File
+    },
     userId: string | mongoose.Types.ObjectId
 }
 
-export const registerAsWorkerService = ({ data, file, userId }: RegisterAsWorkerService) => {
+export const registerAsWorkerService = ({ data, files, userId }: RegisterAsWorkerService) => {
     return new Promise(async (resolve, reject) => {
         try {
             let { bio, age, categoryList, firstName, lastName, email, gender, openToWork, primaryCategory } = JSON.parse(data);
-            const profilePicture = file;
+            const profilePicture = files.profilePicture;
+            const identity = files.identity;
             if(!(validateBio(bio) && validateAge(age) && validateName(firstName) && validateName(lastName) && validateEmail(email) && (gender === undefined || validateGender(gender)) && (openToWork === undefined || validateBoolean(openToWork)))){
                 return reject({status: 400, error: "invalid inputs!"});
             }
@@ -116,6 +120,15 @@ export const registerAsWorkerService = ({ data, file, userId }: RegisterAsWorker
             if(profilePicture){
                 await uploadToCloudinary(`profilePicture/${userId}.png`).then((result: any) => {
                     profilePicUrl = result.url;
+                }).catch((error) => {
+                    reject([{error: "Can't be uploaded to cloudinary!", status: 500}]);
+                    return;
+                });
+            }
+            let identityUrl = '';
+            if(identity){
+                await uploadToCloudinary(`identity/${userId}.png`).then((result: any) => {
+                    identityUrl = result.url;
                 }).catch((error) => {
                     reject([{error: "Can't be uploaded to cloudinary!", status: 500}]);
                     return;
@@ -139,6 +152,9 @@ export const registerAsWorkerService = ({ data, file, userId }: RegisterAsWorker
                     primaryCategory: new mongoose.Types.ObjectId(primaryCategory),
                     ...(profilePicUrl && {
                         profilePicture: profilePicUrl
+                    }),
+                    ...(identityUrl && {
+                        identityUrl: identityUrl
                     })
                 }
             }).then(() => {
