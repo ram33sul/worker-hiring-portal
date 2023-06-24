@@ -19,7 +19,7 @@ export const addSampleWorkService = ({data, userId, file}:  AddSampleWorkService
             const image = file;
             const { title, description }: AddSampleWorkServiceData = JSON.parse(data);
             if(image){
-                await uploadToCloudinary(`sampleWorks/${userId}.png`).then((result: any) => {
+                await uploadToCloudinary(`sampleWorkImage/${userId}.png`).then((result: any) => {
                     imageUrl = result.url;
                 }).catch((error) => {
                     reject([{error: "Can't be uploaded to cloudinary!", status: 400}]);
@@ -32,8 +32,10 @@ export const addSampleWorkService = ({data, userId, file}:  AddSampleWorkService
                 imageUrl,
                 userId: new mongoose.Types.ObjectId(userId),
                 timestamp: new Date()
-            }).then(() => {
-                resolve({data: 'done'})
+            }).then((response: any) => {
+                response = response.toObject();
+                response.timestamp = response.timestamp.getTime();
+                resolve({data: response})
             }).catch((error) => {
                 reject({status: 502, error: "Database error occured!"})
             })
