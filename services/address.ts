@@ -62,7 +62,7 @@ export const getAllAddressesService = ({userId}: {userId: string | mongoose.Type
 export const getAddressService = ({id}: {id: string}) => {
     return new Promise((resolve, reject) => {
         try {
-            Address.find({
+            Address.findOne({
                 _id: new mongoose.Types.ObjectId(id),
             }).then((response) => {
                 resolve({data: response})
