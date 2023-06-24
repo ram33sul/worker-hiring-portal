@@ -7,7 +7,7 @@ import { addBannerService, getBannersService } from "../services/banner";
 import { addAddressService, getAddressService, getAllAddressesService, setSelectedAddressService } from "../services/address";
 import { AddRatingService, getRatingsService } from "../services/rating";
 import { addToFavouritesService, getFavouritesService, removeFavouritesService } from "../services/favourites";
-import { addSampleWorkService, deleteSampleWorkService, getSampleWorkService } from "../services/sampleWorks";
+import { addSampleWorkService, deleteSampleWorkService, getSampleWorkService, getSampleWorksService } from "../services/sampleWorks";
 
 export const eventHandler = (action: string) => {
     return (req: any, res: Response) => {
@@ -93,7 +93,7 @@ export const events = (action: string) => {
         case ADD_SAMPLE_WORK:
             return addSampleWorkService;
         case GET_SAMPLE_WORKS:
-            return getSampleWorkService;
+            return getSampleWorksService;
         case GET_SAMPLE_WORK:
             return getSampleWorkService;
         case DELETE_SAMPLE_WORK:

@@ -50,7 +50,7 @@ export const getSampleWorksService = ({id, page, pageSize}: {id: string; page: n
         try {
             SampleWorks.find({
                 userId: new mongoose.Types.ObjectId(id)
-            }).skip(page * pageSize).limit(pageSize).then((response: any) => {
+            }).skip(page * pageSize).limit(pageSize).lean().then((response: any) => {
                 response = response?.map?.((res: any) => ({...res, timestamp: res?.timestamp?.getTime?.()}))
                 resolve({data: response})
             }).catch((error) => {
@@ -67,7 +67,7 @@ export const getSampleWorkService = ({id}: {id: string}) => {
         try {
             SampleWorks.findOne({
                 _id: new mongoose.Types.ObjectId(id)
-            }).then((response: any) => {
+            }).lean().then((response: any) => {
                 response.timestamp = response?.timestamp?.getTime?.();
                 resolve({data: response})
             }).catch((error) => {
