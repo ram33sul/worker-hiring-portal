@@ -81,6 +81,7 @@ export const setSelectedAddressService = ({addressId, userId}: { addressId: stri
             Address.findOne({
                 _id: new mongoose.Types.ObjectId(addressId),
             }).then((response) => {
+                const addressData = response;
                 if(!response){
                     return reject({status: 404, error: "Address matching the addressId cannot be found!"})
                 }
@@ -91,7 +92,7 @@ export const setSelectedAddressService = ({addressId, userId}: { addressId: stri
                         selectedAddress: new mongoose.Types.ObjectId(addressId)
                     }
                 }).then((response) => {
-                    resolve({data: response})
+                    resolve({data: addressData})
                 }).catch((error) => {
                     reject({status: 502, error: new Error("Database error occured!")})
                 })
