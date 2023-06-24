@@ -196,7 +196,7 @@ export const openToWorkOffService = ({userId}: {userId: mongoose.Types.ObjectId}
     })
 }
 
-export const getUserDetailsService = ({id, userId, needSampleWork}: {id: string, userId: string, needSampleWork: boolean}) => {
+export const getUserDetailsService = ({id, userId }: {id: string, userId: string}) => {
     return new Promise((resolve, reject) => {
         try {
             const _id = new mongoose.Types.ObjectId(id);
@@ -223,9 +223,6 @@ export const getUserDetailsService = ({id, userId, needSampleWork}: {id: string,
                 }
                 if(id !== userId){
                     delete response[0].identityUrl;
-                }
-                if(!needSampleWork){
-                    delete response[0].sampleWorks;
                 }
                 resolve({data: response[0]})
             }).catch((error) => {
