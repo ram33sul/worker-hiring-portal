@@ -12,6 +12,7 @@ import { addSampleWorkService, deleteSampleWorkService, getSampleWorkService } f
 export const eventHandler = (action: string) => {
     return (req: any, res: Response) => {
         try {
+            console.log(`Requested service: ${action}`)
             const event = events(action);
             req.headers.token = req.headers.authorization;
             event({...req.body, ...req.query, file: req.file, ...req.headers, userId: req.verifiedUserId}).then((response) => {
@@ -21,14 +22,18 @@ export const eventHandler = (action: string) => {
                     status: true,
                     data
                 })
+                console.log(`Response sent: ${action}`)
             }).catch(({error, status, errors}) => {
+                status ??= 500;
                 if(errors){
                     return res.status(status).send({error, errors})
                 }
                 res.status(status).send({error})
+                console.log(`Error occured: ${action}`)
             })
         } catch (error) {
             res.status(500).send({error: new Error("Internal error occured!")})
+            console.log(`Internal error: ${action}`)
         }
     }
 }

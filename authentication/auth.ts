@@ -11,5 +11,6 @@ export const auth = (req: any, res: Response, next: NextFunction) => {
             status: false,
             error
         })
+        console.log("Authentication failed!")
     })
 }

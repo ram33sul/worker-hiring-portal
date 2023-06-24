@@ -4,7 +4,7 @@ export const fileUploadMulter = (imageName: string) => {
     return multer({
         storage: multer.diskStorage({
             destination: (req, file, cb) => {
-                cb(null, 'profilePictures/');
+                cb(null, `${imageName}/`);
             },
             filename: (req: any, file, cb) => {
                 const fileName = `${req.verifiedUserId}.png`;
