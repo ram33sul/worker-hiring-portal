@@ -10,7 +10,6 @@ interface EditProfileServiceData {
     lastName: string,
     gender: string,
     email: string,
-    isWorker: boolean,
     userId: string | mongoose.Types.ObjectId,
     age: number
 }
@@ -27,26 +26,25 @@ export const editProfileService = ({
     file
 }: EditProfileService) => {
     return new Promise(async (resolve, reject) => {
-        let { firstName, lastName, gender, email, isWorker, age }: EditProfileServiceData = JSON.parse(data);
+        let { firstName, lastName, gender, email, age }: EditProfileServiceData = JSON.parse(data);
         const profilePicture = file;
         try {
             const errors = validate([
                 [ 'firstName', validateString, firstName ],
                 [ 'lastname', validateString, lastName ],
                 [ 'gender', validateGender, gender ],
-                [ 'isWorker', validateBoolean, isWorker ],
                 [ 'email', validateEmail, email],
                 [ 'age', validateAge, age]
             ]);
             if(errors.length){
-                return reject({errors, status: 400, error: new Error("invalid inputs!")});
+                return reject({errors, status: 400, error: "invalid inputs!"});
             }
             let profilePicUrl = ''
             if(profilePicture){
                 await uploadToCloudinary(`profilePicture/${userId}.png`).then((result: any) => {
                     profilePicUrl = result.url;
                 }).catch((error) => {
-                    reject([{message: "Can't be uploaded to cloudinary!"}]);
+                    reject([{error: "Can't be uploaded to cloudinary!", status: 500}]);
                     return;
                 });
             }
@@ -58,7 +56,6 @@ export const editProfileService = ({
                     firstName: firstName,
                     lastName: lastName,
                     gender: gender,
-                    isWorker: isWorker,
                     email: email,
                     ...(profilePicUrl && {
                         profilePicture: profilePicUrl
@@ -120,7 +117,7 @@ export const registerAsWorkerService = ({ data, file, userId }: RegisterAsWorker
                 await uploadToCloudinary(`profilePicture/${userId}.png`).then((result: any) => {
                     profilePicUrl = result.url;
                 }).catch((error) => {
-                    reject([{error: "Can't be uploaded to cloudinary!", status: 400}]);
+                    reject([{error: "Can't be uploaded to cloudinary!", status: 500}]);
                     return;
                 });
             }
