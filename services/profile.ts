@@ -43,7 +43,7 @@ export const editProfileService = ({
             }
             let profilePicUrl = ''
             if(profilePicture){
-                await uploadToCloudinary(`profilePictures/${userId}.png`).then((result: any) => {
+                await uploadToCloudinary(`profilePicture/${userId}.png`).then((result: any) => {
                     profilePicUrl = result.url;
                 }).catch((error) => {
                     reject([{message: "Can't be uploaded to cloudinary!"}]);
@@ -117,7 +117,7 @@ export const registerAsWorkerService = ({ data, file, userId }: RegisterAsWorker
             }
             let profilePicUrl = ''
             if(profilePicture){
-                await uploadToCloudinary(`profilePictures/${userId}.png`).then((result: any) => {
+                await uploadToCloudinary(`profilePicture/${userId}.png`).then((result: any) => {
                     profilePicUrl = result.url;
                 }).catch((error) => {
                     reject([{error: "Can't be uploaded to cloudinary!", status: 400}]);
