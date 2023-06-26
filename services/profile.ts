@@ -94,8 +94,8 @@ interface RegisterAsWorkerServiceData {
 interface RegisterAsWorkerService {
     data: string,
     files: {
-        profilePicture: File,
-        identity: File
+        profilePicture: File[],
+        identity: File[]
     },
     userId: string | mongoose.Types.ObjectId
 }
@@ -104,8 +104,8 @@ export const registerAsWorkerService = ({ data, files, userId }: RegisterAsWorke
     return new Promise(async (resolve, reject) => {
         try {
             let { bio, age, categoryList, firstName, lastName, email, gender, openToWork, primaryCategory } = JSON.parse(data);
-            const profilePicture = files.profilePicture;
-            const identity = files.identity;
+            const profilePicture = files.profilePicture[0];
+            const identity = files.identity[0];
             if(!(validateBio(bio) && validateAge(age) && validateName(firstName) && validateName(lastName) && validateEmail(email) && (gender === undefined || validateGender(gender)) && (openToWork === undefined || validateBoolean(openToWork)))){
                 return reject({status: 400, error: "invalid inputs!"});
             }

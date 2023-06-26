@@ -15,7 +15,7 @@ export const eventHandler = (action: string) => {
             console.log(`Requested service: ${action}`)
             const event = events(action);
             req.headers.token = req.headers.authorization;
-            event({...req.body, ...req.query, file: req.file, ...req.headers, userId: req.verifiedUserId}).then((response) => {
+            event({...req.body, ...req.query, file: req.file, files: req.files, ...req.headers, userId: req.verifiedUserId}).then((response) => {
                 const { data, headers} = response as {data: unknown, headers: unknown};
                 res.header(headers);
                 res.send({
