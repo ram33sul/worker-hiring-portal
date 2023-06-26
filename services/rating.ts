@@ -16,7 +16,8 @@ export const AddRatingService = ({ userId, ratedUserId, rating, review, isWorker
                 ratedUserId: new mongoose.Types.ObjectId(ratedUserId),
                 rating: rating,
                 review: review,
-                isWorker: isWorker
+                isWorker: isWorker,
+                timestamp: new Date()
             }).then((response) => {
                 resolve({data: response})
             }).catch((error) => {
@@ -36,10 +37,22 @@ interface GetRatingsService {
 export const getRatingsService = ({ ratedUserId, page, pageSize }: GetRatingsService) => {
     return new Promise((resolve, reject) => {
         try {
-            Rating.find({
-                ratedUserId: new mongoose.Types.ObjectId(ratedUserId)
-            }).skip(page * pageSize).limit(pageSize).then((response) => {
-                resolve({data: response})
+            Rating.aggregate([
+                {
+                    $match: {
+                        ratedUserId: new mongoose.Types.ObjectId(ratedUserId)
+                    }
+                },{
+                    $lookup: {
+                        from: "user",
+                        localField: "userId",
+                        foreignField: "_id",
+                        as: "userDetails"
+                    }
+                }
+            ]).skip(page * pageSize).limit(pageSize).then((response) => {
+                response[0].userDetails = response[0].userDetails[0];
+                resolve({data: response[0]})
             }).catch((error) => {
                 reject({status: 502, error: "Database error occured!"})
             })
