@@ -57,6 +57,7 @@ export const editProfileService = ({
                     lastName: lastName,
                     gender: gender,
                     email: email,
+                    age: age,
                     ...(profilePicUrl && {
                         profilePicture: profilePicUrl
                     })

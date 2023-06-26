@@ -47,7 +47,7 @@ const editProfileService = ({ userId, data, file }) => {
             userSchema_1.default.updateOne({
                 _id: userId
             }, {
-                $set: Object.assign({ firstName: firstName, lastName: lastName, gender: gender, email: email }, (profilePicUrl && {
+                $set: Object.assign({ firstName: firstName, lastName: lastName, gender: gender, email: email, age: age }, (profilePicUrl && {
                     profilePicture: profilePicUrl
                 }))
             }).then(() => {
