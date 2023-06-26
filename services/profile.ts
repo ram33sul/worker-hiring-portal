@@ -118,7 +118,7 @@ export const registerAsWorkerService = ({ data, files, userId }: RegisterAsWorke
             }
             let profilePicUrl = ''
             if(profilePicture){
-                await uploadToCloudinary(`profilePicture/${userId}.png`).then((result: any) => {
+                await uploadToCloudinary(`profilePicture/${undefined}.png`).then((result: any) => {
                     profilePicUrl = result.url;
                 }).catch((error) => {
                     reject([{error: "Can't be uploaded to cloudinary!", status: 500}]);
@@ -127,7 +127,7 @@ export const registerAsWorkerService = ({ data, files, userId }: RegisterAsWorke
             }
             let identityUrl = '';
             if(identity){
-                await uploadToCloudinary(`identity/${userId}.png`).then((result: any) => {
+                await uploadToCloudinary(`identity/${undefined}.png`).then((result: any) => {
                     identityUrl = result.url;
                 }).catch((error) => {
                     reject([{error: "Can't be uploaded to cloudinary!", status: 500}]);
@@ -165,6 +165,7 @@ export const registerAsWorkerService = ({ data, files, userId }: RegisterAsWorke
                 reject({status: 502, error: "Database error occured!"})
             })
         } catch (error) {
+            console.log(error)
             reject({status: 500, error: "Internal error occured!"})
         }
     })

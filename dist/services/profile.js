@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addSampleWorkService = exports.getUserDetailsService = exports.openToWorkOffService = exports.openToWorkOnService = exports.registerAsWorkerService = exports.editProfileService = void 0;
+exports.getUserDetailsService = exports.openToWorkOffService = exports.openToWorkOnService = exports.registerAsWorkerService = exports.editProfileService = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const inputs_1 = require("../validation/inputs");
 const types_1 = require("../validation/types");
@@ -21,26 +21,25 @@ const general_1 = require("../validation/general");
 const cloudinary_1 = require("./cloudinary");
 const editProfileService = ({ userId, data, file }) => {
     return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
-        let { firstName, lastName, gender, email, isWorker, age } = JSON.parse(data);
+        let { firstName, lastName, gender, email, age } = JSON.parse(data);
         const profilePicture = file;
         try {
             const errors = (0, general_1.validate)([
                 ['firstName', types_1.validateString, firstName],
                 ['lastname', types_1.validateString, lastName],
                 ['gender', inputs_1.validateGender, gender],
-                ['isWorker', types_1.validateBoolean, isWorker],
                 ['email', inputs_1.validateEmail, email],
                 ['age', inputs_1.validateAge, age]
             ]);
             if (errors.length) {
-                return reject({ errors, status: 400, error: new Error("invalid inputs!") });
+                return reject({ errors, status: 400, error: "invalid inputs!" });
             }
             let profilePicUrl = '';
             if (profilePicture) {
-                yield (0, cloudinary_1.uploadToCloudinary)(`profilePictures/${userId}.png`).then((result) => {
+                yield (0, cloudinary_1.uploadToCloudinary)(`profilePicture/${userId}.png`).then((result) => {
                     profilePicUrl = result.url;
                 }).catch((error) => {
-                    reject([{ message: "Can't be uploaded to cloudinary!" }]);
+                    reject([{ error: "Can't be uploaded to cloudinary!", status: 500 }]);
                     return;
                 });
             }
@@ -48,7 +47,7 @@ const editProfileService = ({ userId, data, file }) => {
             userSchema_1.default.updateOne({
                 _id: userId
             }, {
-                $set: Object.assign({ firstName: firstName, lastName: lastName, gender: gender, isWorker: isWorker, email: email }, (profilePicUrl && {
+                $set: Object.assign({ firstName: firstName, lastName: lastName, gender: gender, email: email }, (profilePicUrl && {
                     profilePicture: profilePicUrl
                 }))
             }).then(() => {
@@ -65,11 +64,12 @@ const editProfileService = ({ userId, data, file }) => {
     }));
 };
 exports.editProfileService = editProfileService;
-const registerAsWorkerService = ({ data, file, userId }) => {
+const registerAsWorkerService = ({ data, files, userId }) => {
     return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             let { bio, age, categoryList, firstName, lastName, email, gender, openToWork, primaryCategory } = JSON.parse(data);
-            const profilePicture = file;
+            const profilePicture = files.profilePicture[0];
+            const identity = files.identity[0];
             if (!((0, inputs_1.validateBio)(bio) && (0, inputs_1.validateAge)(age) && (0, inputs_1.validateName)(firstName) && (0, inputs_1.validateName)(lastName) && (0, inputs_1.validateEmail)(email) && (gender === undefined || (0, inputs_1.validateGender)(gender)) && (openToWork === undefined || (0, types_1.validateBoolean)(openToWork)))) {
                 return reject({ status: 400, error: "invalid inputs!" });
             }
@@ -82,10 +82,19 @@ const registerAsWorkerService = ({ data, file, userId }) => {
             }
             let profilePicUrl = '';
             if (profilePicture) {
-                yield (0, cloudinary_1.uploadToCloudinary)(`profilePictures/${userId}.png`).then((result) => {
+                yield (0, cloudinary_1.uploadToCloudinary)(`profilePicture/${undefined}.png`).then((result) => {
                     profilePicUrl = result.url;
                 }).catch((error) => {
-                    reject([{ error: "Can't be uploaded to cloudinary!", status: 400 }]);
+                    reject([{ error: "Can't be uploaded to cloudinary!", status: 500 }]);
+                    return;
+                });
+            }
+            let identityUrl = '';
+            if (identity) {
+                yield (0, cloudinary_1.uploadToCloudinary)(`identity/${undefined}.png`).then((result) => {
+                    identityUrl = result.url;
+                }).catch((error) => {
+                    reject([{ error: "Can't be uploaded to cloudinary!", status: 500 }]);
                     return;
                 });
             }
@@ -94,7 +103,7 @@ const registerAsWorkerService = ({ data, file, userId }) => {
             userSchema_1.default.updateOne({
                 _id: userId
             }, {
-                $set: Object.assign({ bio,
+                $set: Object.assign(Object.assign({ bio,
                     age,
                     categoryList,
                     firstName,
@@ -103,6 +112,8 @@ const registerAsWorkerService = ({ data, file, userId }) => {
                     gender,
                     openToWork, isWorker: true, primaryCategory: new mongoose_1.default.Types.ObjectId(primaryCategory) }, (profilePicUrl && {
                     profilePicture: profilePicUrl
+                })), (identityUrl && {
+                    identityUrl: identityUrl
                 }))
             }).then(() => {
                 return userSchema_1.default.findOne({ _id: userId });
@@ -113,6 +124,7 @@ const registerAsWorkerService = ({ data, file, userId }) => {
             });
         }
         catch (error) {
+            console.log(error);
             reject({ status: 500, error: "Internal error occured!" });
         }
     }));
@@ -162,14 +174,14 @@ const openToWorkOffService = ({ userId }) => {
     });
 };
 exports.openToWorkOffService = openToWorkOffService;
-const getUserDetailsService = ({ id }) => {
+const getUserDetailsService = ({ id, userId }) => {
     return new Promise((resolve, reject) => {
         try {
-            id = new mongoose_1.default.Types.ObjectId(id);
+            const _id = new mongoose_1.default.Types.ObjectId(id);
             userSchema_1.default.aggregate([
                 {
                     $match: {
-                        _id: id
+                        _id: _id
                     }
                 }, {
                     $lookup: {
@@ -187,6 +199,9 @@ const getUserDetailsService = ({ id }) => {
                         }
                     }
                 }
+                if (id !== userId) {
+                    delete response[0].identityUrl;
+                }
                 resolve({ data: response[0] });
             }).catch((error) => {
                 reject({ status: 502, error: new Error("Database error occured!") });
@@ -198,34 +213,3 @@ const getUserDetailsService = ({ id }) => {
     });
 };
 exports.getUserDetailsService = getUserDetailsService;
-const addSampleWorkService = ({ data, userId, file }) => {
-    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
-        try {
-            let imageUrl = '';
-            const image = file;
-            if (image) {
-                yield (0, cloudinary_1.uploadToCloudinary)(`sampleWorks/${userId}.png`).then((result) => {
-                    imageUrl = result.url;
-                }).catch((error) => {
-                    reject([{ error: "Can't be uploaded to cloudinary!", status: 400 }]);
-                    return;
-                });
-            }
-            userSchema_1.default.updateOne({
-                _id: userId
-            }, {
-                $push: {
-                    sampleWorks: (imageUrl ? Object.assign(Object.assign({}, data), { imageUrl }) : Object.assign({}, data))
-                }
-            }).then(() => {
-                resolve({ data: 'done' });
-            }).catch((error) => {
-                reject({ status: 502, error: new Error("Database error occured!") });
-            });
-        }
-        catch (error) {
-            reject({ status: 500, error: new Error("Internal error occured!") });
-        }
-    }));
-};
-exports.addSampleWorkService = addSampleWorkService;

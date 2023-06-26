@@ -9,27 +9,33 @@ const banner_1 = require("../services/banner");
 const address_1 = require("../services/address");
 const rating_1 = require("../services/rating");
 const favourites_1 = require("../services/favourites");
+const sampleWorks_1 = require("../services/sampleWorks");
 const eventHandler = (action) => {
     return (req, res) => {
         try {
+            console.log(`Requested service: ${action}`);
             const event = (0, exports.events)(action);
             req.headers.token = req.headers.authorization;
-            event(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, req.body), req.query), { file: req.file }), req.headers), { userId: req.verifiedUserId })).then((response) => {
+            event(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, req.body), req.query), { file: req.file, files: req.files }), req.headers), { userId: req.verifiedUserId })).then((response) => {
                 const { data, headers } = response;
                 res.header(headers);
                 res.send({
                     status: true,
                     data
                 });
+                console.log(`Response sent: ${action}`);
             }).catch(({ error, status, errors }) => {
+                status !== null && status !== void 0 ? status : (status = 500);
                 if (errors) {
                     return res.status(status).send({ error, errors });
                 }
                 res.status(status).send({ error });
+                console.log(`Error occured: ${action} - ${error}`);
             });
         }
         catch (error) {
             res.status(500).send({ error: new Error("Internal error occured!") });
+            console.log(`Internal error: ${action} - ${error}`);
         }
     };
 };
@@ -82,6 +88,18 @@ const events = (action) => {
             return favourites_1.addToFavouritesService;
         case events_1.GET_FAVOURITES:
             return favourites_1.getFavouritesService;
+        case events_1.REMOVE_FROM_FAVOURITES:
+            return favourites_1.removeFavouritesService;
+        case events_1.SET_SELECTED_ADDRESS:
+            return address_1.setSelectedAddressService;
+        case events_1.ADD_SAMPLE_WORK:
+            return sampleWorks_1.addSampleWorkService;
+        case events_1.GET_SAMPLE_WORKS:
+            return sampleWorks_1.getSampleWorksService;
+        case events_1.GET_SAMPLE_WORK:
+            return sampleWorks_1.getSampleWorkService;
+        case events_1.DELETE_SAMPLE_WORK:
+            return sampleWorks_1.deleteSampleWorkService;
         default:
             return () => Promise.reject("Internal error occured!");
     }

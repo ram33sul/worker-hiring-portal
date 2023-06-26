@@ -12,14 +12,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uploadToCloudinary = void 0;
+exports.deleteFromCloudinary = exports.uploadToCloudinary = void 0;
 const cloudinary_1 = require("cloudinary");
 const fs_1 = __importDefault(require("fs"));
 const uploadToCloudinary = (localFilePath) => __awaiter(void 0, void 0, void 0, function* () {
     cloudinary_1.v2.config({
-        cloud_name: "doazsqomm",
-        api_key: "711717321567629",
-        api_secret: "vhsVlza-eayvedmDMG6GOCL-qnk"
+        cloud_name: process.env.CLOUDINARY_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET
     });
     const mainFolderName = "main";
     const filePathOnCloudinary = mainFolderName + '/' + localFilePath;
@@ -37,3 +37,17 @@ const uploadToCloudinary = (localFilePath) => __awaiter(void 0, void 0, void 0, 
     });
 });
 exports.uploadToCloudinary = uploadToCloudinary;
+const deleteFromCloudinary = (filePath) => __awaiter(void 0, void 0, void 0, function* () {
+    cloudinary_1.v2.config({
+        cloud_name: process.env.CLOUDINARY_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET
+    });
+    return cloudinary_1.v2.uploader.destroy(`main/${filePath}`)
+        .then((result) => {
+        return true;
+    }).catch((error) => {
+        return false;
+    });
+});
+exports.deleteFromCloudinary = deleteFromCloudinary;

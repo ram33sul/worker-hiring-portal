@@ -26,7 +26,7 @@ export const fileUploadMulterField = (imageNames: any) => {
     return multer({
         storage: multer.diskStorage({
             destination: (req, file, cb) => {
-                let fieldDestination = `identity/`;
+                let fieldDestination = `${file.fieldname}/`;
                 cb(null, fieldDestination || '');
             },
             filename: (req: any, file, cb) => {

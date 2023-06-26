@@ -12,5 +12,6 @@ router.use(auth_1.auth);
 router.post('/add-address', (0, account_1.eventHandler)(events_1.ADD_ADDRESS));
 router.get('/get-all-addresses', (0, account_1.eventHandler)(events_1.GET_ALL_ADDRESSES));
 router.get('/get-address', (0, account_1.eventHandler)(events_1.GET_ADDRESS));
+router.get('/set-selected-address', (0, account_1.eventHandler)(events_1.SET_SELECTED_ADDRESS));
 const addressRouter = router;
 exports.default = addressRouter;

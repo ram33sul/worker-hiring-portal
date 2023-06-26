@@ -9,7 +9,8 @@ const ratingSchema = new mongoose_1.default.Schema({
     ratedUserId: { type: mongoose_1.default.Types.ObjectId, require: true },
     rating: { type: Number, require: true },
     review: { type: String, default: '' },
-    isWorker: { type: Boolean, default: false }
+    isWorker: { type: Boolean, default: false },
+    timestamp: { type: Date, default: new Date() }
 });
 const Rating = mongoose_1.default.model("rating", ratingSchema);
 exports.default = Rating;

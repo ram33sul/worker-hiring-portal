@@ -13,6 +13,7 @@ const auth = (req, res, next) => {
             status: false,
             error
         });
+        console.log("Authentication failed!");
     });
 };
 exports.auth = auth;

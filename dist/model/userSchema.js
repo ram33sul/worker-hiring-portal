@@ -18,11 +18,12 @@ const userSchema = new mongoose_1.default.Schema({
     bio: { type: String, default: '' },
     age: { type: Number, default: 0 },
     categoryList: { type: Array, default: [] },
-    sampleWorks: { type: Array, default: [] },
     dailyWage: { type: Number, default: 0 },
     hourlyWage: { type: Number, default: 0 },
     primaryCategory: { type: mongoose_1.default.Types.ObjectId, default: null },
     openToWork: { type: Boolean, default: false },
+    selectedAddress: { type: mongoose_1.default.Types.ObjectId, default: null },
+    identityUrl: { type: String, default: '' }
 });
 const User = mongoose_1.default.model("user", userSchema);
 exports.default = User;

@@ -79,19 +79,23 @@ exports.getSuggestedCategoriesService = getSuggestedCategoriesService;
 const getCategorySearchService = ({ key, page, pageSize }) => {
     return new Promise((resolve, reject) => {
         try {
-            workerCategorySchema_1.default.find({
+            workerCategorySchema_1.default.find((key ? {
                 $or: [
                     {
                         title: {
-                            $regex: `/${key}/`
+                            $regex: key,
+                            $options: 'i'
                         }
                     }, {
                         skill: {
-                            $regex: `/${key}`
+                            $regex: key,
+                            $options: 'i'
                         }
                     }
                 ]
-            }).skip(page * pageSize).limit(pageSize).then((response) => {
+            }
+                :
+                    {})).skip(page * pageSize).limit(pageSize).then((response) => {
                 resolve({ data: response });
             }).catch((error) => {
                 reject({ status: 502, error: "Database error occured!" });
