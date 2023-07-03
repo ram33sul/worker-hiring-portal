@@ -119,7 +119,7 @@ export const registerAsWorkerService = ({ data, files, userId }: RegisterAsWorke
             }
             let profilePicUrl = ''
             if(profilePicture){
-                await uploadToCloudinary(`profilePicture/${undefined}.png`).then((result: any) => {
+                await uploadToCloudinary(`profilePicture/${userId}.png`).then((result: any) => {
                     profilePicUrl = result.url;
                 }).catch((error) => {
                     reject([{error: "Can't be uploaded to cloudinary!", status: 500}]);
@@ -128,7 +128,7 @@ export const registerAsWorkerService = ({ data, files, userId }: RegisterAsWorke
             }
             let identityUrl = '';
             if(identity){
-                await uploadToCloudinary(`identity/${undefined}.png`).then((result: any) => {
+                await uploadToCloudinary(`identity/${userId}.png`).then((result: any) => {
                     identityUrl = result.url;
                 }).catch((error) => {
                     reject([{error: "Can't be uploaded to cloudinary!", status: 500}]);
@@ -252,4 +252,35 @@ export const getUserDetailsService = ({id, userId }: {id: string, userId: string
     })
 }
 
-
+export const getWorkersListService = ({category, userId}: {category: string; userId: string}) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const location = await User.aggregate([
+                {
+                    $match: {
+                        _id: new mongoose.Types.ObjectId(userId)
+                    }
+                },{
+                    $lookup: {
+                        from: "address",
+                        localField: "selectedAddress",
+                        foreignField: "_id",
+                        as: "selectedAddressData"
+                    }
+                },{
+                    $project: {
+                        location: {
+                            $first: "$selectedAddressData"
+                        }
+                    }
+                },{
+                    $project: {
+                        location: "$location.location"
+                    }
+                }
+            ])
+        } catch (error) {
+            reject({status: 500, error: "Internal error occured!"})
+        }
+    })
+}

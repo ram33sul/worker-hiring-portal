@@ -6,7 +6,7 @@ import { fileUploadMulter, fileUploadMulterField } from '../services/multer';
 
 const router = express.Router();
 
-// router.use(auth);
+router.use(auth);
 
 router.put('/edit-user-profile', fileUploadMulter('profilePicture'), eventHandler(EDIT_PROFILE));
 

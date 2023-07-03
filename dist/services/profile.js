@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUserDetailsService = exports.openToWorkOffService = exports.openToWorkOnService = exports.registerAsWorkerService = exports.editProfileService = void 0;
+exports.getWorkersListService = exports.getUserDetailsService = exports.openToWorkOffService = exports.openToWorkOnService = exports.registerAsWorkerService = exports.editProfileService = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const inputs_1 = require("../validation/inputs");
 const types_1 = require("../validation/types");
@@ -82,7 +82,7 @@ const registerAsWorkerService = ({ data, files, userId }) => {
             }
             let profilePicUrl = '';
             if (profilePicture) {
-                yield (0, cloudinary_1.uploadToCloudinary)(`profilePicture/${undefined}.png`).then((result) => {
+                yield (0, cloudinary_1.uploadToCloudinary)(`profilePicture/${userId}.png`).then((result) => {
                     profilePicUrl = result.url;
                 }).catch((error) => {
                     reject([{ error: "Can't be uploaded to cloudinary!", status: 500 }]);
@@ -91,7 +91,7 @@ const registerAsWorkerService = ({ data, files, userId }) => {
             }
             let identityUrl = '';
             if (identity) {
-                yield (0, cloudinary_1.uploadToCloudinary)(`identity/${undefined}.png`).then((result) => {
+                yield (0, cloudinary_1.uploadToCloudinary)(`identity/${userId}.png`).then((result) => {
                     identityUrl = result.url;
                 }).catch((error) => {
                     reject([{ error: "Can't be uploaded to cloudinary!", status: 500 }]);
@@ -213,3 +213,37 @@ const getUserDetailsService = ({ id, userId }) => {
     });
 };
 exports.getUserDetailsService = getUserDetailsService;
+const getWorkersListService = ({ category, userId }) => {
+    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const location = yield userSchema_1.default.aggregate([
+                {
+                    $match: {
+                        _id: new mongoose_1.default.Types.ObjectId(userId)
+                    }
+                }, {
+                    $lookup: {
+                        from: "address",
+                        localField: "selectedAddress",
+                        foreignField: "_id",
+                        as: "selectedAddressData"
+                    }
+                }, {
+                    $project: {
+                        location: {
+                            $first: "$selectedAddressData"
+                        }
+                    }
+                }, {
+                    $project: {
+                        location: "$location.location"
+                    }
+                }
+            ]);
+        }
+        catch (error) {
+            reject({ status: 500, error: "Internal error occured!" });
+        }
+    }));
+};
+exports.getWorkersListService = getWorkersListService;

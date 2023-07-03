@@ -43,9 +43,15 @@ const getRatingsService = ({ ratedUserId, page, pageSize }) => {
                         foreignField: "_id",
                         as: "userDetails"
                     }
+                }, {
+                    $project: {
+                        lastName: "$userDetails[0]."
+                    }
                 }
             ]).skip(page * pageSize).limit(pageSize).then((response) => {
-                response[0].userDetails = response[0].userDetails[0];
+                response.firstName = response[0].userDetails[0].firstName;
+                response.lastName = response[0].userDetails[0].lastName;
+                delete response[0].userDetails;
                 resolve({ data: response[0] });
             }).catch((error) => {
                 reject({ status: 502, error: "Database error occured!" });
