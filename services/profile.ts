@@ -88,8 +88,7 @@ interface RegisterAsWorkerServiceData {
     email: string,
     gender: string,
     openToWork: boolean,
-    primaryCategory: string,
-    profilePicture: unknown
+    primaryCategory: string
 }
 
 interface RegisterAsWorkerService {
@@ -104,7 +103,7 @@ interface RegisterAsWorkerService {
 export const registerAsWorkerService = ({ data, files, userId }: RegisterAsWorkerService) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let { bio, age, categoryList, firstName, lastName, email, gender, openToWork, primaryCategory } = JSON.parse(data);
+            let { bio, age, categoryList, firstName, lastName, email, gender, openToWork, primaryCategory }: RegisterAsWorkerServiceData = JSON.parse(data);
             const profilePicture = files.profilePicture[0];
             const identity = files.identity[0];
             if(!(validateBio(bio) && validateAge(age) && validateName(firstName) && validateName(lastName) && validateEmail(email) && (gender === undefined || validateGender(gender)) && (openToWork === undefined || validateBoolean(openToWork)))){
@@ -252,10 +251,20 @@ export const getUserDetailsService = ({id, userId }: {id: string, userId: string
     })
 }
 
-export const getWorkersListService = ({category, userId}: {category: string; userId: string}) => {
+interface GetWorkersListServiceProps {
+    nearest: boolean;
+    ratingFourPlus: boolean;
+    isFavourte: boolean;
+    sort: string;
+    userId: string;
+    page: number;
+    pageSize: number;
+}
+
+export const getWorkersListService = ({nearest, ratingFourPlus, isFavourte, sort, userId, page, pageSize}: GetWorkersListServiceProps) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const location = await User.aggregate([
+            let location = await User.aggregate([
                 {
                     $match: {
                         _id: new mongoose.Types.ObjectId(userId)
@@ -279,6 +288,72 @@ export const getWorkersListService = ({category, userId}: {category: string; use
                     }
                 }
             ])
+            if(!location || location?.[0] === undefined || location?.[1] === undefined){
+                location = [ 0, 0 ];
+            }
+            User.aggregate([
+                {
+                    $match: {
+                        isWorker: true,
+                        openToWork: true
+                    }
+                },{
+                    $lookup: {
+                        from: "rating",
+                        localField: "_id",
+                        foreignField: "userId",
+                        as: "ratings"
+                    }
+                },{
+                    $lookup: {
+                        from: "favourites",
+                        localField: "_id",
+                        foreignField: "addedUserId",
+                        as: "favourites",
+                    }
+                },{
+                    $lookup: {
+                        from: "workers",
+                        localField: "primaryCategory",
+                        foreignField: "_id",
+                        as: "primaryCategory"
+                    }
+                },{
+                    $project: {
+                        _id: 1,
+                        firstName: 1,
+                        lastName: 1,
+                        profilePictureUrl: 1,
+                        ratingAverage: {
+                            $avg: "$ratings.rating"
+                        },
+                        rating: {
+                            $len: "$ratings"
+                        },
+                        primaryCategory: {
+                            $first: "$primaryCategory"
+                        },
+                        address: "$selectedAddress",
+                        favourites: 1
+                    }
+                },{
+                    $match: {
+                        ratingAverage: {
+                            $gte: (ratingFourPlus ? 4 : 0)
+                        }
+                    }
+                }
+            ]).then((res) => {
+                res[0].forEach((val: {favourites: any[]}, i: number, arr: any[]) => {
+                    let flag = false
+                    if(val.favourites.reduce((acc: {userId: string}, curr: boolean) => (acc.userId === userId || curr === true ? true : false), false)){
+                        flag = true;
+                    }
+                    arr[i].isFavourite = flag;
+                    delete arr[i].favourites;
+                })
+                resolve({data: res[0]});
+            })
         } catch (error) {
             reject({status: 500, error: "Internal error occured!"})
         }
