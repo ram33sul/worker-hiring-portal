@@ -375,13 +375,63 @@ export const getWorkersListService = ({page, pageSize, userId}: GetWorkersListSe
                         openToWork: true,
                     }
                 },{
+                    $lookup: {
+                        from: "workers",
+                        localField: "primaryCategory",
+                        foreignField: "_id",
+                        as: "primaryCategory"
+                    }
+                },{
+                    $lookup: {
+                        from: "rating",
+                        localField: "_id",
+                        foreignField: "ratedUserId",
+                        as: "ratings"
+                    }
+                },{
+                    $lookup: {
+                        from: "address",
+                        localField: "selectedAddress",
+                        foreignField: "_id",
+                        as: "address"
+                    }
+                },{
+                    $lookup: {
+                        from: "favourites",
+                        localField: "_id",
+                        foreignField: "addedUserId",
+                        as: "isFavourite"
+                    }
+                },{
+                    $project: {
+                        userId: "$_id",
+                        firstName: 1,
+                        lastName: 1,
+                        profileImageUrl: "$profilePicture",
+                        ratingAverage: {
+                            $avg: "$ratings.rating"
+                        },
+                        ratingCount: {
+                            $size: "$ratings"
+                        },
+                        address: {
+                            $first: "$address"
+                        }
+                    }
+                },{
                     $skip: (page * pageSize)
                 },{
                     $limit: pageSize
                 }
             ]).then((response) => {
+                response.forEach((data, i, arr) => {
+                    arr[i].isFavourite = arr[i].isFavourite.reduce((acc: {userId: string}, curr: boolean) => acc.userId === userId || curr === true ? true : false, false)
+                    arr[i].primaryCategoryName = arr[i].primaryCategory[0].title;
+                    arr[i].primaryCategoryDailyWage = arr[i].primaryCategory[0].dailyMinWage;
+                })
                 resolve({data: response})
             }).catch((error) => {
+                console.log(error)
                 reject({status: 502, error: "Database error occured!"})
             })
         } catch (error) {
