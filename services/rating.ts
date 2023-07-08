@@ -49,15 +49,13 @@ export const getRatingsService = ({ ratedUserId, page, pageSize }: GetRatingsSer
                         foreignField: "_id",
                         as: "userDetails"
                     }
-                },{
-                    $project: {
-                        lastName: "$userDetails[0]."
-                    }
                 }
             ]).skip(page * pageSize).limit(pageSize).then((response: any) => {
-                response.firstName = response[0].userDetails[0].firstName;
-                response.lastName = response[0].userDetails[0].lastName;
-                delete response[0].userDetails;
+                response.forEach((data: any, i: number, arr: any) => {
+                    arr[i].firstName = arr[i].userDetails[0].firstName;
+                    arr[i].lastName = arr[i].userDetails[0].lastName;
+                    delete arr[i].userDetails;
+                })
                 resolve({data: response[0]})
             }).catch((error) => {
                 reject({status: 502, error: "Database error occured!"})
