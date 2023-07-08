@@ -251,111 +251,141 @@ export const getUserDetailsService = ({id, userId }: {id: string, userId: string
     })
 }
 
+// interface GetWorkersListServiceProps {
+//     nearest: boolean;
+//     ratingFourPlus: boolean;
+//     isFavourte: boolean;
+//     sort: string;
+//     userId: string;
+//     page: number;
+//     pageSize: number;
+// }
+
+// export const getWorkersListService = ({nearest, ratingFourPlus, isFavourte, sort, userId, page, pageSize}: GetWorkersListServiceProps) => {
+//     return new Promise(async (resolve, reject) => {
+//         try {
+//             let location = await User.aggregate([
+//                 {
+//                     $match: {
+//                         _id: new mongoose.Types.ObjectId(userId)
+//                     }
+//                 },{
+//                     $lookup: {
+//                         from: "address",
+//                         localField: "selectedAddress",
+//                         foreignField: "_id",
+//                         as: "selectedAddressData"
+//                     }
+//                 },{
+//                     $project: {
+//                         location: {
+//                             $first: "$selectedAddressData"
+//                         }
+//                     }
+//                 },{
+//                     $project: {
+//                         location: "$location.location"
+//                     }
+//                 }
+//             ])
+//             if(!location || location?.[0] === undefined || location?.[1] === undefined){
+//                 location = [ 0, 0 ];
+//             }
+//             User.aggregate([
+//                 {
+//                     $match: {
+//                         isWorker: true,
+//                         openToWork: true
+//                     }
+//                 },{
+//                     $lookup: {
+//                         from: "rating",
+//                         localField: "_id",
+//                         foreignField: "userId",
+//                         as: "ratings"
+//                     }
+//                 },{
+//                     $lookup: {
+//                         from: "favourites",
+//                         localField: "_id",
+//                         foreignField: "addedUserId",
+//                         as: "favourites",
+//                     }
+//                 },{
+//                     $lookup: {
+//                         from: "workers",
+//                         localField: "primaryCategory",
+//                         foreignField: "_id",
+//                         as: "primaryCategory"
+//                     }
+//                 },{
+//                     $project: {
+//                         _id: 1,
+//                         firstName: 1,
+//                         lastName: 1,
+//                         profilePictureUrl: 1,
+//                         ratingAverage: {
+//                             $avg: "$ratings.rating"
+//                         },
+//                         rating: {
+//                             $size: "$ratings"
+//                         },
+//                         primaryCategory: {
+//                             $first: "$primaryCategory"
+//                         },
+//                         address: "$selectedAddress",
+//                         favourites: 1
+//                     }
+//                 },{
+//                     $match: {
+//                         ratingAverage: {
+//                             $gte: (ratingFourPlus ? 4 : 0)
+//                         }
+//                     }
+//                 }
+//             ]).then((res) => {
+//                 res[0].forEach((val: {favourites: any[]}, i: number, arr: any[]) => {
+//                     let flag = false
+//                     if(val.favourites.reduce((acc: {userId: string}, curr: boolean) => (acc.userId === userId || curr === true ? true : false), false)){
+//                         flag = true;
+//                     }
+//                     arr[i].isFavourite = flag;
+//                     delete arr[i].favourites;
+//                 })
+//                 resolve({data: res[0]});
+//             })
+//         } catch (error) {
+//             reject({status: 500, error: "Internal error occured!"})
+//         }
+//     })
+// }
+
 interface GetWorkersListServiceProps {
-    nearest: boolean;
-    ratingFourPlus: boolean;
-    isFavourte: boolean;
-    sort: string;
     userId: string;
     page: number;
     pageSize: number;
 }
-
-export const getWorkersListService = ({nearest, ratingFourPlus, isFavourte, sort, userId, page, pageSize}: GetWorkersListServiceProps) => {
-    return new Promise(async (resolve, reject) => {
+export const getWorkersListService = ({page, pageSize, userId}: GetWorkersListServiceProps) => {
+    return new Promise((resolve, reject) => {
         try {
-            let location = await User.aggregate([
-                {
-                    $match: {
-                        _id: new mongoose.Types.ObjectId(userId)
-                    }
-                },{
-                    $lookup: {
-                        from: "address",
-                        localField: "selectedAddress",
-                        foreignField: "_id",
-                        as: "selectedAddressData"
-                    }
-                },{
-                    $project: {
-                        location: {
-                            $first: "$selectedAddressData"
-                        }
-                    }
-                },{
-                    $project: {
-                        location: "$location.location"
-                    }
-                }
-            ])
-            if(!location || location?.[0] === undefined || location?.[1] === undefined){
-                location = [ 0, 0 ];
-            }
             User.aggregate([
                 {
                     $match: {
                         isWorker: true,
-                        openToWork: true
+                        openToWork: true,
                     }
                 },{
-                    $lookup: {
-                        from: "rating",
-                        localField: "_id",
-                        foreignField: "userId",
-                        as: "ratings"
-                    }
+                    $skip: page * pageSize
                 },{
-                    $lookup: {
-                        from: "favourites",
-                        localField: "_id",
-                        foreignField: "addedUserId",
-                        as: "favourites",
-                    }
-                },{
-                    $lookup: {
-                        from: "workers",
-                        localField: "primaryCategory",
-                        foreignField: "_id",
-                        as: "primaryCategory"
-                    }
-                },{
-                    $project: {
-                        _id: 1,
-                        firstName: 1,
-                        lastName: 1,
-                        profilePictureUrl: 1,
-                        ratingAverage: {
-                            $avg: "$ratings.rating"
-                        },
-                        rating: {
-                            $len: "$ratings"
-                        },
-                        primaryCategory: {
-                            $first: "$primaryCategory"
-                        },
-                        address: "$selectedAddress",
-                        favourites: 1
-                    }
-                },{
-                    $match: {
-                        ratingAverage: {
-                            $gte: (ratingFourPlus ? 4 : 0)
-                        }
-                    }
+                    $limit: pageSize
                 }
-            ]).then((res) => {
-                res[0].forEach((val: {favourites: any[]}, i: number, arr: any[]) => {
-                    let flag = false
-                    if(val.favourites.reduce((acc: {userId: string}, curr: boolean) => (acc.userId === userId || curr === true ? true : false), false)){
-                        flag = true;
-                    }
-                    arr[i].isFavourite = flag;
-                    delete arr[i].favourites;
-                })
-                resolve({data: res[0]});
+            ]).then((response) => {
+                resolve({data: response})
+            }).catch((error) => {
+                reject({status: 502, error: new Error("Database error occured!")})
             })
         } catch (error) {
-            reject({status: 500, error: "Internal error occured!"})
+            reject({status: 500, error: new Error("Internal error occured!")})
         }
     })
 }
