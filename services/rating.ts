@@ -58,6 +58,7 @@ export const getRatingsService = ({ ratedUserId, page, pageSize }: GetRatingsSer
                 })
                 resolve({data: response})
             }).catch((error) => {
+                console.log(error)
                 reject({status: 502, error: "Database error occured!"})
             })
         } catch (error) {
