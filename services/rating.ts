@@ -49,8 +49,12 @@ export const getRatingsService = ({ ratedUserId, page, pageSize }: GetRatingsSer
                         foreignField: "_id",
                         as: "userDetails"
                     }
+                },{
+                    $skip: (page * pageSize)
+                },{
+                    $limit: pageSize
                 }
-            ]).skip(page * pageSize).limit(pageSize).then((response: any) => {
+            ]).then((response: any) => {
                 response.forEach((data: any, i: number, arr: any) => {
                     arr[i].firstName = arr[i].userDetails[0].firstName;
                     arr[i].lastName = arr[i].userDetails[0].lastName;

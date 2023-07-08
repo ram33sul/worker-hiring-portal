@@ -431,6 +431,7 @@ export const getWorkersListService = ({page, pageSize, userId}: GetWorkersListSe
                     arr[i].primaryCategoryName = arr[i].primaryCategory[0].title;
                     arr[i].primaryCategoryDailyWage = arr[i].primaryCategory[0].dailyMinWage;
                     arr[i].address ??= null;
+                    delete arr[i].primaryCategory;
                 })
                 resolve({data: response})
             }).catch((error) => {
