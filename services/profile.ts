@@ -417,7 +417,8 @@ export const getWorkersListService = ({page, pageSize, userId}: GetWorkersListSe
                         address: {
                             $first: "$address"
                         },
-                        isFavourite: 1
+                        isFavourite: 1,
+                        primaryCategory: 1
                     }
                 },{
                     $skip: (page * pageSize)
