@@ -430,6 +430,7 @@ export const getWorkersListService = ({page, pageSize, userId}: GetWorkersListSe
                     arr[i].isFavourite = arr[i].isFavourite.reduce((acc: {userId: string}, curr: boolean) => acc.userId === userId || curr === true ? true : false, false)
                     arr[i].primaryCategoryName = arr[i].primaryCategory[0].title;
                     arr[i].primaryCategoryDailyWage = arr[i].primaryCategory[0].dailyMinWage;
+                    arr[i].address ??= null;
                 })
                 resolve({data: response})
             }).catch((error) => {
