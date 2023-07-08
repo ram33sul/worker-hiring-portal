@@ -56,7 +56,7 @@ export const getRatingsService = ({ ratedUserId, page, pageSize }: GetRatingsSer
                     arr[i].lastName = arr[i].userDetails[0].lastName;
                     delete arr[i].userDetails;
                 })
-                resolve({data: response[0]})
+                resolve({data: response})
             }).catch((error) => {
                 reject({status: 502, error: "Database error occured!"})
             })
