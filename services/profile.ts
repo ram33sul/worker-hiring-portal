@@ -375,17 +375,17 @@ export const getWorkersListService = ({page, pageSize, userId}: GetWorkersListSe
                         openToWork: true,
                     }
                 },{
-                    $skip: page * pageSize
+                    $skip: (page * pageSize)
                 },{
                     $limit: pageSize
                 }
             ]).then((response) => {
                 resolve({data: response})
             }).catch((error) => {
-                reject({status: 502, error: new Error("Database error occured!")})
+                reject({status: 502, error: "Database error occured!"})
             })
         } catch (error) {
-            reject({status: 500, error: new Error("Internal error occured!")})
+            reject({status: 500, error: "Internal error occured!"})
         }
     })
 }
