@@ -104,8 +104,8 @@ export const registerAsWorkerService = ({ data, files, userId }: RegisterAsWorke
     return new Promise(async (resolve, reject) => {
         try {
             let { bio, age, categoryList, firstName, lastName, email, gender, openToWork, primaryCategory }: RegisterAsWorkerServiceData = JSON.parse(data);
-            const profilePicture = files.profilePicture[0];
-            const identity = files.identity[0];
+            const profilePicture = files.profilePicture?.[0];
+            const identity = files.identity?.[0];
             if(!(validateBio(bio) && validateAge(age) && validateName(firstName) && validateName(lastName) && validateEmail(email) && (gender === undefined || validateGender(gender)) && (openToWork === undefined || validateBoolean(openToWork)))){
                 return reject({status: 400, error: "invalid inputs!"});
             }
@@ -427,7 +427,7 @@ export const getWorkersListService = ({page, pageSize, userId}: GetWorkersListSe
                 }
             ]).then((response) => {
                 response.forEach((data, i, arr) => {
-                    arr[i].isFavourite = arr[i].isFavourite.reduce((acc: {userId: string}, curr: boolean) => acc.userId === userId || curr === true ? true : false, false)
+                    arr[i].isFavourite = arr[i].isFavourite.reduce((acc: {userId: string}, curr: boolean) => JSON.stringify(acc.userId) === JSON.stringify(userId) || curr === true ? true : false, false)
                     arr[i].primaryCategoryName = arr[i].primaryCategory[0].title;
                     arr[i].primaryCategoryDailyWage = arr[i].primaryCategory[0].dailyMinWage;
                     arr[i].address ??= null;
