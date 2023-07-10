@@ -56,15 +56,14 @@ export const getRatingsService = ({ ratedUserId, page, pageSize }: GetRatingsSer
                 }
             ]).then((response: any) => {
                 response.forEach((data: any, i: number, arr: any) => {
-                    arr[i].firstName = arr[i].userDetails[0].firstName;
-                    arr[i].lastName = arr[i].userDetails[0].lastName;
+                    arr[i].firstName = arr[i].userDetails?.[0]?.firstName;
+                    arr[i].lastName = arr[i].userDetails?.[0]?.lastName;
                     delete arr[i].userDetails;
                 })
                 resolve({data: response})
             }).catch((error) => {
                 console.log(pageSize, typeof pageSize)
                 console.log(error)
-
                 reject({status: 502, error: "Database error occured!"})
             })
         } catch (error) {
