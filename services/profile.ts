@@ -263,8 +263,6 @@ interface GetWorkersListServiceProps {
 }
 export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previouslyHired, userId, category}: GetWorkersListServiceProps) => {
     const sorts = ["rating", "distance", "wageLowToHigh", "wageHighToLow"];
-    page = new Number(page);
-    pageSize = new Number(pageSize)
     return new Promise(async (resolve, reject) => {
         try {
             const { location } = (await User.aggregate([
@@ -435,7 +433,7 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                 },{
                     $skip: (page !== undefined && pageSize !== undefined) ? (page * pageSize) : 0
                 },{
-                    $limit: pageSize ?? 1
+                    $limit: pageSize ? pageSize : 1
                 }
             ]).then((response) => {
                 resolve({data: response})
