@@ -438,7 +438,6 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
             ]).then((response) => {
                 resolve({data: response})
             }).catch((error) => {
-                console.log(error)
                 reject({status: 502, error: "Database error occured!"})
             })
         } catch (error) {

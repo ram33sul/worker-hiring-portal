@@ -58,6 +58,7 @@ export const getRatingsService = ({ ratedUserId, page, pageSize }: GetRatingsSer
                 response.forEach((data: any, i: number, arr: any) => {
                     arr[i].firstName = arr[i].userDetails?.[0]?.firstName;
                     arr[i].lastName = arr[i].userDetails?.[0]?.lastName;
+                    arr[i].profileImageUrl = arr[i].userDetails?.[0]?.profilePicture;
                     delete arr[i].userDetails;
                 })
                 resolve({data: response})
