@@ -16,7 +16,7 @@ export const AddRatingService = ({ userId, ratedUserId, rating, review, isWorker
                 ratedUserId: new mongoose.Types.ObjectId(ratedUserId),
                 rating: rating,
                 review: review,
-                isWorker: isWorker,
+                isWorker: isWorker ? isWorker : false,
                 timestamp: new Date()
             }).then((response) => {
                 resolve({data: response})
@@ -50,9 +50,9 @@ export const getRatingsService = ({ ratedUserId, page, pageSize }: GetRatingsSer
                         as: "userDetails"
                     }
                 },{
-                    $skip: (page * pageSize)
+                    $skip: (page !== undefined && pageSize !== undefined) ? (page * pageSize) : 0
                 },{
-                    $limit: pageSize
+                    $limit: pageSize ?? 1
                 }
             ]).then((response: any) => {
                 response.forEach((data: any, i: number, arr: any) => {
@@ -62,7 +62,6 @@ export const getRatingsService = ({ ratedUserId, page, pageSize }: GetRatingsSer
                 })
                 resolve({data: response})
             }).catch((error) => {
-                console.log(pageSize, typeof pageSize)
                 console.log(error)
                 reject({status: 502, error: "Database error occured!"})
             })

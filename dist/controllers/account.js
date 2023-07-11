@@ -100,6 +100,8 @@ const events = (action) => {
             return sampleWorks_1.getSampleWorkService;
         case events_1.DELETE_SAMPLE_WORK:
             return sampleWorks_1.deleteSampleWorkService;
+        case events_1.GET_WORKERS_LIST:
+            return profile_1.getWorkersListService;
         default:
             return () => Promise.reject("Internal error occured!");
     }

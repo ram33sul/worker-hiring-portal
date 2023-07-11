@@ -14,7 +14,7 @@ const AddRatingService = ({ userId, ratedUserId, rating, review, isWorker }) => 
                 ratedUserId: new mongoose_1.default.Types.ObjectId(ratedUserId),
                 rating: rating,
                 review: review,
-                isWorker: isWorker,
+                isWorker: isWorker ? isWorker : false,
                 timestamp: new Date()
             }).then((response) => {
                 resolve({ data: response });
@@ -44,16 +44,20 @@ const getRatingsService = ({ ratedUserId, page, pageSize }) => {
                         as: "userDetails"
                     }
                 }, {
-                    $project: {
-                        lastName: "$userDetails[0]."
-                    }
+                    $skip: (page !== undefined && pageSize !== undefined) ? (page * pageSize) : 0
+                }, {
+                    $limit: pageSize !== null && pageSize !== void 0 ? pageSize : 1
                 }
-            ]).skip(page * pageSize).limit(pageSize).then((response) => {
-                response.firstName = response[0].userDetails[0].firstName;
-                response.lastName = response[0].userDetails[0].lastName;
-                delete response[0].userDetails;
-                resolve({ data: response[0] });
+            ]).then((response) => {
+                response.forEach((data, i, arr) => {
+                    var _a, _b, _c, _d;
+                    arr[i].firstName = (_b = (_a = arr[i].userDetails) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.firstName;
+                    arr[i].lastName = (_d = (_c = arr[i].userDetails) === null || _c === void 0 ? void 0 : _c[0]) === null || _d === void 0 ? void 0 : _d.lastName;
+                    delete arr[i].userDetails;
+                });
+                resolve({ data: response });
             }).catch((error) => {
+                console.log(error);
                 reject({ status: 502, error: "Database error occured!" });
             });
         }

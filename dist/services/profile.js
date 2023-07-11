@@ -66,10 +66,11 @@ const editProfileService = ({ userId, data, file }) => {
 exports.editProfileService = editProfileService;
 const registerAsWorkerService = ({ data, files, userId }) => {
     return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+        var _a, _b;
         try {
             let { bio, age, categoryList, firstName, lastName, email, gender, openToWork, primaryCategory } = JSON.parse(data);
-            const profilePicture = files.profilePicture[0];
-            const identity = files.identity[0];
+            const profilePicture = (_a = files.profilePicture) === null || _a === void 0 ? void 0 : _a[0];
+            const identity = (_b = files.identity) === null || _b === void 0 ? void 0 : _b[0];
             if (!((0, inputs_1.validateBio)(bio) && (0, inputs_1.validateAge)(age) && (0, inputs_1.validateName)(firstName) && (0, inputs_1.validateName)(lastName) && (0, inputs_1.validateEmail)(email) && (gender === undefined || (0, inputs_1.validateGender)(gender)) && (openToWork === undefined || (0, types_1.validateBoolean)(openToWork)))) {
                 return reject({ status: 400, error: "invalid inputs!" });
             }
@@ -213,33 +214,174 @@ const getUserDetailsService = ({ id, userId }) => {
     });
 };
 exports.getUserDetailsService = getUserDetailsService;
-const getWorkersListService = ({ category, userId }) => {
+const getWorkersListService = ({ page, pageSize, sort, rating4Plus, previouslyHired, userId, category }) => {
     return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const location = yield userSchema_1.default.aggregate([
+            console.log(rating4Plus);
+            const { location } = (yield userSchema_1.default.aggregate([
                 {
                     $match: {
                         _id: new mongoose_1.default.Types.ObjectId(userId)
                     }
                 }, {
                     $lookup: {
-                        from: "address",
+                        from: "addresses",
                         localField: "selectedAddress",
                         foreignField: "_id",
-                        as: "selectedAddressData"
+                        as: "address"
                     }
                 }, {
                     $project: {
+                        _id: 0,
                         location: {
-                            $first: "$selectedAddressData"
+                            $arrayElemAt: [
+                                "$address.location",
+                                0
+                            ]
+                        }
+                    }
+                }
+            ]))[0];
+            userSchema_1.default.aggregate([
+                {
+                    $match: Object.assign({ isWorker: true, openToWork: true }, (category ? {
+                        categoryList: {
+                            $elemMatch: {
+                                id: new mongoose_1.default.Types.ObjectId
+                            }
+                        }
+                    } : {}))
+                }, {
+                    $lookup: {
+                        from: "workers",
+                        localField: "primaryCategory",
+                        foreignField: "_id",
+                        as: "primaryCategoryData"
+                    }
+                }, {
+                    $lookup: {
+                        from: "ratings",
+                        localField: "_id",
+                        foreignField: "ratedUserId",
+                        as: "ratings"
+                    }
+                }, {
+                    $lookup: {
+                        from: "addresses",
+                        localField: "selectedAddress",
+                        foreignField: "_id",
+                        as: "address"
+                    }
+                }, {
+                    $lookup: {
+                        from: "favourites",
+                        localField: "_id",
+                        foreignField: "addedUserId",
+                        as: "isFavourite"
+                    }
+                }, {
+                    $project: {
+                        userId: "$_id",
+                        firstName: 1,
+                        lastName: 1,
+                        profileImageUrl: "$profilePicture",
+                        ratingAverage: {
+                            $avg: "$ratings.rating"
+                        },
+                        ratingCount: {
+                            $size: "$ratings"
+                        },
+                        address: {
+                            $first: "$address"
+                        },
+                        isFavourite: {
+                            $reduce: {
+                                input: "$isFavourite",
+                                initialValue: false,
+                                in: {
+                                    $cond: [
+                                        {
+                                            $or: [
+                                                {
+                                                    $eq: [
+                                                        {
+                                                            $toString: "$$this.userId"
+                                                        },
+                                                        userId
+                                                    ]
+                                                },
+                                                "$$value"
+                                            ]
+                                        },
+                                        true,
+                                        false
+                                    ]
+                                }
+                            }
+                        },
+                        primaryCategoryName: {
+                            $arrayElemAt: [
+                                "$primaryCategoryData.title",
+                                0
+                            ]
+                        },
+                        primaryCategoryDailyWage: {
+                            $arrayElemAt: [
+                                {
+                                    $map: {
+                                        input: "$categoryList",
+                                        in: {
+                                            $cond: [
+                                                {
+                                                    $eq: [
+                                                        "$$this.id",
+                                                        "$primaryCategory"
+                                                    ]
+                                                },
+                                                "$$this.dailyWage",
+                                                null
+                                            ]
+                                        }
+                                    }
+                                },
+                                0
+                            ]
                         }
                     }
                 }, {
-                    $project: {
-                        location: "$location.location"
+                    $addFields: {
+                        address: {
+                            $ifNull: ["$address", null]
+                        }
                     }
+                }, {
+                    $match: Object.assign({ ratingAverage: {
+                            $gte: rating4Plus === 'true' ? 5 : 0
+                        } }, (previouslyHired === 'true' ? {
+                        previouslyHired: true
+                    } : {}))
+                }, {
+                    $sort: (sort === 'rating' ?
+                        {
+                            ratingAverage: -1
+                        } : sort === 'wageLowToHigh' ?
+                        {
+                            primaryCategoryDailyWage: 1
+                        } : sort === 'wageHighToLow' ?
+                        {
+                            primaryCategoryDailyWage: -1
+                        } : { ratingAverage: -1 })
+                }, {
+                    $skip: (page !== undefined && pageSize !== undefined) ? (page * pageSize) : 0
+                }, {
+                    $limit: pageSize !== null && pageSize !== void 0 ? pageSize : 1
                 }
-            ]);
+            ]).then((response) => {
+                resolve({ data: response });
+            }).catch((error) => {
+                console.log(error);
+                reject({ status: 502, error: "Database error occured!" });
+            });
         }
         catch (error) {
             reject({ status: 500, error: "Internal error occured!" });

@@ -251,146 +251,74 @@ export const getUserDetailsService = ({id, userId }: {id: string, userId: string
     })
 }
 
-// interface GetWorkersListServiceProps {
-//     nearest: boolean;
-//     ratingFourPlus: boolean;
-//     isFavourte: boolean;
-//     sort: string;
-//     userId: string;
-//     page: number;
-//     pageSize: number;
-// }
-
-// export const getWorkersListService = ({nearest, ratingFourPlus, isFavourte, sort, userId, page, pageSize}: GetWorkersListServiceProps) => {
-//     return new Promise(async (resolve, reject) => {
-//         try {
-//             let location = await User.aggregate([
-//                 {
-//                     $match: {
-//                         _id: new mongoose.Types.ObjectId(userId)
-//                     }
-//                 },{
-//                     $lookup: {
-//                         from: "address",
-//                         localField: "selectedAddress",
-//                         foreignField: "_id",
-//                         as: "selectedAddressData"
-//                     }
-//                 },{
-//                     $project: {
-//                         location: {
-//                             $first: "$selectedAddressData"
-//                         }
-//                     }
-//                 },{
-//                     $project: {
-//                         location: "$location.location"
-//                     }
-//                 }
-//             ])
-//             if(!location || location?.[0] === undefined || location?.[1] === undefined){
-//                 location = [ 0, 0 ];
-//             }
-//             User.aggregate([
-//                 {
-//                     $match: {
-//                         isWorker: true,
-//                         openToWork: true
-//                     }
-//                 },{
-//                     $lookup: {
-//                         from: "rating",
-//                         localField: "_id",
-//                         foreignField: "userId",
-//                         as: "ratings"
-//                     }
-//                 },{
-//                     $lookup: {
-//                         from: "favourites",
-//                         localField: "_id",
-//                         foreignField: "addedUserId",
-//                         as: "favourites",
-//                     }
-//                 },{
-//                     $lookup: {
-//                         from: "workers",
-//                         localField: "primaryCategory",
-//                         foreignField: "_id",
-//                         as: "primaryCategory"
-//                     }
-//                 },{
-//                     $project: {
-//                         _id: 1,
-//                         firstName: 1,
-//                         lastName: 1,
-//                         profilePictureUrl: 1,
-//                         ratingAverage: {
-//                             $avg: "$ratings.rating"
-//                         },
-//                         rating: {
-//                             $size: "$ratings"
-//                         },
-//                         primaryCategory: {
-//                             $first: "$primaryCategory"
-//                         },
-//                         address: "$selectedAddress",
-//                         favourites: 1
-//                     }
-//                 },{
-//                     $match: {
-//                         ratingAverage: {
-//                             $gte: (ratingFourPlus ? 4 : 0)
-//                         }
-//                     }
-//                 }
-//             ]).then((res) => {
-//                 res[0].forEach((val: {favourites: any[]}, i: number, arr: any[]) => {
-//                     let flag = false
-//                     if(val.favourites.reduce((acc: {userId: string}, curr: boolean) => (acc.userId === userId || curr === true ? true : false), false)){
-//                         flag = true;
-//                     }
-//                     arr[i].isFavourite = flag;
-//                     delete arr[i].favourites;
-//                 })
-//                 resolve({data: res[0]});
-//             })
-//         } catch (error) {
-//             reject({status: 500, error: "Internal error occured!"})
-//         }
-//     })
-// }
 
 interface GetWorkersListServiceProps {
     userId: string;
     page: number;
     pageSize: number;
+    sort: "wageLowToHigh" | "wageHighToLow" | "rating" | "distance";
+    rating4Plus: string;
+    previouslyHired: string;
+    category: string
 }
-export const getWorkersListService = ({page, pageSize, userId}: GetWorkersListServiceProps) => {
-    return new Promise((resolve, reject) => {
+export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previouslyHired, userId, category}: GetWorkersListServiceProps) => {
+    return new Promise(async (resolve, reject) => {
         try {
+            console.log(rating4Plus)
+            const { location } = (await User.aggregate([
+                {
+                    $match: {
+                        _id: new mongoose.Types.ObjectId(userId)
+                    }
+                },{
+                    $lookup: {
+                        from: "addresses",
+                        localField: "selectedAddress",
+                        foreignField: "_id",
+                        as: "address"
+                    }
+                },{
+                    $project: {
+                        _id: 0,
+                        location: {
+                            $arrayElemAt: [
+                                "$address.location",
+                                0
+                            ]
+                        }
+                    }
+                }
+            ]))[0];
             User.aggregate([
                 {
                     $match: {
                         isWorker: true,
                         openToWork: true,
+                        ...(category ? {
+                            categoryList: {
+                                $elemMatch: {
+                                    id: new mongoose.Types.ObjectId
+                                }
+                            }
+                        } : {} )
                     }
                 },{
                     $lookup: {
                         from: "workers",
                         localField: "primaryCategory",
                         foreignField: "_id",
-                        as: "primaryCategory"
+                        as: "primaryCategoryData"
                     }
                 },{
                     $lookup: {
-                        from: "rating",
+                        from: "ratings",
                         localField: "_id",
                         foreignField: "ratedUserId",
                         as: "ratings"
                     }
                 },{
                     $lookup: {
-                        from: "address",
+                        from: "addresses",
                         localField: "selectedAddress",
                         foreignField: "_id",
                         as: "address"
@@ -417,22 +345,94 @@ export const getWorkersListService = ({page, pageSize, userId}: GetWorkersListSe
                         address: {
                             $first: "$address"
                         },
-                        isFavourite: 1,
-                        primaryCategory: 1
+                        isFavourite: {
+                            $reduce: {
+                                input: "$isFavourite",
+                                initialValue: false,
+                                in: {
+                                    $cond: [
+                                        {
+                                            $or: [
+                                                {
+                                                    $eq: [
+                                                        {
+                                                            $toString: "$$this.userId"
+                                                        },
+                                                        userId
+                                                    ]
+                                                },
+                                                "$$value"
+                                            ]
+                                        },
+                                        true,
+                                        false
+                                    ]
+                                }
+                            }
+                        },
+                        primaryCategoryName: {
+                            $arrayElemAt: [
+                                "$primaryCategoryData.title",
+                                0
+                            ]
+                        },
+                        primaryCategoryDailyWage: {
+                            $arrayElemAt: [
+                                {
+                                    $map: {
+                                        input: "$categoryList",
+                                        in: {
+                                            $cond: [
+                                                {
+                                                    $eq: [
+                                                        "$$this.id",
+                                                        "$primaryCategory"
+                                                    ]
+                                                },
+                                                "$$this.dailyWage",
+                                                null
+                                            ]
+                                        }
+                                    }
+                                },
+                                0
+                            ]
+                        }
                     }
                 },{
-                    $skip: (page * pageSize)
+                    $addFields: {
+                        address: {
+                            $ifNull: ["$address", null]
+                        }
+                    }
                 },{
-                    $limit: pageSize
+                    $match: {
+                        ratingAverage: {
+                            $gte: rating4Plus === 'true' ? 5 : 0
+                        },
+                        ...(previouslyHired === 'true' ? {
+                            previouslyHired: true
+                        }: {})
+                    }
+                },{
+                    $sort: (
+                        sort === 'rating' ?
+                        {
+                            ratingAverage: -1
+                        } : sort === 'wageLowToHigh' ?
+                        {
+                            primaryCategoryDailyWage: 1
+                        } : sort === 'wageHighToLow' ?
+                        {
+                            primaryCategoryDailyWage: -1
+                        } : {ratingAverage: -1}
+                    )
+                },{
+                    $skip: (page !== undefined && pageSize !== undefined) ? (page * pageSize) : 0
+                },{
+                    $limit: pageSize ?? 1
                 }
             ]).then((response) => {
-                response.forEach((data, i, arr) => {
-                    arr[i].isFavourite = arr[i].isFavourite.reduce((acc: {userId: string}, curr: boolean) => JSON.stringify(acc.userId) === JSON.stringify(userId) || curr === true ? true : false, false)
-                    arr[i].primaryCategoryName = arr[i].primaryCategory[0].title;
-                    arr[i].primaryCategoryDailyWage = arr[i].primaryCategory[0].dailyMinWage;
-                    arr[i].address ??= null;
-                    delete arr[i].primaryCategory;
-                })
                 resolve({data: response})
             }).catch((error) => {
                 console.log(error)

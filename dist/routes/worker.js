@@ -20,5 +20,6 @@ router.use(auth_1.auth);
 router.get('/get-worker-categories', (0, account_1.eventHandler)(events_1.GET_WORKER_CATEGORIES));
 router.get('/get-suggested-categories', (0, account_1.eventHandler)(events_1.GET_SUGGESTED_CATEGORIES));
 router.get('/category-search', (0, account_1.eventHandler)(events_1.CATEGORY_SEARCH));
+router.get('/get-workers-list', (0, account_1.eventHandler)(events_1.GET_WORKERS_LIST));
 const workerRouter = router;
 exports.default = workerRouter;
