@@ -294,6 +294,9 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                     $match: {
                         isWorker: true,
                         openToWork: true,
+                        _id: {
+                            $ne: new mongoose.Types.ObjectId(userId)
+                        },
                         ...(category ? {
                             categoryList: {
                                 $elemMatch: {
