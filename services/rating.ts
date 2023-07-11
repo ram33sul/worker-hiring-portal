@@ -35,8 +35,8 @@ interface GetRatingsService {
     pageSize: any;
 }
 export const getRatingsService = ({ ratedUserId, page, pageSize }: GetRatingsService) => {
-    page = isNaN(page) ? parseInt(page) : page;
-    pageSize = isNaN(pageSize) ? parseInt(pageSize) : pageSize;
+    page = new Number(page)
+    pageSize = new Number(pageSize)
     return new Promise((resolve, reject) => {
         try {
             Rating.aggregate([
@@ -64,7 +64,6 @@ export const getRatingsService = ({ ratedUserId, page, pageSize }: GetRatingsSer
                 })
                 resolve({data: response})
             }).catch((error) => {
-                console.log(error)
                 reject({status: 502, error: "Database error occured!"})
             })
         } catch (error) {

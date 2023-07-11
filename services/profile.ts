@@ -264,7 +264,6 @@ interface GetWorkersListServiceProps {
 export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previouslyHired, userId, category}: GetWorkersListServiceProps) => {
     return new Promise(async (resolve, reject) => {
         try {
-            console.log(rating4Plus)
             const { location } = (await User.aggregate([
                 {
                     $match: {
