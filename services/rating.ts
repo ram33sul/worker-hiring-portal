@@ -31,10 +31,12 @@ export const AddRatingService = ({ userId, ratedUserId, rating, review, isWorker
 
 interface GetRatingsService {
     ratedUserId: string;
-    page: number;
-    pageSize: number;
+    page: any;
+    pageSize: any;
 }
 export const getRatingsService = ({ ratedUserId, page, pageSize }: GetRatingsService) => {
+    page = isNaN(page) ? parseInt(page) : page;
+    pageSize = isNaN(pageSize) ? parseInt(pageSize) : pageSize;
     return new Promise((resolve, reject) => {
         try {
             Rating.aggregate([
