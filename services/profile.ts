@@ -254,14 +254,17 @@ export const getUserDetailsService = ({id, userId }: {id: string, userId: string
 
 interface GetWorkersListServiceProps {
     userId: string;
-    page: number;
-    pageSize: number;
-    sort: "wageLowToHigh" | "wageHighToLow" | "rating" | "distance";
+    page: any;
+    pageSize: any;
+    sort: number;
     rating4Plus: string;
     previouslyHired: string;
     category: string
 }
 export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previouslyHired, userId, category}: GetWorkersListServiceProps) => {
+    const sorts = ["rating", "distance", "wageLowToHigh", "wageHighToLow"];
+    page = new Number(page);
+    pageSize = new Number(pageSize)
     return new Promise(async (resolve, reject) => {
         try {
             const { location } = (await User.aggregate([
@@ -418,13 +421,13 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                     }
                 },{
                     $sort: (
-                        sort === 'rating' ?
+                        sorts[sort] === 'rating' ?
                         {
                             ratingAverage: -1
-                        } : sort === 'wageLowToHigh' ?
+                        } : sorts[sort] === 'wageLowToHigh' ?
                         {
                             primaryCategoryDailyWage: 1
-                        } : sort === 'wageHighToLow' ?
+                        } : sorts[sort] === 'wageHighToLow' ?
                         {
                             primaryCategoryDailyWage: -1
                         } : {ratingAverage: -1}
