@@ -433,7 +433,7 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                 },{
                     $skip: (page !== undefined && pageSize !== undefined) ? (page * pageSize) : 0
                 },{
-                    $limit: pageSize ? pageSize : 1
+                    $limit: pageSize ? parseInt(pageSize) : 1
                 }
             ]).then((response) => {
                 resolve({data: response})

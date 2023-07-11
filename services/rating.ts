@@ -52,7 +52,7 @@ export const getRatingsService = ({ ratedUserId, page, pageSize }: GetRatingsSer
                 },{
                     $skip: (page !== undefined && pageSize !== undefined) ? (page * pageSize) : 0
                 },{
-                    $limit: pageSize ? pageSize : 1
+                    $limit: pageSize ? parseInt(pageSize) : 1
                 }
             ]).then((response: any) => {
                 response.forEach((data: any, i: number, arr: any) => {
