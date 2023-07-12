@@ -431,6 +431,40 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                         } : {ratingAverage: -1}
                     )
                 },{
+                    $addFields: {
+                        distance: {
+                          $sqrt: {
+                            $add: [
+                              {
+                                $pow: [
+                                  {
+                                    $subtract: [
+                                      location[0], {
+                                        '$arrayElemAt': [
+                                          '$address.location', 0
+                                        ]
+                                      }
+                                    ]
+                                  }, 2
+                                ]
+                              }, {
+                                $pow: [
+                                  {
+                                    $subtract: [
+                                      location[1], {
+                                        $arrayElemAt: [
+                                          '$address.location', 1
+                                        ]
+                                      }
+                                    ]
+                                  }, 2
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      }
+                },{
                     $skip: (page !== undefined && pageSize !== undefined) ? (page * pageSize) : 0
                 },{
                     $limit: pageSize ? parseInt(pageSize) : 1
