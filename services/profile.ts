@@ -300,7 +300,7 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                         ...(category ? {
                             categoryList: {
                                 $elemMatch: {
-                                    id: new mongoose.Types.ObjectId
+                                    id: new mongoose.Types.ObjectId(category)
                                 }
                             }
                         } : {} )
@@ -600,6 +600,50 @@ export const getWorkerDetailsService = ({userId, id}: {userId: string, id: strin
             })
         } catch (error) {
             reject({status: 500, error: "Internal error occured!"})
+        }
+    })
+}
+
+
+export const getRatingsCountService = ({id, userId }: {id: string, userId: string}) => {
+    return new Promise((resolve, reject) => {
+        try {
+            const _id = new mongoose.Types.ObjectId(id);
+            User.aggregate([
+                {
+                    $match: {
+                        _id: new mongoose.Types.ObjectId(id)
+                    }
+                },{
+                    $lookup: {
+                        from: "ratings",
+                        localField: "_id",
+                        foreignField: "ratedUserId",
+                        as: "ratingsDetails"
+                    }
+                },{
+                    $group: {
+                        _id: "$_id",
+                        ratingsCount: 
+                    }
+                }
+            ]).then((response) => {
+                for(let i = 0; i < response[0].categoryList.length; i++){
+                    for(let j = 0; j < response[0].categoryListDetails.length; j++){
+                        if(JSON.stringify(response[0].categoryList[i].id) === JSON.stringify(response[0].categoryListDetails[j]._id)){
+                            response[0].categoryList[i] = { ...response[0].categoryList[i], ...response[0].categoryListDetails[j]};
+                        }
+                    }
+                }
+                if(id !== userId){
+                    delete response[0].identityUrl;
+                }
+                resolve({data: response[0]})
+            }).catch((error) => {
+                reject({status: 502, error: new Error("Database error occured!")})
+            })
+        } catch (error) {
+            reject({status: 500, error: new Error("Internal error occured!")})
         }
     })
 }
