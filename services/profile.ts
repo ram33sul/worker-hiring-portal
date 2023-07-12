@@ -605,7 +605,7 @@ export const getWorkerDetailsService = ({userId, id}: {userId: string, id: strin
 }
 
 
-export const getRatingsCountService = ({id, userId }: {id: string, userId: string}) => {
+export const getRatingsListService = ({id, userId }: {id: string, userId: string}) => {
     return new Promise((resolve, reject) => {
         try {
             const _id = new mongoose.Types.ObjectId(id);
@@ -624,7 +624,12 @@ export const getRatingsCountService = ({id, userId }: {id: string, userId: strin
                 },{
                     $group: {
                         _id: "$_id",
-                        ratingsCount: 
+                        ratingsCount: {
+                            $sum: 1
+                        },
+                        ratingAverage: {
+                            $avg: "$rating"
+                        }
                     }
                 }
             ]).then((response) => {
