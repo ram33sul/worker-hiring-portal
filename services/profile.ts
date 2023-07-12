@@ -445,3 +445,127 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
         }
     })
 }
+
+
+export const getWorkerDetailsService = ({userId, id}: {userId: string, id: string}) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            User.aggregate([
+                {
+                    $match: {
+                        _id: new mongoose.Types.ObjectId(id)
+                    }
+                },{
+                    $lookup: {
+                        from: "workers",
+                        localField: "primaryCategory",
+                        foreignField: "_id",
+                        as: "primaryCategoryData"
+                    }
+                },{
+                    $lookup: {
+                        from: "ratings",
+                        localField: "_id",
+                        foreignField: "ratedUserId",
+                        as: "ratings"
+                    }
+                },{
+                    $lookup: {
+                        from: "addresses",
+                        localField: "selectedAddress",
+                        foreignField: "_id",
+                        as: "address"
+                    }
+                },{
+                    $lookup: {
+                        from: "favourites",
+                        localField: "_id",
+                        foreignField: "addedUserId",
+                        as: "isFavourite"
+                    }
+                },{
+                    $project: {
+                        userId: "$_id",
+                        firstName: 1,
+                        lastName: 1,
+                        profileImageUrl: "$profilePicture",
+                        ratingAverage: {
+                            $avg: "$ratings.rating"
+                        },
+                        ratingCount: {
+                            $size: "$ratings"
+                        },
+                        address: {
+                            $first: "$address"
+                        },
+                        isFavourite: {
+                            $reduce: {
+                                input: "$isFavourite",
+                                initialValue: false,
+                                in: {
+                                    $cond: [
+                                        {
+                                            $or: [
+                                                {
+                                                    $eq: [
+                                                        {
+                                                            $toString: "$$this.userId"
+                                                        },
+                                                        userId
+                                                    ]
+                                                },
+                                                "$$value"
+                                            ]
+                                        },
+                                        true,
+                                        false
+                                    ]
+                                }
+                            }
+                        },
+                        primaryCategoryName: {
+                            $arrayElemAt: [
+                                "$primaryCategoryData.title",
+                                0
+                            ]
+                        },
+                        primaryCategoryDailyWage: {
+                            $arrayElemAt: [
+                                {
+                                    $map: {
+                                        input: "$categoryList",
+                                        in: {
+                                            $cond: [
+                                                {
+                                                    $eq: [
+                                                        "$$this.id",
+                                                        "$primaryCategory"
+                                                    ]
+                                                },
+                                                "$$this.dailyWage",
+                                                null
+                                            ]
+                                        }
+                                    }
+                                },
+                                0
+                            ]
+                        }
+                    }
+                },{
+                    $addFields: {
+                        address: {
+                            $ifNull: ["$address", null]
+                        }
+                    }
+                }
+            ]).then((response) => {
+                resolve({data: response[0]})
+            }).catch((error) => {
+                reject({status: 502, error: "Database error occured!"})
+            })
+        } catch (error) {
+            reject({status: 500, error: "Internal error occured!"})
+        }
+    })
+}
