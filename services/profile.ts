@@ -336,8 +336,13 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                 },{
                     $project: {
                         userId: "$_id",
+                        isVerified: 1,
+                        gender: 1,
+                        openToWork: 1,
+                        bio: 1,
                         firstName: 1,
                         lastName: 1,
+                        categoryList: 1,
                         profileImageUrl: "$profilePicture",
                         ratingAverage: {
                             $avg: "$ratings.rating"
