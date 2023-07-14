@@ -520,6 +520,10 @@ export const getWorkerDetailsService = ({userId, id}: {userId: string, id: strin
                 },{
                     $project: {
                         userId: "$_id",
+                        isVerified: 1,
+                        gender: 1,
+                        openToWork: 1,
+                        bio: 1,
                         firstName: 1,
                         lastName: 1,
                         profileImageUrl: "$profilePicture",
