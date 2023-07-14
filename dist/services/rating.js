@@ -46,18 +46,18 @@ const getRatingsService = ({ ratedUserId, page, pageSize }) => {
                 }, {
                     $skip: (page !== undefined && pageSize !== undefined) ? (page * pageSize) : 0
                 }, {
-                    $limit: pageSize !== null && pageSize !== void 0 ? pageSize : 1
+                    $limit: pageSize ? parseInt(pageSize) : 1
                 }
             ]).then((response) => {
                 response.forEach((data, i, arr) => {
-                    var _a, _b, _c, _d;
+                    var _a, _b, _c, _d, _e, _f;
                     arr[i].firstName = (_b = (_a = arr[i].userDetails) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.firstName;
                     arr[i].lastName = (_d = (_c = arr[i].userDetails) === null || _c === void 0 ? void 0 : _c[0]) === null || _d === void 0 ? void 0 : _d.lastName;
+                    arr[i].profileImageUrl = (_f = (_e = arr[i].userDetails) === null || _e === void 0 ? void 0 : _e[0]) === null || _f === void 0 ? void 0 : _f.profilePicture;
                     delete arr[i].userDetails;
                 });
                 resolve({ data: response });
             }).catch((error) => {
-                console.log(error);
                 reject({ status: 502, error: "Database error occured!" });
             });
         }

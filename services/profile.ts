@@ -2,6 +2,7 @@ import mongoose from "mongoose"
 import { validateAge, validateBio, validateEmail, validateGender, validateName } from "../validation/inputs"
 import { validateBoolean, validatePositiveNumber, validateString, validateStringArray } from "../validation/types"
 import User from "../model/userSchema";
+import Worker from "../model/workerCategorySchema";
 import { validate } from "../validation/general";
 import { uploadToCloudinary } from "./cloudinary";
 
@@ -293,10 +294,9 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                 {
                     $match: {
                         isWorker: true,
-                        openToWork: true,
-                        _id: {
-                            $ne: new mongoose.Types.ObjectId(userId)
-                        },
+                        // _id: {
+                        //     $ne: new mongoose.Types.ObjectId(userId)
+                        // },
                         ...(category ? {
                             categoryList: {
                                 $elemMatch: {
@@ -336,13 +336,13 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                 },{
                     $project: {
                         userId: "$_id",
-                        isVerified: 1,
                         gender: 1,
                         openToWork: 1,
                         bio: 1,
                         firstName: 1,
                         lastName: 1,
                         categoryList: 1,
+                        isVerified: "$isVerified",
                         profileImageUrl: "$profilePicture",
                         ratingAverage: {
                             $avg: "$ratings.rating"
@@ -378,34 +378,34 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                                 }
                             }
                         },
-                        primaryCategoryName: {
+                        primaryCategoryId: {
                             $arrayElemAt: [
-                                "$primaryCategoryData.title",
+                                "$primaryCategoryData._id",
                                 0
                             ]
                         },
-                        primaryCategoryDailyWage: {
-                            $arrayElemAt: [
-                                {
-                                    $map: {
-                                        input: "$categoryList",
-                                        in: {
-                                            $cond: [
-                                                {
-                                                    $eq: [
-                                                        "$$this.id",
-                                                        "$primaryCategory"
-                                                    ]
-                                                },
-                                                "$$this.dailyWage",
-                                                null
-                                            ]
-                                        }
-                                    }
-                                },
-                                0
-                            ]
-                        }
+                        // primaryCategoryDailyWage: {
+                        //     $arrayElemAt: [
+                        //         {
+                        //             $map: {
+                        //                 input: "$categoryList",
+                        //                 in: {
+                        //                     $cond: [
+                        //                         {
+                        //                             $eq: [
+                        //                                 "$$this.id",
+                        //                                 "$primaryCategory"
+                        //                             ]
+                        //                         },
+                        //                         "$$this.dailyWage",
+                        //                         null
+                        //                     ]
+                        //                 }
+                        //             }
+                        //         },
+                        //         0
+                        //     ]
+                        // }
                     }
                 },{
                     $addFields: {
@@ -475,7 +475,21 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                     $limit: pageSize ? parseInt(pageSize) : 1
                 }
             ]).then((response) => {
-                resolve({data: response})
+                Worker.find().lean().then((workers) => {
+                    for(let i in response){
+                        for(let j in response[i].categoryList){
+                            for(let worker of workers){
+                                if(JSON.stringify(response[i].categoryList[j].id) === JSON.stringify(worker._id)){
+                                    response[i].categoryList[j] = { ...response[i].categoryList[j], ...worker}
+                                    delete response[i].categoryList[j]._id;
+                                    delete response[i].categoryList[j].dailyMinWage;
+                                    delete response[i].categoryList[j].hourlyMinWage;
+                                }
+                            }
+                        }
+                    }
+                    resolve({data: response})
+                })
             }).catch((error) => {
                 reject({status: 502, error: "Database error occured!"})
             })

@@ -11,5 +11,6 @@ const router = express_1.default.Router();
 router.use(auth_1.auth);
 router.post('/add-rating', (0, account_1.eventHandler)(events_1.ADD_RATING));
 router.get('/get-ratings', (0, account_1.eventHandler)(events_1.GET_RATINGS));
+router.get('/get-ratings-list', (0, account_1.eventHandler)(events_1.GET_RATINGS_LIST));
 const ratingRouter = router;
 exports.default = ratingRouter;
