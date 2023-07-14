@@ -342,7 +342,7 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                         firstName: 1,
                         lastName: 1,
                         categoryList: 1,
-                        isVerified: "$isVerified",
+                        isVerified: 1,
                         profileImageUrl: "$profilePicture",
                         ratingAverage: {
                             $avg: "$ratings.rating"
