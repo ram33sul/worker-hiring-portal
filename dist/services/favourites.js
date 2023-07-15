@@ -104,7 +104,8 @@ const getFavouritesService = ({ userId, page, pageSize }) => {
                     }
                 }, {
                     $project: {
-                        userId: "$userId",
+                        _id: "$userDetails._id",
+                        userId: "$userDetails._id",
                         gender: "$userDetails.gender",
                         openToWork: "$userDetails.openToWork",
                         bio: "$userDetails.bio",
@@ -113,6 +114,8 @@ const getFavouritesService = ({ userId, page, pageSize }) => {
                         categoryList: "$userDetails.categoryList",
                         isVerified: "$userDetails.isVerified",
                         profilePicture: "$userDetails.profilePicture",
+                        primaryCategory: "$userDetails.primaryCategory",
+                        selectedAddress: "$userDetails.selectedAddress",
                     }
                 }, {
                     $lookup: {

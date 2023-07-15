@@ -88,7 +88,8 @@ export const getFavouritesService = ({userId, page, pageSize}: {userId: string |
                     }
                 },{
                     $project: {
-                        userId: "$userId",
+                        _id: "$userDetails._id",
+                        userId: "$userDetails._id",
                         gender: "$userDetails.gender",
                         openToWork: "$userDetails.openToWork",
                         bio: "$userDetails.bio",
@@ -97,6 +98,8 @@ export const getFavouritesService = ({userId, page, pageSize}: {userId: string |
                         categoryList: "$userDetails.categoryList",
                         isVerified: "$userDetails.isVerified",
                         profilePicture: "$userDetails.profilePicture",
+                        primaryCategory: "$userDetails.primaryCategory",
+                        selectedAddress: "$userDetails.selectedAddress",
                     }
                 },{
                     $lookup: {
