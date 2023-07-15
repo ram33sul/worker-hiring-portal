@@ -68,6 +68,12 @@ export const getRatingsService = ({ ratedUserId, page, pageSize }: GetRatingsSer
                                 "$userDetails.lastName",
                                 0
                             ]
+                        },
+                        profileImageUrl: {
+                            $arrayElemAt: [
+                                "$userDetails.profilePicture",
+                                0
+                            ]
                         }
                     }
                 },{

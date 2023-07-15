@@ -62,6 +62,12 @@ const getRatingsService = ({ ratedUserId, page, pageSize }) => {
                                 "$userDetails.lastName",
                                 0
                             ]
+                        },
+                        profileImageUrl: {
+                            $arrayElemAt: [
+                                "$userDetails.profilePicture",
+                                0
+                            ]
                         }
                     }
                 }, {
