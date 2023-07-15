@@ -245,9 +245,7 @@ const getWorkersListService = ({ page, pageSize, sort, rating4Plus, previouslyHi
             ]))[0];
             userSchema_1.default.aggregate([
                 {
-                    $match: Object.assign({ isWorker: true, _id: {
-                            $ne: new mongoose_1.default.Types.ObjectId(userId)
-                        } }, (category ? {
+                    $match: Object.assign({ isWorker: true }, (category ? {
                         categoryList: {
                             $elemMatch: {
                                 id: new mongoose_1.default.Types.ObjectId(category)
@@ -332,29 +330,7 @@ const getWorkersListService = ({ page, pageSize, sort, rating4Plus, previouslyHi
                                 "$primaryCategoryData._id",
                                 0
                             ]
-                        },
-                        // primaryCategoryDailyWage: {
-                        //     $arrayElemAt: [
-                        //         {
-                        //             $map: {
-                        //                 input: "$categoryList",
-                        //                 in: {
-                        //                     $cond: [
-                        //                         {
-                        //                             $eq: [
-                        //                                 "$$this.id",
-                        //                                 "$primaryCategory"
-                        //                             ]
-                        //                         },
-                        //                         "$$this.dailyWage",
-                        //                         null
-                        //                     ]
-                        //                 }
-                        //             }
-                        //         },
-                        //         0
-                        //     ]
-                        // }
+                        }
                     }
                 }, {
                     $addFields: {
@@ -530,29 +506,7 @@ const getWorkerDetailsService = ({ userId, id }) => {
                                 "$primaryCategoryData._id",
                                 0
                             ]
-                        },
-                        // primaryCategoryDailyWage: {
-                        //     $arrayElemAt: [
-                        //         {
-                        //             $map: {
-                        //                 input: "$categoryList",
-                        //                 in: {
-                        //                     $cond: [
-                        //                         {
-                        //                             $eq: [
-                        //                                 "$$this.id",
-                        //                                 "$primaryCategory"
-                        //                             ]
-                        //                         },
-                        //                         "$$this.dailyWage",
-                        //                         null
-                        //                     ]
-                        //                 }
-                        //             }
-                        //         },
-                        //         0
-                        //     ]
-                        // }
+                        }
                     }
                 }, {
                     $addFields: {

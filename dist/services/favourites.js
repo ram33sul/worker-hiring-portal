@@ -240,7 +240,6 @@ const getFavouritesService = ({ userId, page, pageSize }) => {
                     $limit: pageSize ? parseInt(pageSize) : 1
                 }
             ]).then((response) => {
-                console.log(response);
                 resolve({ data: response });
             }).catch((error) => {
                 reject({ status: 500, error: "Database error occured!" });
