@@ -8,14 +8,28 @@ interface AddProposalServiceProps {
     wage: number;
     isFullDay: boolean;
     isBeforeNoon: boolean;
-    proposedDate: string;
+    proposedDate: number;
     workDescription: string;
     proposedAddressId: string;
 }
 
 export const addProposalService = ({workerId, chosenCategoryId, wage, isFullDay, isBeforeNoon, proposedDate, workDescription, proposedAddressId, userId}: AddProposalServiceProps) => {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         try {
+            const proposedDateInDate = new Date(proposedDate)
+            const proposalData = await Proposal.find({
+                workerId: new mongoose.Types.ObjectId(workerId),
+                isFullDay,
+                isBeforeNoon,
+            })
+            const isWorkerBusy = proposalData?.reduce((acc: any, curr: any) => {
+                const proposedDateString1 = `${acc.proposedDate.getDate()}${acc.proposedDate.getMonth()}${acc.proposedDate.getFullYear()}`;
+                const proposedDateString2 = `${proposedDateInDate.getDate()}${proposedDateInDate.getMonth()}${proposedDateInDate.getFullYear()}`;
+                return proposedDateString1 === proposedDateString2 || curr === true;
+            }, false)
+            if(isWorkerBusy){
+                return reject({status: 409, error: "Worker is busy on the given date"})
+            }
             Proposal.create({
                 userId: new mongoose.Types.ObjectId(userId),
                 workerId: new mongoose.Types.ObjectId(workerId),
@@ -23,7 +37,7 @@ export const addProposalService = ({workerId, chosenCategoryId, wage, isFullDay,
                 wage,
                 isFullDay,
                 isBeforeNoon,
-                proposedDate,
+                proposedDate: proposedDateInDate,
                 workDescription,
                 proposedAddressId,
                 timestamp: new Date()
