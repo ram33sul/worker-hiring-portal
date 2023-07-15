@@ -245,7 +245,9 @@ const getWorkersListService = ({ page, pageSize, sort, rating4Plus, previouslyHi
             ]))[0];
             userSchema_1.default.aggregate([
                 {
-                    $match: Object.assign({ isWorker: true }, (category ? {
+                    $match: Object.assign({ isWorker: true, _id: {
+                            $ne: new mongoose_1.default.Types.ObjectId(userId)
+                        } }, (category ? {
                         categoryList: {
                             $elemMatch: {
                                 id: new mongoose_1.default.Types.ObjectId(category)

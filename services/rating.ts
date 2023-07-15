@@ -44,10 +44,31 @@ export const getRatingsService = ({ ratedUserId, page, pageSize }: GetRatingsSer
                     }
                 },{
                     $lookup: {
-                        from: "user",
+                        from: "users",
                         localField: "userId",
                         foreignField: "_id",
                         as: "userDetails"
+                    }
+                },{
+                    $project: {
+                        userId: 1,
+                        ratedUserId: 1,
+                        rating: 1,
+                        review: 1,
+                        isWorker: 1,
+                        timestamp: 1,
+                        firstName: {
+                            $arrayElemAt: [
+                                "$userDetails.firstName",
+                                0
+                            ]
+                        },
+                        lastName: {
+                            $arrayElemAt: [
+                                "$userDetails.lastName",
+                                0
+                            ]
+                        }
                     }
                 },{
                     $skip: (page !== undefined && pageSize !== undefined) ? (page * pageSize) : 0
@@ -55,14 +76,10 @@ export const getRatingsService = ({ ratedUserId, page, pageSize }: GetRatingsSer
                     $limit: pageSize ? parseInt(pageSize) : 1
                 }
             ]).then((response: any) => {
-                response.forEach((data: any, i: number, arr: any) => {
-                    arr[i].firstName = arr[i].userDetails?.[0]?.firstName;
-                    arr[i].lastName = arr[i].userDetails?.[0]?.lastName;
-                    arr[i].profileImageUrl = arr[i].userDetails?.[0]?.profilePicture;
-                    delete arr[i].userDetails;
-                })
+                response = response.map((res: any) => ({...res, timestamp: res.timestamp?.getTime()}))
                 resolve({data: response})
             }).catch((error) => {
+                console.log(error)
                 reject({status: 502, error: "Database error occured!"})
             })
         } catch (error) {
