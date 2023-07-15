@@ -670,19 +670,27 @@ export const getRatingsListService = ({id, userId }: {id: string, userId: string
                         }
                     }
                 }
-            ]).then((response) => {
-                for(let i = 0; i < response[0].categoryList.length; i++){
-                    for(let j = 0; j < response[0].categoryListDetails.length; j++){
-                        if(JSON.stringify(response[0].categoryList[i].id) === JSON.stringify(response[0].categoryListDetails[j]._id)){
-                            response[0].categoryList[i] = { ...response[0].categoryList[i], ...response[0].categoryListDetails[j]};
+            ]).then((response: any) => {
+                if(response.length === 0){
+                    response = [{
+                        ratingsCount: 0,
+                        ratingsAverage: 0,
+                    }]
+                } else {
+                    for(let i = 0; i < response[0]?.categoryList?.length; i++){
+                        for(let j = 0; j < response[0].categoryListDetails.length; j++){
+                            if(JSON.stringify(response[0].categoryList[i].id) === JSON.stringify(response[0].categoryListDetails[j]._id)){
+                                response[0].categoryList[i] = { ...response[0].categoryList[i], ...response[0].categoryListDetails[j]};
+                            }
                         }
                     }
-                }
-                if(id !== userId){
-                    delete response[0].identityUrl;
+                    if(id !== userId){
+                        delete response[0].identityUrl;
+                    }
                 }
                 resolve({data: response[0]})
             }).catch((error) => {
+                console.log(error)
                 reject({status: 502, error: new Error("Database error occured!")})
             })
         } catch (error) {

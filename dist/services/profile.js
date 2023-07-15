@@ -245,7 +245,9 @@ const getWorkersListService = ({ page, pageSize, sort, rating4Plus, previouslyHi
             ]))[0];
             userSchema_1.default.aggregate([
                 {
-                    $match: Object.assign({ isWorker: true }, (category ? {
+                    $match: Object.assign({ isWorker: true, _id: {
+                            $ne: new mongoose_1.default.Types.ObjectId(userId)
+                        } }, (category ? {
                         categoryList: {
                             $elemMatch: {
                                 id: new mongoose_1.default.Types.ObjectId(category)
@@ -289,7 +291,7 @@ const getWorkersListService = ({ page, pageSize, sort, rating4Plus, previouslyHi
                         firstName: 1,
                         lastName: 1,
                         categoryList: 1,
-                        isVerified: "$isVerified",
+                        isVerified: 1,
                         profileImageUrl: "$profilePicture",
                         ratingAverage: {
                             $avg: "$ratings.rating"
@@ -481,12 +483,13 @@ const getWorkerDetailsService = ({ userId, id }) => {
                 }, {
                     $project: {
                         userId: "$_id",
-                        isVerified: 1,
                         gender: 1,
                         openToWork: 1,
                         bio: 1,
                         firstName: 1,
                         lastName: 1,
+                        categoryList: 1,
+                        isVerified: 1,
                         profileImageUrl: "$profilePicture",
                         ratingAverage: {
                             $avg: "$ratings.rating"
@@ -522,34 +525,34 @@ const getWorkerDetailsService = ({ userId, id }) => {
                                 }
                             }
                         },
-                        primaryCategoryName: {
+                        primaryCategoryId: {
                             $arrayElemAt: [
-                                "$primaryCategoryData.title",
+                                "$primaryCategoryData._id",
                                 0
                             ]
                         },
-                        primaryCategoryDailyWage: {
-                            $arrayElemAt: [
-                                {
-                                    $map: {
-                                        input: "$categoryList",
-                                        in: {
-                                            $cond: [
-                                                {
-                                                    $eq: [
-                                                        "$$this.id",
-                                                        "$primaryCategory"
-                                                    ]
-                                                },
-                                                "$$this.dailyWage",
-                                                null
-                                            ]
-                                        }
-                                    }
-                                },
-                                0
-                            ]
-                        }
+                        // primaryCategoryDailyWage: {
+                        //     $arrayElemAt: [
+                        //         {
+                        //             $map: {
+                        //                 input: "$categoryList",
+                        //                 in: {
+                        //                     $cond: [
+                        //                         {
+                        //                             $eq: [
+                        //                                 "$$this.id",
+                        //                                 "$primaryCategory"
+                        //                             ]
+                        //                         },
+                        //                         "$$this.dailyWage",
+                        //                         null
+                        //                     ]
+                        //                 }
+                        //             }
+                        //         },
+                        //         0
+                        //     ]
+                        // }
                     }
                 }, {
                     $addFields: {
@@ -559,7 +562,21 @@ const getWorkerDetailsService = ({ userId, id }) => {
                     }
                 }
             ]).then((response) => {
-                resolve({ data: response[0] });
+                workerCategorySchema_1.default.find().lean().then((workers) => {
+                    for (let i in response) {
+                        for (let j in response[i].categoryList) {
+                            for (let worker of workers) {
+                                if (JSON.stringify(response[i].categoryList[j].id) === JSON.stringify(worker._id)) {
+                                    response[i].categoryList[j] = Object.assign(Object.assign({}, response[i].categoryList[j]), worker);
+                                    delete response[i].categoryList[j]._id;
+                                    delete response[i].categoryList[j].dailyMinWage;
+                                    delete response[i].categoryList[j].hourlyMinWage;
+                                }
+                            }
+                        }
+                    }
+                    resolve({ data: response[0] });
+                });
             }).catch((error) => {
                 reject({ status: 502, error: "Database error occured!" });
             });
@@ -598,18 +615,28 @@ const getRatingsListService = ({ id, userId }) => {
                     }
                 }
             ]).then((response) => {
-                for (let i = 0; i < response[0].categoryList.length; i++) {
-                    for (let j = 0; j < response[0].categoryListDetails.length; j++) {
-                        if (JSON.stringify(response[0].categoryList[i].id) === JSON.stringify(response[0].categoryListDetails[j]._id)) {
-                            response[0].categoryList[i] = Object.assign(Object.assign({}, response[0].categoryList[i]), response[0].categoryListDetails[j]);
+                var _a, _b;
+                if (response.length === 0) {
+                    response = [{
+                            ratingsCount: 0,
+                            ratingsAverage: 0,
+                        }];
+                }
+                else {
+                    for (let i = 0; i < ((_b = (_a = response[0]) === null || _a === void 0 ? void 0 : _a.categoryList) === null || _b === void 0 ? void 0 : _b.length); i++) {
+                        for (let j = 0; j < response[0].categoryListDetails.length; j++) {
+                            if (JSON.stringify(response[0].categoryList[i].id) === JSON.stringify(response[0].categoryListDetails[j]._id)) {
+                                response[0].categoryList[i] = Object.assign(Object.assign({}, response[0].categoryList[i]), response[0].categoryListDetails[j]);
+                            }
                         }
                     }
-                }
-                if (id !== userId) {
-                    delete response[0].identityUrl;
+                    if (id !== userId) {
+                        delete response[0].identityUrl;
+                    }
                 }
                 resolve({ data: response[0] });
             }).catch((error) => {
+                console.log(error);
                 reject({ status: 502, error: new Error("Database error occured!") });
             });
         }
