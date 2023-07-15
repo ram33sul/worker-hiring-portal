@@ -260,9 +260,10 @@ interface GetWorkersListServiceProps {
     sort: number;
     rating4Plus: string;
     previouslyHired: string;
-    category: string
+    category: string;
+    query: string;
 }
-export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previouslyHired, userId, category}: GetWorkersListServiceProps) => {
+export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previouslyHired, userId, category, query}: GetWorkersListServiceProps) => {
     const sorts = ["rating", "distance", "wageLowToHigh", "wageHighToLow"];
     return new Promise(async (resolve, reject) => {
         try {
@@ -455,6 +456,10 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
             ]).then((response) => {
                 Worker.find().lean().then((workers) => {
                     for(let i in response){
+                        if(!!query && !response[i].firstName?.includes(query) && !response[i].lastName?.includes(query) && !`${response[i].firstName} ${response[i].lastName}`.includes(query)){
+                            response.splice(parseInt(i), 1);
+                            continue;
+                        }
                         for(let j in response[i].categoryList){
                             for(let worker of workers){
                                 if(JSON.stringify(response[i].categoryList[j].id) === JSON.stringify(worker._id)){

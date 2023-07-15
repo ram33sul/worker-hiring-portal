@@ -215,7 +215,7 @@ const getUserDetailsService = ({ id, userId }) => {
     });
 };
 exports.getUserDetailsService = getUserDetailsService;
-const getWorkersListService = ({ page, pageSize, sort, rating4Plus, previouslyHired, userId, category }) => {
+const getWorkersListService = ({ page, pageSize, sort, rating4Plus, previouslyHired, userId, category, query }) => {
     const sorts = ["rating", "distance", "wageLowToHigh", "wageHighToLow"];
     return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
         try {
@@ -396,7 +396,12 @@ const getWorkersListService = ({ page, pageSize, sort, rating4Plus, previouslyHi
                 }
             ]).then((response) => {
                 workerCategorySchema_1.default.find().lean().then((workers) => {
+                    var _a, _b;
                     for (let i in response) {
+                        if (!!query && !((_a = response[i].firstName) === null || _a === void 0 ? void 0 : _a.includes(query)) && !((_b = response[i].lastName) === null || _b === void 0 ? void 0 : _b.includes(query)) && !`${response[i].firstName} ${response[i].lastName}`.includes(query)) {
+                            response.splice(parseInt(i), 1);
+                            continue;
+                        }
                         for (let j in response[i].categoryList) {
                             for (let worker of workers) {
                                 if (JSON.stringify(response[i].categoryList[j].id) === JSON.stringify(worker._id)) {
