@@ -43,7 +43,7 @@ export const getFavouritesService = ({userId, page, pageSize}: {userId: string |
     return new Promise((resolve, reject) => {
         try {
             Favourites.find({
-                _id: new mongoose.Types.ObjectId(userId)
+                userId: new mongoose.Types.ObjectId(userId)
             }).skip(page * pageSize).limit(pageSize).then((response) => {
                 resolve({data: response})
             }).catch((error) => {
