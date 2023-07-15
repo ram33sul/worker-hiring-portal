@@ -295,9 +295,9 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                 {
                     $match: {
                         isWorker: true,
-                        _id: {
-                            $ne: new mongoose.Types.ObjectId(userId)
-                        },
+                        // _id: {
+                        //     $ne: new mongoose.Types.ObjectId(userId)
+                        // },
                         ...(category ? {
                             categoryList: {
                                 $elemMatch: {
@@ -455,7 +455,7 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                 }
             ]).then((response) => {
                 Worker.find().lean().then((workers) => {
-                    query = query.toLowerCase()
+                    query = query?.toLowerCase()
                     for(let i in response){
                         if(!!query && !response[i].firstName?.toLowerCase()?.includes(query) && !response[i].lastName?.toLowerCase()?.includes(query) && !`${response[i].firstName} ${response[i].lastName}`.toLowerCase().includes(query)){
                             response.splice(parseInt(i), 1);

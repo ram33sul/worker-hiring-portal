@@ -245,9 +245,7 @@ const getWorkersListService = ({ page, pageSize, sort, rating4Plus, previouslyHi
             ]))[0];
             userSchema_1.default.aggregate([
                 {
-                    $match: Object.assign({ isWorker: true, _id: {
-                            $ne: new mongoose_1.default.Types.ObjectId(userId)
-                        } }, (category ? {
+                    $match: Object.assign({ isWorker: true }, (category ? {
                         categoryList: {
                             $elemMatch: {
                                 id: new mongoose_1.default.Types.ObjectId(category)
@@ -399,7 +397,7 @@ const getWorkersListService = ({ page, pageSize, sort, rating4Plus, previouslyHi
             ]).then((response) => {
                 workerCategorySchema_1.default.find().lean().then((workers) => {
                     var _a, _b, _c, _d;
-                    query = query.toLowerCase();
+                    query = query === null || query === void 0 ? void 0 : query.toLowerCase();
                     for (let i in response) {
                         if (!!query && !((_b = (_a = response[i].firstName) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === null || _b === void 0 ? void 0 : _b.includes(query)) && !((_d = (_c = response[i].lastName) === null || _c === void 0 ? void 0 : _c.toLowerCase()) === null || _d === void 0 ? void 0 : _d.includes(query)) && !`${response[i].firstName} ${response[i].lastName}`.toLowerCase().includes(query)) {
                             response.splice(parseInt(i), 1);
