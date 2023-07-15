@@ -7,6 +7,7 @@ import bannerRouter from './banner';
 import ratingRouter from './rating';
 import favouritesRouter from './favourites';
 import sampleWorkRouter from './sampleWorks';
+import proposalRouter from './proposal';
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use('/banner', bannerRouter);
 app.use('/rating', ratingRouter);
 app.use('/favourites', favouritesRouter);
 app.use('/sample-work', sampleWorkRouter);
+app.use('/proposal', proposalRouter);
 
 const apiRouter = app;
 
