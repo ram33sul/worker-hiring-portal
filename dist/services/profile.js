@@ -396,9 +396,10 @@ const getWorkersListService = ({ page, pageSize, sort, rating4Plus, previouslyHi
                 }
             ]).then((response) => {
                 workerCategorySchema_1.default.find().lean().then((workers) => {
-                    var _a, _b;
+                    var _a, _b, _c, _d;
+                    query = query.toLowerCase();
                     for (let i in response) {
-                        if (!!query && !((_a = response[i].firstName) === null || _a === void 0 ? void 0 : _a.includes(query)) && !((_b = response[i].lastName) === null || _b === void 0 ? void 0 : _b.includes(query)) && !`${response[i].firstName} ${response[i].lastName}`.includes(query)) {
+                        if (!!query && !((_b = (_a = response[i].firstName) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === null || _b === void 0 ? void 0 : _b.includes(query)) && !((_d = (_c = response[i].lastName) === null || _c === void 0 ? void 0 : _c.toLowerCase()) === null || _d === void 0 ? void 0 : _d.includes(query)) && !`${response[i].firstName} ${response[i].lastName}`.toLowerCase().includes(query)) {
                             response.splice(parseInt(i), 1);
                             continue;
                         }
