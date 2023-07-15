@@ -234,6 +234,8 @@ export const getFavouritesService = ({userId, page, pageSize}: {userId: string |
                             for(let worker of workers){
                                 if(JSON.stringify(response[i].categoryList[j].id) === JSON.stringify(worker._id)){
                                     response[i].categoryList[j] = { ...response[i].categoryList[j], ...worker}
+                                    console.log({...worker, ...response[i].categoryList[j]})
+                                    console.log(response[i].categoryList)
                                     delete response[i].categoryList[j]._id;
                                     delete response[i].categoryList[j].dailyMinWage;
                                     delete response[i].categoryList[j].hourlyMinWage;
@@ -243,7 +245,6 @@ export const getFavouritesService = ({userId, page, pageSize}: {userId: string |
                     }
                     resolve({data: response})
                 })
-                resolve({data: response})
             }).catch((error) => {
                 reject({status: 500, error: "Database error occured!"})
             })

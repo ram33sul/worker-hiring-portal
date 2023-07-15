@@ -250,6 +250,8 @@ const getFavouritesService = ({ userId, page, pageSize }) => {
                             for (let worker of workers) {
                                 if (JSON.stringify(response[i].categoryList[j].id) === JSON.stringify(worker._id)) {
                                     response[i].categoryList[j] = Object.assign(Object.assign({}, response[i].categoryList[j]), worker);
+                                    console.log(Object.assign(Object.assign({}, worker), response[i].categoryList[j]));
+                                    console.log(response[i].categoryList);
                                     delete response[i].categoryList[j]._id;
                                     delete response[i].categoryList[j].dailyMinWage;
                                     delete response[i].categoryList[j].hourlyMinWage;
@@ -259,7 +261,6 @@ const getFavouritesService = ({ userId, page, pageSize }) => {
                     }
                     resolve({ data: response });
                 });
-                resolve({ data: response });
             }).catch((error) => {
                 reject({ status: 500, error: "Database error occured!" });
             });
