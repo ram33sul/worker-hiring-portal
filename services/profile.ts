@@ -646,7 +646,9 @@ export const getWorkerDetailsService = ({userId, id}: {userId: string, id: strin
 export const getRatingsListService = ({id, userId }: {id: string, userId: string}) => {
     return new Promise((resolve, reject) => {
         try {
-            const _id = new mongoose.Types.ObjectId(id);
+            if(id === undefined){
+                return reject({status: 400, error: "id field is required!"})
+            }
             User.aggregate([
                 {
                     $match: {
