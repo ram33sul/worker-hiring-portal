@@ -671,7 +671,7 @@ export const getRatingsListService = ({id, userId }: {id: string, userId: string
                                 $cond: [
                                     {
                                         $eq: [
-                                            "$ratingsDetails",
+                                            "$ratingsDetails.rating",
                                             1
                                         ]
                                     },
@@ -685,7 +685,7 @@ export const getRatingsListService = ({id, userId }: {id: string, userId: string
                                 $cond: [
                                     {
                                         $eq: [
-                                            "$ratingsDetails",
+                                            "$ratingsDetails.rating",
                                             2
                                         ]
                                     },
@@ -699,7 +699,7 @@ export const getRatingsListService = ({id, userId }: {id: string, userId: string
                                 $cond: [
                                     {
                                         $eq: [
-                                            "$ratingsDetails",
+                                            "$ratingsDetails.rating",
                                             3
                                         ]
                                     },
@@ -713,7 +713,7 @@ export const getRatingsListService = ({id, userId }: {id: string, userId: string
                                 $cond: [
                                     {
                                         $eq: [
-                                            "$ratingsDetails",
+                                            "$ratingsDetails.rating",
                                             4
                                         ]
                                     },
@@ -727,7 +727,7 @@ export const getRatingsListService = ({id, userId }: {id: string, userId: string
                                 $cond: [
                                     {
                                         $eq: [
-                                            "$ratingsDetails",
+                                            "$ratingsDetails.rating",
                                             5
                                         ]
                                     },
@@ -740,7 +740,7 @@ export const getRatingsListService = ({id, userId }: {id: string, userId: string
                             $sum: 1
                         },
                         ratingAverage: {
-                            $avg: "$rating"
+                            $avg: "$ratingsDetails.rating"
                         }
                     }
                 }
