@@ -16,6 +16,9 @@ interface AddProposalServiceProps {
 export const addProposalService = ({workerId, chosenCategoryId, wage, isFullDay, isBeforeNoon, proposedDate, workDescription, proposedAddressId, userId}: AddProposalServiceProps) => {
     return new Promise(async (resolve, reject) => {
         try {
+            if(workerId === userId){
+                return reject({status: 400, error: "worker and user cannot be same"})
+            }
             const proposedDateInDate = new Date(proposedDate)
             const proposalData = await Proposal.find({
                 workerId: new mongoose.Types.ObjectId(workerId),
