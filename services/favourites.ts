@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import Favourites from "../model/favouritesSchema";
+import User from "../model/userSchema";
 
 export const addToFavouritesService = ({addedUserId, userId}: {addedUserId: string | mongoose.Types.ObjectId, userId: string | mongoose.Types.ObjectId}) => {
     return new Promise((resolve, reject) => {
@@ -39,12 +40,190 @@ export const removeFavouritesService = ({removedUserId}: {removedUserId: string 
     })
 }
 
-export const getFavouritesService = ({userId, page, pageSize}: {userId: string | mongoose.Types.ObjectId, page: number, pageSize: number}) => {
-    return new Promise((resolve, reject) => {
+export const getFavouritesService = ({userId, page, pageSize}: {userId: string | mongoose.Types.ObjectId, page: number, pageSize: any}) => {
+    return new Promise(async (resolve, reject) => {
         try {
-            Favourites.find({
-                userId: new mongoose.Types.ObjectId(userId)
-            }).skip(page * pageSize).limit(pageSize).then((response) => {
+            const { location } = (await User.aggregate([
+                {
+                    $match: {
+                        _id: new mongoose.Types.ObjectId(userId)
+                    }
+                },{
+                    $lookup: {
+                        from: "addresses",
+                        localField: "selectedAddress",
+                        foreignField: "_id",
+                        as: "address"
+                    }
+                },{
+                    $project: {
+                        _id: 0,
+                        location: {
+                            $arrayElemAt: [
+                                "$address.location",
+                                0
+                            ]
+                        }
+                    }
+                }
+            ]))[0];
+            Favourites.aggregate([
+                {
+                    $match: {
+                        userId: new mongoose.Types.ObjectId(userId)
+                    }
+                },{
+                    $lookup: {
+                        from: "users",
+                        localField: "addedUserId",
+                        foreignField: "_id",
+                        as: "userDetails"
+                    }
+                },{
+                    $project: {
+                        userId: "addedUserId",
+                        userDetails: {
+                            $first: "$userDetails"
+                        }
+                    }
+                },{
+                    $project: {
+                        userId: "$userId",
+                        gender: "$userDetails.gender",
+                        openToWork: "$userDetails.openToWork",
+                        bio: "$userDetails.bio",
+                        firstName: "$userDetails.firstName",
+                        lastName: "$userDetails.lastName",
+                        categoryList: "$userDetails.categoryList",
+                        isVerified: "$userDetails.isVerified",
+                        profilePicture: "$userDetails.profilePicture",
+                    }
+                },{
+                    $lookup: {
+                        from: "workers",
+                        localField: "primaryCategory",
+                        foreignField: "_id",
+                        as: "primaryCategoryData"
+                    }
+                },{
+                    $lookup: {
+                        from: "ratings",
+                        localField: "_id",
+                        foreignField: "ratedUserId",
+                        as: "ratings"
+                    }
+                },{
+                    $lookup: {
+                        from: "addresses",
+                        localField: "selectedAddress",
+                        foreignField: "_id",
+                        as: "address"
+                    }
+                },{
+                    $lookup: {
+                        from: "favourites",
+                        localField: "_id",
+                        foreignField: "addedUserId",
+                        as: "isFavourite"
+                    }
+                },{
+                    $project: {
+                        userId: "$_id",
+                        gender: 1,
+                        openToWork: 1,
+                        bio: 1,
+                        firstName: 1,
+                        lastName: 1,
+                        categoryList: 1,
+                        isVerified: 1,
+                        profileImageUrl: "$profilePicture",
+                        ratingAverage: {
+                            $avg: "$ratings.rating"
+                        },
+                        ratingCount: {
+                            $size: "$ratings"
+                        },
+                        address: {
+                            $first: "$address"
+                        },
+                        isFavourite: {
+                            $reduce: {
+                                input: "$isFavourite",
+                                initialValue: false,
+                                in: {
+                                    $cond: [
+                                        {
+                                            $or: [
+                                                {
+                                                    $eq: [
+                                                        {
+                                                            $toString: "$$this.userId"
+                                                        },
+                                                        userId
+                                                    ]
+                                                },
+                                                "$$value"
+                                            ]
+                                        },
+                                        true,
+                                        false
+                                    ]
+                                }
+                            }
+                        },
+                        primaryCategoryId: {
+                            $arrayElemAt: [
+                                "$primaryCategoryData._id",
+                                0
+                            ]
+                        }
+                    }
+                },{
+                    $addFields: {
+                        address: {
+                            $ifNull: ["$address", null]
+                        }
+                    }
+                },{
+                    $addFields: {
+                        distance: {
+                          $sqrt: {
+                            $add: [
+                              {
+                                $pow: [
+                                  {
+                                    $subtract: [
+                                      location[0], {
+                                        '$arrayElemAt': [
+                                          '$address.location', 0
+                                        ]
+                                      }
+                                    ]
+                                  }, 2
+                                ]
+                              }, {
+                                $pow: [
+                                  {
+                                    $subtract: [
+                                      location[1], {
+                                        $arrayElemAt: [
+                                          '$address.location', 1
+                                        ]
+                                      }
+                                    ]
+                                  }, 2
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      }
+                },{
+                    $skip: (page !== undefined && pageSize !== undefined) ? (page * pageSize) : 0
+                },{
+                    $limit: pageSize ? parseInt(pageSize) : 1
+                }
+            ]).then((response) => {
                 resolve({data: response})
             }).catch((error) => {
                 reject({status: 500, error: "Database error occured!"})

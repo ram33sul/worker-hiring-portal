@@ -590,7 +590,9 @@ exports.getWorkerDetailsService = getWorkerDetailsService;
 const getRatingsListService = ({ id, userId }) => {
     return new Promise((resolve, reject) => {
         try {
-            const _id = new mongoose_1.default.Types.ObjectId(id);
+            if (id === undefined) {
+                return reject({ status: 400, error: "id field is required!" });
+            }
             userSchema_1.default.aggregate([
                 {
                     $match: {
@@ -604,37 +606,99 @@ const getRatingsListService = ({ id, userId }) => {
                         as: "ratingsDetails"
                     }
                 }, {
+                    $unwind: "$ratingsDetails"
+                }, {
                     $group: {
                         _id: "$_id",
+                        one: {
+                            $sum: {
+                                $cond: [
+                                    {
+                                        $eq: [
+                                            "$ratingsDetails.rating",
+                                            1
+                                        ]
+                                    },
+                                    1,
+                                    0
+                                ]
+                            }
+                        },
+                        two: {
+                            $sum: {
+                                $cond: [
+                                    {
+                                        $eq: [
+                                            "$ratingsDetails.rating",
+                                            2
+                                        ]
+                                    },
+                                    1,
+                                    0
+                                ]
+                            }
+                        },
+                        three: {
+                            $sum: {
+                                $cond: [
+                                    {
+                                        $eq: [
+                                            "$ratingsDetails.rating",
+                                            3
+                                        ]
+                                    },
+                                    1,
+                                    0
+                                ]
+                            }
+                        },
+                        four: {
+                            $sum: {
+                                $cond: [
+                                    {
+                                        $eq: [
+                                            "$ratingsDetails.rating",
+                                            4
+                                        ]
+                                    },
+                                    1,
+                                    0
+                                ]
+                            }
+                        },
+                        five: {
+                            $sum: {
+                                $cond: [
+                                    {
+                                        $eq: [
+                                            "$ratingsDetails.rating",
+                                            5
+                                        ]
+                                    },
+                                    1,
+                                    0
+                                ]
+                            }
+                        },
                         ratingsCount: {
                             $sum: 1
                         },
                         ratingAverage: {
-                            $avg: "$rating"
+                            $avg: "$ratingsDetails.rating"
                         }
                     }
                 }
             ]).then((response) => {
-                var _a, _b;
-                if (response.length === 0) {
-                    response = [{
-                            ratingsCount: 0,
-                            ratingsAverage: 0,
-                        }];
-                }
-                else {
-                    for (let i = 0; i < ((_b = (_a = response[0]) === null || _a === void 0 ? void 0 : _a.categoryList) === null || _b === void 0 ? void 0 : _b.length); i++) {
-                        for (let j = 0; j < response[0].categoryListDetails.length; j++) {
-                            if (JSON.stringify(response[0].categoryList[i].id) === JSON.stringify(response[0].categoryListDetails[j]._id)) {
-                                response[0].categoryList[i] = Object.assign(Object.assign({}, response[0].categoryList[i]), response[0].categoryListDetails[j]);
-                            }
-                        }
-                    }
-                    if (id !== userId) {
-                        delete response[0].identityUrl;
-                    }
-                }
-                resolve({ data: response[0] });
+                const blankData = {
+                    One: 0,
+                    Two: 0,
+                    Three: 0,
+                    Four: 0,
+                    Five: 0,
+                    ratingsAverage: 0,
+                    ratingsCount: 0
+                };
+                resolve({ data: response.length === 0 ? blankData : response[0] });
             }).catch((error) => {
                 console.log(error);
                 reject({ status: 502, error: new Error("Database error occured!") });
