@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import Favourites from "../model/favouritesSchema";
 import User from "../model/userSchema";
+import Worker from "../model/workerCategorySchema";
 
 export const addToFavouritesService = ({addedUserId, userId}: {addedUserId: string | mongoose.Types.ObjectId, userId: string | mongoose.Types.ObjectId}) => {
     return new Promise((resolve, reject) => {
@@ -97,7 +98,7 @@ export const getFavouritesService = ({userId, page, pageSize}: {userId: string |
                         lastName: "$userDetails.lastName",
                         categoryList: "$userDetails.categoryList",
                         isVerified: "$userDetails.isVerified",
-                        profilePicture: "$userDetails.profilePicture",
+                        profileImageUrl: "$userDetails.profilePicture",
                         primaryCategory: "$userDetails.primaryCategory",
                         selectedAddress: "$userDetails.selectedAddress",
                     }
@@ -139,7 +140,7 @@ export const getFavouritesService = ({userId, page, pageSize}: {userId: string |
                         lastName: 1,
                         categoryList: 1,
                         isVerified: 1,
-                        profileImageUrl: "$profilePicture",
+                        profileImageUrl: 1,
                         ratingAverage: {
                             $avg: "$ratings.rating"
                         },
@@ -227,6 +228,21 @@ export const getFavouritesService = ({userId, page, pageSize}: {userId: string |
                     $limit: pageSize ? parseInt(pageSize) : 1
                 }
             ]).then((response) => {
+                Worker.find().lean().then((workers) => {
+                    for(let i in response){
+                        for(let j in response[i].categoryList){
+                            for(let worker of workers){
+                                if(JSON.stringify(response[i].categoryList[j].id) === JSON.stringify(worker._id)){
+                                    response[i].categoryList[j] = { ...response[i].categoryList[j], ...worker}
+                                    delete response[i].categoryList[j]._id;
+                                    delete response[i].categoryList[j].dailyMinWage;
+                                    delete response[i].categoryList[j].hourlyMinWage;
+                                }
+                            }
+                        }
+                    }
+                    resolve({data: response})
+                })
                 resolve({data: response})
             }).catch((error) => {
                 reject({status: 500, error: "Database error occured!"})

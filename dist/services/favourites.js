@@ -16,6 +16,7 @@ exports.getFavouritesService = exports.removeFavouritesService = exports.addToFa
 const mongoose_1 = __importDefault(require("mongoose"));
 const favouritesSchema_1 = __importDefault(require("../model/favouritesSchema"));
 const userSchema_1 = __importDefault(require("../model/userSchema"));
+const workerCategorySchema_1 = __importDefault(require("../model/workerCategorySchema"));
 const addToFavouritesService = ({ addedUserId, userId }) => {
     return new Promise((resolve, reject) => {
         try {
@@ -113,7 +114,7 @@ const getFavouritesService = ({ userId, page, pageSize }) => {
                         lastName: "$userDetails.lastName",
                         categoryList: "$userDetails.categoryList",
                         isVerified: "$userDetails.isVerified",
-                        profilePicture: "$userDetails.profilePicture",
+                        profileImageUrl: "$userDetails.profilePicture",
                         primaryCategory: "$userDetails.primaryCategory",
                         selectedAddress: "$userDetails.selectedAddress",
                     }
@@ -155,7 +156,7 @@ const getFavouritesService = ({ userId, page, pageSize }) => {
                         lastName: 1,
                         categoryList: 1,
                         isVerified: 1,
-                        profileImageUrl: "$profilePicture",
+                        profileImageUrl: 1,
                         ratingAverage: {
                             $avg: "$ratings.rating"
                         },
@@ -243,6 +244,21 @@ const getFavouritesService = ({ userId, page, pageSize }) => {
                     $limit: pageSize ? parseInt(pageSize) : 1
                 }
             ]).then((response) => {
+                workerCategorySchema_1.default.find().lean().then((workers) => {
+                    for (let i in response) {
+                        for (let j in response[i].categoryList) {
+                            for (let worker of workers) {
+                                if (JSON.stringify(response[i].categoryList[j].id) === JSON.stringify(worker._id)) {
+                                    response[i].categoryList[j] = Object.assign(Object.assign({}, response[i].categoryList[j]), worker);
+                                    delete response[i].categoryList[j]._id;
+                                    delete response[i].categoryList[j].dailyMinWage;
+                                    delete response[i].categoryList[j].hourlyMinWage;
+                                }
+                            }
+                        }
+                    }
+                    resolve({ data: response });
+                });
                 resolve({ data: response });
             }).catch((error) => {
                 reject({ status: 500, error: "Database error occured!" });
