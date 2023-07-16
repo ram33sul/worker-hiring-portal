@@ -291,6 +291,7 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                     }
                 }
             ]))[0];
+
             User.aggregate([
                 {
                     $match: {
@@ -394,9 +395,11 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                     }
                 },{
                     $match: {
-                        ratingAverage: {
-                            $gte: rating4Plus === 'true' ? 5 : 0
-                        },
+                        ...(rating4Plus === 'true' ? {
+                            ratingAverage: {
+                                $gte: 5
+                            }
+                        }: {}),
                         ...(previouslyHired === 'true' ? {
                             previouslyHired: true
                         }: {})
@@ -451,11 +454,11 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                 },{
                     $skip: (page !== undefined && pageSize !== undefined) ? (page * pageSize) : 0
                 },{
-                    $limit: pageSize ? parseInt(pageSize) : 1
+                    $limit: pageSize ? parseInt(pageSize) : 2
                 }
             ]).then((response) => {
                 Worker.find().lean().then((workers) => {
-                    query = query?.toLowerCase()
+                    query = query?.trim().toLowerCase();
                     for(let i in response){
                         if(!!query && !response[i].firstName?.toLowerCase()?.includes(query) && !response[i].lastName?.toLowerCase()?.includes(query) && !`${response[i].firstName} ${response[i].lastName}`.toLowerCase().includes(query)){
                             response.splice(parseInt(i), 1);

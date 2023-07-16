@@ -10,6 +10,7 @@ const address_1 = require("../services/address");
 const rating_1 = require("../services/rating");
 const favourites_1 = require("../services/favourites");
 const sampleWorks_1 = require("../services/sampleWorks");
+const proposal_1 = require("../services/proposal");
 const eventHandler = (action) => {
     return (req, res) => {
         try {
@@ -106,6 +107,14 @@ const events = (action) => {
             return profile_1.getWorkerDetailsService;
         case events_1.GET_RATINGS_LIST:
             return profile_1.getRatingsListService;
+        case events_1.ADD_PROPOSAL:
+            return proposal_1.addProposalService;
+        case events_1.GET_PROPOSALS:
+            return proposal_1.getProposalsService;
+        case events_1.ACCEPT_PROPOSAL:
+            return proposal_1.acceptProposalService;
+        case events_1.REJECT_PROPOSAL:
+            return proposal_1.rejectProposalService;
         default:
             return () => Promise.reject("Internal error occured!");
     }
