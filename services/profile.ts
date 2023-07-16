@@ -719,13 +719,14 @@ export const getRatingsListService = ({id, userId }: {id: string, userId: string
                 }
             ]).then((response: any) => {
                 const blankData = {
-                    One: 0,
-                    Two: 0,
-                    Three: 0,
-                    Four: 0,
-                    Five: 0,
-                    ratingsAverage: 0,
-                    ratingsCount: 0
+                    one: 0,
+                    two: 0,
+                    three: 0,
+                    four: 0,
+                    five: 0,
+                    ratingAverage: 0,
+                    ratingsCount: 0,
+                    _id: id
                 }
                 resolve({data: response.length === 0 ? blankData : response[0]})
             }).catch((error) => {
