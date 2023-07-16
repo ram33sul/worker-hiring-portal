@@ -47,6 +47,7 @@ export const addProposalService = ({workerId, chosenCategoryId, wage, isFullDay,
             }).then((response) => {
                 resolve({data: response})
             }).catch((error) => {
+                console.log(error)
                 reject({status: 502, error: "Database error occurred"})
             })
         } catch (error) {
