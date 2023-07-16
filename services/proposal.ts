@@ -26,9 +26,9 @@ export const addProposalService = ({workerId, chosenCategoryId, wage, isFullDay,
                 isBeforeNoon,
             })
             const isWorkerBusy = proposalData?.reduce((acc: any, curr: any) => {
-                const proposedDateString1 = `${acc.proposedDate.getDate()}${acc.proposedDate.getMonth()}${acc.proposedDate.getFullYear()}`;
+                const proposedDateString1 = `${curr.proposedDate.getDate()}${curr.proposedDate.getMonth()}${curr.proposedDate.getFullYear()}`;
                 const proposedDateString2 = `${proposedDateInDate.getDate()}${proposedDateInDate.getMonth()}${proposedDateInDate.getFullYear()}`;
-                return proposedDateString1 === proposedDateString2 || curr === true;
+                return proposedDateString1 === proposedDateString2 || acc === true;
             }, false)
             if(isWorkerBusy){
                 return reject({status: 409, error: "Worker is busy on the given date"})
@@ -51,6 +51,7 @@ export const addProposalService = ({workerId, chosenCategoryId, wage, isFullDay,
                 reject({status: 502, error: "Database error occurred"})
             })
         } catch (error) {
+            console.log(error)
             reject({status: 500, error: "Internal error occurred"})
         }
     })
