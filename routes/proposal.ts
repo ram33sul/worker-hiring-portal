@@ -7,13 +7,13 @@ const router = express.Router();
 
 router.use(auth)
 
-router.post("add-proposal", eventHandler(ADD_PROPOSAL));
+router.post("/add-proposal", eventHandler(ADD_PROPOSAL));
 
-router.get("get-proposals", eventHandler(GET_PROPOSALS));
+router.get("/get-proposals", eventHandler(GET_PROPOSALS));
 
-router.patch("accept-proposal", eventHandler(ACCEPT_PROPOSAL));
+router.patch("/accept-proposal", eventHandler(ACCEPT_PROPOSAL));
 
-router.patch("reject-proposal", eventHandler(REJECT_PROPOSAL));
+router.patch("/reject-proposal", eventHandler(REJECT_PROPOSAL));
 
 const proposalRouter = router;
 
