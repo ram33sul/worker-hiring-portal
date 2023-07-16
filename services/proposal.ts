@@ -47,10 +47,10 @@ export const addProposalService = ({workerId, chosenCategoryId, wage, isFullDay,
             }).then((response) => {
                 resolve({data: response})
             }).catch((error) => {
-                reject({status: 502, error: "Database error occured"})
+                reject({status: 502, error: "Database error occurred"})
             })
         } catch (error) {
-            reject({status: 500, error: "Internal error occured"})
+            reject({status: 500, error: "Internal error occurred"})
         }
     })
 }
@@ -134,10 +134,10 @@ export const getProposalsService = ({workerId}: GetProposalServiceProps) => {
             ]).then((response) => {
                 resolve({data: response})
             }).catch((error) => {
-                reject({status: 502, error: "Database error occured"})
+                reject({status: 502, error: "Database error occurred"})
             })
         } catch (error) {
-            reject({status: 500, error: "Internal error occured"})
+            reject({status: 500, error: "Internal error occurred"})
         }
     })
 }
@@ -164,10 +164,10 @@ export const acceptProposalService = ({ proposalId, userId}: AcceptProposalServi
             }).then((response) => {
                 resolve({data: 'done'})
             }).catch((error) => {
-                reject({status: 502, error: "Database error occured"})
+                reject({status: 502, error: "Database error occurred"})
             })
         } catch (error) {
-            reject({status: 500, error: "Internal error occured"})
+            reject({status: 500, error: "Internal error occurred"})
         }
     })
 }
@@ -194,10 +194,10 @@ export const rejectProposalService = ({ proposalId, userId}: RejectProposalServi
             }).then((response) => {
                 resolve({data: 'done'})
             }).catch((error) => {
-                reject({status: 502, error: "Database error occured"})
+                reject({status: 502, error: "Database error occurred"})
             })
         } catch (error) {
-            reject({status: 500, error: "Internal error occured"})
+            reject({status: 500, error: "Internal error occurred"})
         }
     })
 }
