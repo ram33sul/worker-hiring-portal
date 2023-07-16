@@ -405,19 +405,6 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                         }: {})
                     }
                 },{
-                    $sort: (
-                        sorts[sort] === 'rating' ?
-                        {
-                            ratingAverage: -1
-                        } : sorts[sort] === 'wageLowToHigh' ?
-                        {
-                            primaryCategoryDailyWage: 1
-                        } : sorts[sort] === 'wageHighToLow' ?
-                        {
-                            primaryCategoryDailyWage: -1
-                        } : {ratingAverage: -1}
-                    )
-                },{
                     $addFields: {
                         distance: {
                           $sqrt: {
@@ -451,6 +438,19 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                           }
                         }
                       }
+                },{
+                    $sort: (
+                        sorts[sort] === 'rating' ?
+                        {
+                            ratingAverage: -1
+                        } : sorts[sort] === 'wageLowToHigh' ?
+                        {
+                            primaryCategoryDailyWage: 1
+                        } : sorts[sort] === 'wageHighToLow' ?
+                        {
+                            primaryCategoryDailyWage: -1
+                        } : {distance: 1}
+                    )
                 },{
                     $skip: (page !== undefined && pageSize !== undefined) ? (page * pageSize) : 0
                 },{
