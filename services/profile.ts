@@ -260,10 +260,11 @@ interface GetWorkersListServiceProps {
     sort: number;
     rating4Plus: string;
     previouslyHired: string;
+    isFavourite: string;
     category: string;
     query: string;
 }
-export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previouslyHired, userId, category, query}: GetWorkersListServiceProps) => {
+export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previouslyHired, isFavourite, userId, category, query}: GetWorkersListServiceProps) => {
     const sorts = ["rating", "distance", "wageLowToHigh", "wageHighToLow"];
     return new Promise(async (resolve, reject) => {
         try {
@@ -402,7 +403,14 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                         }: {}),
                         ...(previouslyHired === 'true' ? {
                             previouslyHired: true
-                        }: {})
+                        } : previouslyHired === 'false' ? {
+                            previouslyHired: false
+                        } : {}),
+                        ...(isFavourite === 'true' ? {
+                            isFavourite: true
+                        } : isFavourite === 'false' ? {
+                            isFavourite: false
+                        } : {})
                     }
                 },{
                     $addFields: {

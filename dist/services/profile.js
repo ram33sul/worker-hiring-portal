@@ -215,7 +215,7 @@ const getUserDetailsService = ({ id, userId }) => {
     });
 };
 exports.getUserDetailsService = getUserDetailsService;
-const getWorkersListService = ({ page, pageSize, sort, rating4Plus, previouslyHired, userId, category, query }) => {
+const getWorkersListService = ({ page, pageSize, sort, rating4Plus, previouslyHired, isFavourite, userId, category, query }) => {
     const sorts = ["rating", "distance", "wageLowToHigh", "wageHighToLow"];
     return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
         try {
@@ -341,24 +341,19 @@ const getWorkersListService = ({ page, pageSize, sort, rating4Plus, previouslyHi
                         }
                     }
                 }, {
-                    $match: Object.assign(Object.assign({}, (rating4Plus === 'true' ? {
+                    $match: Object.assign(Object.assign(Object.assign({}, (rating4Plus === 'true' ? {
                         ratingAverage: {
                             $gte: 5
                         }
                     } : {})), (previouslyHired === 'true' ? {
                         previouslyHired: true
+                    } : previouslyHired === 'false' ? {
+                        previouslyHired: false
+                    } : {})), (isFavourite === 'true' ? {
+                        isFavourite: true
+                    } : isFavourite === 'false' ? {
+                        isFavourite: false
                     } : {}))
-                }, {
-                    $sort: (sorts[sort] === 'rating' ?
-                        {
-                            ratingAverage: -1
-                        } : sorts[sort] === 'wageLowToHigh' ?
-                        {
-                            primaryCategoryDailyWage: 1
-                        } : sorts[sort] === 'wageHighToLow' ?
-                        {
-                            primaryCategoryDailyWage: -1
-                        } : { ratingAverage: -1 })
                 }, {
                     $addFields: {
                         distance: {
@@ -393,6 +388,17 @@ const getWorkersListService = ({ page, pageSize, sort, rating4Plus, previouslyHi
                             }
                         }
                     }
+                }, {
+                    $sort: (sorts[sort] === 'rating' ?
+                        {
+                            ratingAverage: -1
+                        } : sorts[sort] === 'wageLowToHigh' ?
+                        {
+                            primaryCategoryDailyWage: 1
+                        } : sorts[sort] === 'wageHighToLow' ?
+                        {
+                            primaryCategoryDailyWage: -1
+                        } : { distance: 1 })
                 }, {
                     $skip: (page !== undefined && pageSize !== undefined) ? (page * pageSize) : 0
                 }, {
