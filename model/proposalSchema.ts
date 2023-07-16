@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 
 const proposalSchema = new mongoose.Schema({
     userId: { type: mongoose.Types.ObjectId, required: true},
-    WorkerId: { type: mongoose.Types.ObjectId, required: true},
+    workerId: { type: mongoose.Types.ObjectId, required: true},
     chosenCategoryId: { type: mongoose.Types.ObjectId, required: true},
-    Wage: { type: Number, required: true},
+    wage: { type: Number, required: true},
     isFullDay: { type: Boolean, required: true},
     isBeforeNoon: { type: Boolean, default: true},
     isAccepted: { type: Boolean, default: false},
