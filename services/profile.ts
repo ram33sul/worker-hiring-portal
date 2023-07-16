@@ -268,7 +268,7 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
     const sorts = ["rating", "distance", "wageLowToHigh", "wageHighToLow"];
     return new Promise(async (resolve, reject) => {
         try {
-            const { location } = (await User.aggregate([
+            let location = (await User.aggregate([
                 {
                     $match: {
                         _id: new mongoose.Types.ObjectId(userId)
@@ -291,7 +291,8 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                         }
                     }
                 }
-            ]))[0];
+            ]));
+            location = location[0] ? location[0]?.location : [ 0, 0 ];
 
             User.aggregate([
                 {
