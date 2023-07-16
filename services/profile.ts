@@ -489,6 +489,7 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                 reject({status: 502, error: "Database error occured!"})
             })
         } catch (error) {
+            console.log(error)
             reject({status: 500, error: "Internal error occured!"})
         }
     })

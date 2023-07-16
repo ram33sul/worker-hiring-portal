@@ -44,7 +44,9 @@ export const addProposalService = ({workerId, chosenCategoryId, wage, isFullDay,
                 workDescription,
                 proposedAddressId,
                 timestamp: new Date()
-            }).then((response) => {
+            }).then((response: any) => {
+                response.timestamp = response.timestamp.getTime();
+                response.proposedDate = response.timestamp.getTime();
                 resolve({data: response})
             }).catch((error) => {
                 console.log(error)
@@ -124,7 +126,9 @@ export const getProposalsService = ({workerId}: GetProposalServiceProps) => {
                                 0
                             ]
                         },
-                        proposedDate: 1,
+                        proposedDate: {
+                            $toLong: "$proposedDate"
+                        },
                         wage: 1,
                         isFullDay: 1,
                         isBeforeNoon: 1,
