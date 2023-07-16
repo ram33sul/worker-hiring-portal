@@ -61,8 +61,10 @@ export const addProposalService = ({workerId, chosenCategoryId, wage, isFullDay,
 
 interface GetProposalServiceProps {
     workerId: string;
+    page: string;
+    pageSize: string;
 }
-export const getProposalsService = ({workerId}: GetProposalServiceProps) => {
+export const getProposalsService = ({workerId, page, pageSize}: GetProposalServiceProps) => {
     return new Promise((resolve, reject) => {
         try {
             Proposal.aggregate([
@@ -136,10 +138,15 @@ export const getProposalsService = ({workerId}: GetProposalServiceProps) => {
                             $first: "$addressData"
                         }
                     }
+                },{
+                    $skip: (page === undefined || pageSize === undefined) ? 0 : (parseInt(page) * parseInt(pageSize))
+                },{
+                    $limit: parseInt(pageSize)
                 }
             ]).then((response) => {
                 resolve({data: response})
             }).catch((error) => {
+                console.log(error)
                 reject({status: 502, error: "Database error occurred"})
             })
         } catch (error) {
