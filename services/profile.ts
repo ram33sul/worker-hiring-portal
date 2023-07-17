@@ -292,7 +292,7 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                     }
                 }
             ]));
-            location = location[0] ? location[0]?.location : [ 0, 0 ];
+            location = location?.[0] ? location[0]?.location : [ 0, 0 ];
 
             User.aggregate([
                 {
