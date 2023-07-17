@@ -6,9 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const proposalSchema = new mongoose_1.default.Schema({
     userId: { type: mongoose_1.default.Types.ObjectId, required: true },
-    WorkerId: { type: mongoose_1.default.Types.ObjectId, required: true },
+    workerId: { type: mongoose_1.default.Types.ObjectId, required: true },
     chosenCategoryId: { type: mongoose_1.default.Types.ObjectId, required: true },
-    Wage: { type: Number, required: true },
+    wage: { type: Number, required: true },
     isFullDay: { type: Boolean, required: true },
     isBeforeNoon: { type: Boolean, default: true },
     isAccepted: { type: Boolean, default: false },

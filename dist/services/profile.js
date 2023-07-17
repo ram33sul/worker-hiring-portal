@@ -219,7 +219,7 @@ const getWorkersListService = ({ page, pageSize, sort, rating4Plus, previouslyHi
     const sorts = ["rating", "distance", "wageLowToHigh", "wageHighToLow"];
     return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const { location } = (yield userSchema_1.default.aggregate([
+            let location = (yield userSchema_1.default.aggregate([
                 {
                     $match: {
                         _id: new mongoose_1.default.Types.ObjectId(userId)
@@ -242,7 +242,10 @@ const getWorkersListService = ({ page, pageSize, sort, rating4Plus, previouslyHi
                         }
                     }
                 }
-            ]))[0];
+            ]));
+            console.log(location);
+            location = (location === null || location === void 0 ? void 0 : location[0]) ? location[0].location : [0, 0];
+            console.log("hii");
             userSchema_1.default.aggregate([
                 {
                     $match: Object.assign({ isWorker: true, _id: {
@@ -431,6 +434,7 @@ const getWorkersListService = ({ page, pageSize, sort, rating4Plus, previouslyHi
             });
         }
         catch (error) {
+            console.log(error);
             reject({ status: 500, error: "Internal error occured!" });
         }
     }));
@@ -660,13 +664,14 @@ const getRatingsListService = ({ id, userId }) => {
                 }
             ]).then((response) => {
                 const blankData = {
-                    One: 0,
-                    Two: 0,
-                    Three: 0,
-                    Four: 0,
-                    Five: 0,
-                    ratingsAverage: 0,
-                    ratingsCount: 0
+                    one: 0,
+                    two: 0,
+                    three: 0,
+                    four: 0,
+                    five: 0,
+                    ratingAverage: 0,
+                    ratingsCount: 0,
+                    _id: id
                 };
                 resolve({ data: response.length === 0 ? blankData : response[0] });
             }).catch((error) => {

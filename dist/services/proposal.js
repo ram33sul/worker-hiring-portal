@@ -28,9 +28,9 @@ const addProposalService = ({ workerId, chosenCategoryId, wage, isFullDay, isBef
                 isBeforeNoon,
             });
             const isWorkerBusy = proposalData === null || proposalData === void 0 ? void 0 : proposalData.reduce((acc, curr) => {
-                const proposedDateString1 = `${acc.proposedDate.getDate()}${acc.proposedDate.getMonth()}${acc.proposedDate.getFullYear()}`;
+                const proposedDateString1 = `${curr.proposedDate.getDate()}${curr.proposedDate.getMonth()}${curr.proposedDate.getFullYear()}`;
                 const proposedDateString2 = `${proposedDateInDate.getDate()}${proposedDateInDate.getMonth()}${proposedDateInDate.getFullYear()}`;
-                return proposedDateString1 === proposedDateString2 || curr === true;
+                return proposedDateString1 === proposedDateString2 || acc === true;
             }, false);
             if (isWorkerBusy) {
                 return reject({ status: 409, error: "Worker is busy on the given date" });
@@ -47,18 +47,22 @@ const addProposalService = ({ workerId, chosenCategoryId, wage, isFullDay, isBef
                 proposedAddressId,
                 timestamp: new Date()
             }).then((response) => {
+                response.timestamp = response.timestamp.getTime();
+                response.proposedDate = response.timestamp.getTime();
                 resolve({ data: response });
             }).catch((error) => {
+                console.log(error);
                 reject({ status: 502, error: "Database error occurred" });
             });
         }
         catch (error) {
+            console.log(error);
             reject({ status: 500, error: "Internal error occurred" });
         }
     }));
 };
 exports.addProposalService = addProposalService;
-const getProposalsService = ({ workerId }) => {
+const getProposalsService = ({ workerId, page, pageSize }) => {
     return new Promise((resolve, reject) => {
         try {
             proposalSchema_1.default.aggregate([
@@ -122,7 +126,9 @@ const getProposalsService = ({ workerId }) => {
                                 0
                             ]
                         },
-                        proposedDate: 1,
+                        proposedDate: {
+                            $toLong: "$proposedDate"
+                        },
                         wage: 1,
                         isFullDay: 1,
                         isBeforeNoon: 1,
@@ -130,10 +136,15 @@ const getProposalsService = ({ workerId }) => {
                             $first: "$addressData"
                         }
                     }
+                }, {
+                    $skip: (page === undefined || pageSize === undefined) ? 0 : (parseInt(page) * parseInt(pageSize))
+                }, {
+                    $limit: parseInt(pageSize)
                 }
             ]).then((response) => {
                 resolve({ data: response });
             }).catch((error) => {
+                console.log(error);
                 reject({ status: 502, error: "Database error occurred" });
             });
         }
