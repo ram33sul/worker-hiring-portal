@@ -108,7 +108,6 @@ export const registerAsWorkerService = ({ data, files, userId }: RegisterAsWorke
             let { bio, age, categoryList, firstName, lastName, email, gender, openToWork, primaryCategory }: RegisterAsWorkerServiceData = JSON.parse(data);
             const profilePicture = files.profilePicture?.[0];
             const identity = files.identity?.[0];
-            console.log({bio, age, categoryList, firstName, lastName, email, gender, openToWork, primaryCategory})
             if(!(validateBio(bio) && validateAge(age) && validateName(firstName) && validateName(lastName) && validateEmail(email) && (gender === undefined || validateGender(gender)) && (openToWork === undefined || validateBoolean(openToWork)))){
                 return reject({status: 400, error: "invalid inputs!"});
             }
@@ -294,7 +293,7 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                     }
                 }
             ]));
-            location = location?.[0] ? location[0].location : [ 0, 0 ];
+            location = [ 0, 0 ];
 
             User.aggregate([
                 {
