@@ -306,14 +306,11 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                         isBeforeNoon: isBeforeNoon === 'true',
                         isFullDay: isFullDay === 'true'
                     }
-                },{
-                    $project: {
-                        "$$root": "$workerId"
-                    }
                 }
             ]);
 
             notAvailableWorkers.push(new mongoose.Types.ObjectId(userId))
+            console.log(notAvailableWorkers)
 
 
             User.aggregate([
