@@ -5,6 +5,7 @@ import User from "../model/userSchema";
 import Worker from "../model/workerCategorySchema";
 import { validate } from "../validation/general";
 import { uploadToCloudinary } from "./cloudinary";
+import Proposal from "../model/proposalSchema";
 
 interface EditProfileServiceData {
     firstName: string,
@@ -264,12 +265,15 @@ interface GetWorkersListServiceProps {
     isFavourite: string;
     category: string;
     query: string;
+    date: string;
+    isBeforeNoon: string;
+    isFullDay: string;
 }
-export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previouslyHired, isFavourite, userId, category, query}: GetWorkersListServiceProps) => {
+export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previouslyHired, isFavourite, userId, category, query, isBeforeNoon, isFullDay, date}: GetWorkersListServiceProps) => {
     const sorts = ["rating", "distance", "wageLowToHigh", "wageHighToLow"];
     return new Promise(async (resolve, reject) => {
         try {
-            let location = (await User.aggregate([
+            let location = await User.aggregate([
                 {
                     $match: {
                         _id: new mongoose.Types.ObjectId(userId)
@@ -292,15 +296,32 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                         }
                     }
                 }
-            ]));
-            location = [ 0, 0 ];
+            ]);
+            location = (location && Array.isArray(location) && location?.[0] && location?.[0]?.location) ? location[0].location : [ 0, 0 ];
+
+            const notAvailableWorkers = await Proposal.aggregate([
+                {
+                    $match: {
+                        proposedDate: new Date(date),
+                        isBeforeNoon,
+                        isFullDay
+                    }
+                },{
+                    $project: {
+                        "$$root": "$workerId"
+                    }
+                }
+            ]);
+
+            notAvailableWorkers.push(new mongoose.Types.ObjectId(userId))
+
 
             User.aggregate([
                 {
                     $match: {
                         isWorker: true,
                         _id: {
-                            $ne: new mongoose.Types.ObjectId(userId)
+                            $nin: notAvailableWorkers,
                         },
                         ...(category ? {
                             categoryList: {
