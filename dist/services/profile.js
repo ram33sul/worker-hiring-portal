@@ -60,6 +60,7 @@ const editProfileService = ({ userId, data, file }) => {
             });
         }
         catch (error) {
+            console.log(error);
             reject({ status: 500, error: new Error("Internal error occured!") });
         }
     }));
@@ -243,9 +244,7 @@ const getWorkersListService = ({ page, pageSize, sort, rating4Plus, previouslyHi
                     }
                 }
             ]));
-            console.log(location);
-            location = (location === null || location === void 0 ? void 0 : location[0]) ? location[0].location : [0, 0];
-            console.log("hii");
+            location = [0, 0];
             userSchema_1.default.aggregate([
                 {
                     $match: Object.assign({ isWorker: true, _id: {

@@ -47,8 +47,9 @@ const addProposalService = ({ workerId, chosenCategoryId, wage, isFullDay, isBef
                 proposedAddressId,
                 timestamp: new Date()
             }).then((response) => {
+                response = response.toObject();
                 response.timestamp = response.timestamp.getTime();
-                response.proposedDate = response.timestamp.getTime();
+                response.proposedDate = response.proposedDate.getTime();
                 resolve({ data: response });
             }).catch((error) => {
                 console.log(error);
@@ -62,13 +63,13 @@ const addProposalService = ({ workerId, chosenCategoryId, wage, isFullDay, isBef
     }));
 };
 exports.addProposalService = addProposalService;
-const getProposalsService = ({ workerId, page, pageSize }) => {
+const getProposalsService = ({ userId, page, pageSize }) => {
     return new Promise((resolve, reject) => {
         try {
             proposalSchema_1.default.aggregate([
                 {
                     $match: {
-                        workerId: new mongoose_1.default.Types.ObjectId(workerId),
+                        workerId: new mongoose_1.default.Types.ObjectId(userId),
                         isWorkerDeleted: false,
                         status: true
                     }

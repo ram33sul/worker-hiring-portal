@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.authenticateService = exports.refreshTokenService = exports.verifyUserService = exports.verifySmsOtpService = exports.sendSmsOtpService = void 0;
+exports.googleAuthService = exports.authenticateService = exports.refreshTokenService = exports.verifyUserService = exports.verifySmsOtpService = exports.sendSmsOtpService = void 0;
 const twilio_1 = __importDefault(require("twilio"));
 const userSchema_1 = __importDefault(require("../model/userSchema"));
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -196,3 +196,13 @@ const authenticateService = ({ token }) => {
     }));
 };
 exports.authenticateService = authenticateService;
+const googleAuthService = ({ token }) => {
+    return new Promise((resolve, reject) => {
+        try {
+        }
+        catch (error) {
+            reject({ status: 500, error: new Error("Internal error occured!") });
+        }
+    });
+};
+exports.googleAuthService = googleAuthService;
