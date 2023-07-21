@@ -46,7 +46,7 @@ export const addProposalService = ({workerId, chosenCategoryId, wage, isFullDay,
                 timestamp: new Date()
             }).then((response: any) => {
                 response.timestamp = response.timestamp.getTime();
-                response.proposedDate = response.timestamp.getTime();
+                response.proposedDate = response.proposedDate.getTime();
                 resolve({data: response})
             }).catch((error) => {
                 console.log(error)

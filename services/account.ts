@@ -1,8 +1,9 @@
 import twilio from 'twilio';
 import User from '../model/userSchema';
-import mongoose, { mongo } from 'mongoose';
+import mongoose from 'mongoose';
 import jwt, {JwtPayload} from 'jsonwebtoken'
 import { jwtSignAccess, jwtSignRefresh } from '../authentication/jwt';
+import jwtDecode from 'jwt-decode';
 
 export const sendSmsOtpService = ({phone, countryCode}: {phone: string, countryCode: string}) => {
     return new Promise(async (resolve, reject) => {
@@ -167,6 +168,16 @@ export const authenticateService = ({token}:{token: string}) => {
             });
         } catch (error) {
             reject({status: 500, error: new Error("Internal error occured!")});
+        }
+    })
+}
+
+export const googleAuthService = ({token}: {token: string}) => {
+    return new Promise((resolve, reject) => {
+        try {
+
+        } catch (error) {
+            reject({status: 500, error: new Error("Internal error occured!")})
         }
     })
 }
