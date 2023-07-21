@@ -144,6 +144,7 @@ export const getProposalsService = ({workerId, page, pageSize}: GetProposalServi
                     $limit: parseInt(pageSize)
                 }
             ]).then((response) => {
+                console.log(response)
                 resolve({data: response})
             }).catch((error) => {
                 console.log(error)
