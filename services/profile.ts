@@ -303,6 +303,12 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                 {
                     $match: {
                         proposedDate: parseInt(date),
+                        isBeforeNoon: isBeforeNoon === 'true',
+                        isFullDay: isFullDay === 'true'
+                    }
+                },{
+                    $project: {
+                        '$$root': "$workerId"
                     }
                 }
             ]);
