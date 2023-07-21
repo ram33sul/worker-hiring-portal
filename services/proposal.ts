@@ -26,9 +26,7 @@ export const addProposalService = ({workerId, chosenCategoryId, wage, isFullDay,
                 isBeforeNoon,
             })
             const isWorkerBusy = proposalData?.reduce((acc: any, curr: any) => {
-                const proposedDateString1 = `${curr.proposedDate.getDate()}${curr.proposedDate.getMonth()}${curr.proposedDate.getFullYear()}`;
-                const proposedDateString2 = `${proposedDateInDate.getDate()}${proposedDateInDate.getMonth()}${proposedDateInDate.getFullYear()}`;
-                return proposedDateString1 === proposedDateString2 || acc === true;
+                curr.proposedDate === proposedDate || acc === true;
             }, false)
             if(isWorkerBusy){
                 return reject({status: 409, error: "Worker is busy on the given date"})
@@ -40,14 +38,14 @@ export const addProposalService = ({workerId, chosenCategoryId, wage, isFullDay,
                 wage,
                 isFullDay,
                 isBeforeNoon,
-                proposedDate: proposedDateInDate,
+                proposedDate: proposedDate,
                 workDescription,
                 proposedAddressId,
                 timestamp: new Date()
             }).then((response: any) => {
                 response = response.toObject();
                 response.timestamp = response.timestamp.getTime();
-                response.proposedDate = response.proposedDate.getTime();
+                response.proposedDate = response.proposedDate;
                 resolve({data: response})
             }).catch((error) => {
                 console.log(error)

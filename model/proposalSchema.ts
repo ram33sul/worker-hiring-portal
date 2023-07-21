@@ -11,7 +11,7 @@ const proposalSchema = new mongoose.Schema({
     isRejected: { type: Boolean, default: false},
     status: { type: String, default: true},
     timestamp: { type: Date, default: new Date()},
-    proposedDate: { type: Date, default: new Date()},
+    proposedDate: { type: Number, required: true},
     workDescription: { type: String, default: ''},
     proposedAddressId: { type: mongoose.Types.ObjectId, required: true},
     isUserDeleted: { type: Boolean, default: false},
