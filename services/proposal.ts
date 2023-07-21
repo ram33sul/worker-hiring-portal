@@ -60,17 +60,17 @@ export const addProposalService = ({workerId, chosenCategoryId, wage, isFullDay,
 }
 
 interface GetProposalServiceProps {
-    workerId: string;
+    userId: string;
     page: string;
     pageSize: string;
 }
-export const getProposalsService = ({workerId, page, pageSize}: GetProposalServiceProps) => {
+export const getProposalsService = ({userId, page, pageSize}: GetProposalServiceProps) => {
     return new Promise((resolve, reject) => {
         try {
             Proposal.aggregate([
                 {
                     $match: {
-                        workerId: new mongoose.Types.ObjectId(workerId),
+                        workerId: new mongoose.Types.ObjectId(userId),
                         isWorkerDeleted: false,
                         status: true
                     }
@@ -144,7 +144,6 @@ export const getProposalsService = ({workerId, page, pageSize}: GetProposalServi
                     $limit: parseInt(pageSize)
                 }
             ]).then((response) => {
-                console.log(response)
                 resolve({data: response})
             }).catch((error) => {
                 console.log(error)
