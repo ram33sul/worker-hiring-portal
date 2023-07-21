@@ -45,7 +45,7 @@ export const addProposalService = ({workerId, chosenCategoryId, wage, isFullDay,
                 proposedAddressId,
                 timestamp: new Date()
             }).then((response: any) => {
-                response = response?.toObject()
+                response = response.toObject();
                 response.timestamp = response.timestamp.getTime();
                 response.proposedDate = response.proposedDate.getTime();
                 resolve({data: response})
