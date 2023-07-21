@@ -302,9 +302,9 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
             const notAvailableWorkers = await Proposal.aggregate([
                 {
                     $match: {
-                        proposedDate: new Date(date),
-                        isBeforeNoon,
-                        isFullDay
+                        proposedDate: new Date(parseInt(date)),
+                        isBeforeNoon: isBeforeNoon === 'true',
+                        isFullDay: isFullDay === 'true'
                     }
                 },{
                     $project: {
