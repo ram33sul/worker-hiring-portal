@@ -299,7 +299,7 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
             ]);
             location = (location && Array.isArray(location) && location?.[0] && location?.[0]?.location) ? location[0].location : [ 0, 0 ];
 
-            const notAvailableWorkers = await Proposal.aggregate([
+            let notAvailableWorkers = await Proposal.aggregate([
                 {
                     $match: {
                         proposedDate: parseInt(date),
@@ -307,11 +307,19 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                         isFullDay: isFullDay === 'true'
                     }
                 },{
-                    $project: {
-                        '$$root': "$workerId"
-                    }
+                  $group: {
+                    _id: null,
+                    workerIds: { $push: "$workerId" }
+                  }
+                },{
+                  $project: {
+                    _id: 0,
+                    workerIds: 1
+                  }
                 }
             ]);
+
+            notAvailableWorkers = notAvailableWorkers?.[0]?.workerIds ?? [];
 
             notAvailableWorkers.push(new mongoose.Types.ObjectId(userId))
             console.log(notAvailableWorkers)
