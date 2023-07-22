@@ -66,79 +66,79 @@ interface GetProposalServiceProps {
 export const getProposalsService = ({userId, page, pageSize}: GetProposalServiceProps) => {
     return new Promise((resolve, reject) => {
         try {
+
             Proposal.aggregate([
                 {
                     $match: {
                         workerId: new mongoose.Types.ObjectId(userId),
-                        // isWorkerDeleted: false,
-                        // status: true
+                        isWorkerDeleted: false,
+                        status: true
                     }
-                },
-                //{
-                //     $lookup: {
-                //         from: "users",
-                //         localField: "userId",
-                //         foreignField: "_id",
-                //         as: "userData"
-                //     }
-                // },{
-                //     $lookup: {
-                //         from: "workers",
-                //         localField: "chosenCategoryId",
-                //         foreignField: "_id",
-                //         as: "categoryData"
-                //     }
-                // },{
-                //     $lookup: {
-                //         from: "addresses",
-                //         localField: "proposedAddressId",
-                //         foreignField: "_id",
-                //         as: "addressData"
-                //     }
-                // },{
-                //     $project: {
-                //         userId: 1,
-                //         firstName: {
-                //             $arrayElemAt: [
-                //                 "$userData.firstName",
-                //                 0
-                //             ]
-                //         },
-                //         lastName: {
-                //             $arrayElemAt: [
-                //                 "$userData.lastName",
-                //                 0
-                //             ]
-                //         },
-                //         profileImageUrl: {
-                //             $arrayElemAt: [
-                //                 "$userData.profilePicture",
-                //                 0
-                //             ]
-                //         },
-                //         categoryTitle: {
-                //             $arrayElemAt: [
-                //                 "$categoryData.title",
-                //                 0
-                //             ]
-                //         },
-                //         categorySkill: {
-                //             $arrayElemAt: [
-                //                 "$categoryData.skill",
-                //                 0
-                //             ]
-                //         },
-                //         proposedDate: {
-                //             $toLong: "$proposedDate"
-                //         },
-                //         wage: 1,
-                //         isFullDay: 1,
-                //         isBeforeNoon: 1,
-                //         address: {
-                //             $first: "$addressData"
-                //         }
-                //     }
-                // }
+                },{
+                    $lookup: {
+                        from: "users",
+                        localField: "userId",
+                        foreignField: "_id",
+                        as: "userData"
+                    }
+                },{
+                    $lookup: {
+                        from: "workers",
+                        localField: "chosenCategoryId",
+                        foreignField: "_id",
+                        as: "categoryData"
+                    }
+                },{
+                    $lookup: {
+                        from: "addresses",
+                        localField: "proposedAddressId",
+                        foreignField: "_id",
+                        as: "addressData"
+                    }
+                },{
+                    $project: {
+                        userId: 1,
+                        firstName: {
+                            $arrayElemAt: [
+                                "$userData.firstName",
+                                0
+                            ]
+                        },
+                        lastName: {
+                            $arrayElemAt: [
+                                "$userData.lastName",
+                                0
+                            ]
+                        },
+                        profileImageUrl: {
+                            $arrayElemAt: [
+                                "$userData.profilePicture",
+                                0
+                            ]
+                        },
+                        categoryTitle: {
+                            $arrayElemAt: [
+                                "$categoryData.title",
+                                0
+                            ]
+                        },
+                        categorySkill: {
+                            $arrayElemAt: [
+                                "$categoryData.skill",
+                                0
+                            ]
+                        },
+                        proposedDate: {
+                            $toLong: "$proposedDate"
+                        },
+                        wage: 1,
+                        isFullDay: 1,
+                        isBeforeNoon: 1,
+                        address: {
+                            $first: "$addressData"
+                        }
+                    }
+                }
             ]).then((response) => {
                 resolve({data: response})
             }).catch((error) => {

@@ -20,6 +20,7 @@ const userSchema_1 = __importDefault(require("../model/userSchema"));
 const workerCategorySchema_1 = __importDefault(require("../model/workerCategorySchema"));
 const general_1 = require("../validation/general");
 const cloudinary_1 = require("./cloudinary");
+const proposalSchema_1 = __importDefault(require("../model/proposalSchema"));
 const editProfileService = ({ userId, data, file }) => {
     return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
         let { firstName, lastName, gender, email, age } = JSON.parse(data);
@@ -216,11 +217,12 @@ const getUserDetailsService = ({ id, userId }) => {
     });
 };
 exports.getUserDetailsService = getUserDetailsService;
-const getWorkersListService = ({ page, pageSize, sort, rating4Plus, previouslyHired, isFavourite, userId, category, query }) => {
+const getWorkersListService = ({ page, pageSize, sort, rating4Plus, previouslyHired, isFavourite, userId, category, query, isBeforeNoon, isFullDay, date }) => {
     const sorts = ["rating", "distance", "wageLowToHigh", "wageHighToLow"];
     return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+        var _a, _b, _c;
         try {
-            let location = (yield userSchema_1.default.aggregate([
+            let location = yield userSchema_1.default.aggregate([
                 {
                     $match: {
                         _id: new mongoose_1.default.Types.ObjectId(userId)
@@ -243,12 +245,32 @@ const getWorkersListService = ({ page, pageSize, sort, rating4Plus, previouslyHi
                         }
                     }
                 }
-            ]));
-            location = [0, 0];
+            ]);
+            location = (location && Array.isArray(location) && (location === null || location === void 0 ? void 0 : location[0]) && ((_a = location === null || location === void 0 ? void 0 : location[0]) === null || _a === void 0 ? void 0 : _a.location)) ? location[0].location : [0, 0];
+            let notAvailableWorkers = yield proposalSchema_1.default.aggregate([
+                {
+                    $match: Object.assign({ proposedDate: parseInt(date), isFullDay: isFullDay === 'true' }, (isFullDay !== 'true' ? {
+                        isBeforeNoon: isBeforeNoon === 'true'
+                    } : {}))
+                }, {
+                    $group: {
+                        _id: null,
+                        workerIds: { $push: "$workerId" }
+                    }
+                }, {
+                    $project: {
+                        _id: 0,
+                        workerIds: 1
+                    }
+                }
+            ]);
+            notAvailableWorkers = (_c = (_b = notAvailableWorkers === null || notAvailableWorkers === void 0 ? void 0 : notAvailableWorkers[0]) === null || _b === void 0 ? void 0 : _b.workerIds) !== null && _c !== void 0 ? _c : [];
+            notAvailableWorkers.push(new mongoose_1.default.Types.ObjectId(userId));
+            console.log(notAvailableWorkers);
             userSchema_1.default.aggregate([
                 {
                     $match: Object.assign({ isWorker: true, _id: {
-                            $ne: new mongoose_1.default.Types.ObjectId(userId)
+                            $nin: notAvailableWorkers,
                         } }, (category ? {
                         categoryList: {
                             $elemMatch: {

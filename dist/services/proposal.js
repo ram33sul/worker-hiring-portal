@@ -28,9 +28,7 @@ const addProposalService = ({ workerId, chosenCategoryId, wage, isFullDay, isBef
                 isBeforeNoon,
             });
             const isWorkerBusy = proposalData === null || proposalData === void 0 ? void 0 : proposalData.reduce((acc, curr) => {
-                const proposedDateString1 = `${curr.proposedDate.getDate()}${curr.proposedDate.getMonth()}${curr.proposedDate.getFullYear()}`;
-                const proposedDateString2 = `${proposedDateInDate.getDate()}${proposedDateInDate.getMonth()}${proposedDateInDate.getFullYear()}`;
-                return proposedDateString1 === proposedDateString2 || acc === true;
+                curr.proposedDate === proposedDate || acc === true;
             }, false);
             if (isWorkerBusy) {
                 return reject({ status: 409, error: "Worker is busy on the given date" });
@@ -42,14 +40,14 @@ const addProposalService = ({ workerId, chosenCategoryId, wage, isFullDay, isBef
                 wage,
                 isFullDay,
                 isBeforeNoon,
-                proposedDate: proposedDateInDate,
+                proposedDate: proposedDate,
                 workDescription,
                 proposedAddressId,
                 timestamp: new Date()
             }).then((response) => {
                 response = response.toObject();
                 response.timestamp = response.timestamp.getTime();
-                response.proposedDate = response.proposedDate.getTime();
+                response.proposedDate = response.proposedDate;
                 resolve({ data: response });
             }).catch((error) => {
                 console.log(error);
@@ -137,10 +135,6 @@ const getProposalsService = ({ userId, page, pageSize }) => {
                             $first: "$addressData"
                         }
                     }
-                }, {
-                    $skip: (page === undefined || pageSize === undefined) ? 0 : (parseInt(page) * parseInt(pageSize))
-                }, {
-                    $limit: parseInt(pageSize)
                 }
             ]).then((response) => {
                 resolve({ data: response });
