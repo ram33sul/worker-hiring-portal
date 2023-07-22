@@ -172,11 +172,11 @@ export const acceptProposalService = ({ proposalId, userId}: AcceptProposalServi
             if(!proposalData){
                 return reject({status: 400, error: "proposal doesn't exit"})
             }
-            if(proposalData.userId?.toString() !== userId){
-                return reject({status: 400, error: "The proposal wasn't added by the same user"})
+            if(proposalData.workerId?.toString() !== userId){
+                return reject({status: 400, error: "The proposal can't be modified by the worker"})
             }
             Proposal.updateOne({
-                userId: new mongoose.Types.ObjectId(userId),
+                workerId: new mongoose.Types.ObjectId(userId),
                 _id: new mongoose.Types.ObjectId(proposalId)
             },{
                 $set: {
