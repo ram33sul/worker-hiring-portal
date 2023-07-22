@@ -19,11 +19,12 @@ export const addProposalService = ({workerId, chosenCategoryId, wage, isFullDay,
             if(workerId === userId){
                 return reject({status: 400, error: "worker and user cannot be same"})
             }
-            const proposedDateInDate = new Date(proposedDate)
             const proposalData = await Proposal.find({
                 workerId: new mongoose.Types.ObjectId(workerId),
                 isFullDay,
-                isBeforeNoon,
+                ...(isFullDay ? {} : {
+                    isBeforeNoon
+                })
             })
             const isWorkerBusy = proposalData?.reduce((acc: any, curr: any) => {
                 curr.proposedDate === proposedDate || acc === true;
