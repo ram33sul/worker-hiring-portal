@@ -71,6 +71,8 @@ export const getProposalsService = ({userId, page, pageSize}: GetProposalService
                 {
                     $match: {
                         workerId: new mongoose.Types.ObjectId(userId),
+                        isWorkerDeleted: false,
+                        status: true
                     }
                 },{
                     $lookup: {
@@ -138,6 +140,10 @@ export const getProposalsService = ({userId, page, pageSize}: GetProposalService
                             $toLong: "$timestamp"
                         }
                     }
+                },{
+                    $skip: (page === undefined || pageSize === undefined) ? 0 : (parseInt(page) * parseInt(pageSize))
+                },{
+                    $limit: parseInt(pageSize)
                 }
             ]).then((response) => {
                 resolve({data: response})

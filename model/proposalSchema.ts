@@ -9,7 +9,7 @@ const proposalSchema = new mongoose.Schema({
     isBeforeNoon: { type: Boolean, default: true},
     isAccepted: { type: Boolean, default: false},
     isRejected: { type: Boolean, default: false},
-    status: { type: String, default: true},
+    status: { type: Boolean, default: true},
     timestamp: { type: Date, default: new Date()},
     proposedDate: { type: Number, required: true},
     workDescription: { type: String, default: ''},
