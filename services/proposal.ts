@@ -27,9 +27,8 @@ export const addProposalService = ({workerId, chosenCategoryId, wage, isFullDay,
                 })
             })
 
-            console.log(proposedDate)
             const isWorkerBusy = proposalData?.reduce((acc: any, curr: any) => {
-                curr.proposedDate === proposedDate || acc === true;
+                return curr.proposedDate === proposedDate || acc === true;
             }, false)
             if(isWorkerBusy){
                 return reject({status: 409, error: "Worker is busy on the given date"})
