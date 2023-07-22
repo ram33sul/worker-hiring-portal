@@ -169,8 +169,11 @@ export const acceptProposalService = ({ proposalId, userId}: AcceptProposalServi
     return new Promise(async (resolve, reject) => {
         try {
             const proposalData = await Proposal.findOne({ _id: new mongoose.Types.ObjectId(proposalId)});
-            if(JSON.stringify(proposalData?.userId) !== userId || !proposalData?._id){
-                return reject({status: 400, error: "proposal doesn't exit or the proposal wasn't added by the user"})
+            if(!proposalData){
+                return reject({status: 400, error: "proposal doesn't exit"})
+            }
+            if(proposalData.userId?.toString() !== userId){
+                return reject({status: 400, error: "The proposal wasn't added by the same user"})
             }
             Proposal.updateOne({
                 userId: new mongoose.Types.ObjectId(userId),
