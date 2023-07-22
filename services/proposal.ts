@@ -27,7 +27,7 @@ export const addProposalService = ({workerId, chosenCategoryId, wage, isFullDay,
                 })
             })
 
-            console.log(proposalData)
+            console.log(proposedDate)
             const isWorkerBusy = proposalData?.reduce((acc: any, curr: any) => {
                 curr.proposedDate === proposedDate || acc === true;
             }, false)
