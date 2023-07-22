@@ -72,7 +72,9 @@ export const getProposalsService = ({userId, page, pageSize}: GetProposalService
                     $match: {
                         workerId: new mongoose.Types.ObjectId(userId),
                         isWorkerDeleted: false,
-                        status: true
+                        status: true,
+                        isAccepted: false,
+                        isRejected: false
                     }
                 },{
                     $lookup: {
