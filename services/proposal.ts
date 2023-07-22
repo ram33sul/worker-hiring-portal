@@ -209,7 +209,7 @@ export const rejectProposalService = ({ proposalId, userId}: RejectProposalServi
                 return reject({status: 400, error: "The proposal can't be modified by the worker"})
             }
             Proposal.updateOne({
-                userId: new mongoose.Types.ObjectId(userId),
+                workerId: new mongoose.Types.ObjectId(userId),
                 _id: new mongoose.Types.ObjectId(proposalId)
             },{
                 $set: {
