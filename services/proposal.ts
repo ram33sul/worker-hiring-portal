@@ -128,9 +128,7 @@ export const getProposalsService = ({userId, page, pageSize}: GetProposalService
                                 0
                             ]
                         },
-                        proposedDate: {
-                            $toLong: "$proposedDate"
-                        },
+                        proposedDate: 1,
                         wage: 1,
                         isFullDay: 1,
                         isBeforeNoon: 1,
