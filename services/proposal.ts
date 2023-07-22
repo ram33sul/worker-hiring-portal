@@ -132,6 +132,10 @@ export const getProposalsService = ({userId, page, pageSize}: GetProposalService
                         isBeforeNoon: 1,
                         address: {
                             $first: "$addressData"
+                        },
+                        workDescription: 1,
+                        timestamp: {
+                            $toLong: "$timestamp"
                         }
                     }
                 }
