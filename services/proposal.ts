@@ -261,3 +261,156 @@ export const completeProposalService = ({ proposalId, userId}: RejectProposalSer
         }
     })
 }
+
+interface GetReportProps {
+    fromDate: string,
+    toDate: string,
+    workHistory: string,
+    hiringHistory: string,
+    pendingWorks: string,
+    completedWorks: string,
+    cancelledWorks: string,
+    userId: string,
+    page: string,
+    pageSize: string
+}
+
+export const getReportService = ({ fromDate, toDate, workHistory, hiringHistory, pendingWorks, completedWorks, cancelledWorks, userId, page, pageSize  }: GetReportProps) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const str = 'true'
+            Proposal.aggregate([
+                {
+                    $match: {
+                        proposalDate : {
+                            $and: [
+                                {
+                                    $gte: parseInt(fromDate)
+                                },{
+                                    $lte: parseInt(toDate)
+                                }
+                            ]
+                        },
+                        ...(workHistory === 'true' ? {
+                            workerId: new mongoose.Types.ObjectId(userId)
+                        } : {}),
+                        ...(hiringHistory === 'true' ? {
+                            userId: new mongoose.Types.ObjectId(userId)
+                        } : {}),
+                        ...((pendingWorks === str && completedWorks === str && cancelledWorks === str) ? {} :
+                        (pendingWorks === str && completedWorks === str) ? {
+                            isUserDeleted: false,
+                            isWorkerDeleted: false,
+                        } : (pendingWorks === str && cancelledWorks === str) ? {
+                            isCompleted: false
+                        } : (completedWorks === str && cancelledWorks === str) ? {
+                            $or: [
+                                {
+                                    isCompleted: true
+                                },{
+                                    isUserDeleted: true
+                                },{
+                                    isWorkerDeleted: true
+                                }
+                            ]
+                        } : (pendingWorks === str) ? {
+                            isCompleted: false,
+                            isUserDeleted: false,
+                            isWorkerDeleted: false
+                        } : (completedWorks === str) ? {
+                            isCompleted: true
+                        } : (cancelledWorks === str) ? {
+                            $or: [
+                                {
+                                    isUserDeleted: true
+                                },{
+                                    isWorkerDeleted: true
+                                }
+                            ]
+                        } : {})
+                    }
+                },{
+                    $lookup: {
+                        from: "users",
+                        localField: "userId",
+                        foreignField: "_id",
+                        as: "userDetails"
+                    }
+                },{
+                    $lookup: {
+                        from: "users",
+                        localField: "workerId",
+                        foreignField: "_id",
+                        as: "workerDetails"
+                    }
+                },{
+                    $lookup: {
+                        from: "addresses",
+                        localField: "proposedAddressId",
+                        foreignField: "_id",
+                        as: "addressDetails"
+                    }
+                },{
+                    $lookup: {
+                        from: "workers",
+                        localField: "chosenCategoryId",
+                        foreignField: "_id",
+                        as: "categoryDetails"
+                    }
+                },{
+                    $project: {
+                        _id: 1,
+                        userId: 1,
+                        workerId: 1,
+                        userImageUrl: {
+                            $arrayElemAt: [
+                                "$userDetails.profilePicture",
+                                0
+                            ]
+                        },
+                        workerImageUrl: {
+                            $arrayElemAt: [
+                                "$userDetails.profilePicture",
+                                0
+                            ]
+                        },
+                        workDescription: 1,
+                        wage: 1,
+                        proposedDate: 1,
+                        proposedAddress: {
+                            $first: "$addressDetails"
+                        },
+                        isFullDay: 1,
+                        isBeforeNoon: 1,
+                        categoryTitle: {
+                            $arrayElemAt: [
+                                "$categoryDetails.title",
+                                0
+                            ]
+                        },
+                        categorySkill: {
+                            $arrayElemAt: [
+                                "$categoryDetails.skill",
+                                0
+                            ]
+                        },
+                        isAccepted: 1,
+                        isCompleted: 1,
+                        isUserDeleted: 1,
+                        isWorkerDeleted: 1,
+                    }
+                },{
+                    $skip: (page === undefined || pageSize === undefined) ? 0 : (parseInt(page) * parseInt(pageSize))
+                },{
+                    $limit: pageSize === undefined ? -1 : parseInt(pageSize)
+                }
+            ]).then((response) => {
+                resolve({data: response})
+            }).catch((error) => {
+                reject({status: 502, error: "Database error occurred"})
+            })
+        } catch (error) {
+            reject({status: 500, error: "Internal error occurred"})
+        }
+    })
+}
