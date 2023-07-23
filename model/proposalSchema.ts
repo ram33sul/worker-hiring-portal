@@ -15,7 +15,8 @@ const proposalSchema = new mongoose.Schema({
     workDescription: { type: String, default: ''},
     proposedAddressId: { type: mongoose.Types.ObjectId, required: true},
     isUserDeleted: { type: Boolean, default: false},
-    isWorkerDeleted: { type: Boolean, default: false}
+    isWorkerDeleted: { type: Boolean, default: false},
+    isCompleted: { type: Boolean, default: false}
 })
 
 const Proposal = mongoose.model("proposals", proposalSchema);

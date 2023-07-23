@@ -226,3 +226,38 @@ export const rejectProposalService = ({ proposalId, userId}: RejectProposalServi
         }
     })
 }
+
+export const completeProposalService = ({ proposalId, userId}: RejectProposalServiceProps) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const proposalData = await Proposal.findOne({ _id: new mongoose.Types.ObjectId(proposalId)});
+            if(!proposalData){
+                return reject({status: 400, error: "proposal doesn't exit"})
+            }
+            if(proposalData.workerId?.toString() !== userId && proposalData.userId?.toString() !== userId){
+                return reject({status: 400, error: "The proposal can't be modified by the user"})
+            }
+            Proposal.updateOne({
+                $or: [
+                    {
+                        _id: new mongoose.Types.ObjectId(proposalId),
+                        userId: new mongoose.Types.ObjectId(userId)
+                    },{
+                        _id: new mongoose.Types.ObjectId(proposalId),
+                        workerId: new mongoose.Types.ObjectId(userId)
+                    }
+                ]
+            },{
+                $set: {
+                    isCompleted: true
+                }
+            }).then((response) => {
+                resolve({data: 'done'})
+            }).catch((error) => {
+                reject({status: 502, error: "Database error occurred"})
+            })
+        } catch (error) {
+            reject({status: 500, error: "Internal error occurred"})
+        }
+    })
+}
