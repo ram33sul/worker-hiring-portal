@@ -282,54 +282,47 @@ export const getReportService = ({ fromDate, toDate, workHistory, hiringHistory,
             Proposal.aggregate([
                 {
                     $match: {
-                        $and: [
-                            {
-                                proposalDate: {
-                                    $gte: parseInt(fromDate)
-                                }
-                            },{
-                                proposalDate: {
-                                    $lte: parseInt(toDate)
-                                }
-                            }
-                        ],
-                        ...(workHistory === 'true' ? {
-                            workerId: new mongoose.Types.ObjectId(userId)
-                        } : {}),
-                        ...(hiringHistory === 'true' ? {
-                            userId: new mongoose.Types.ObjectId(userId)
-                        } : {}),
-                        ...((pendingWorks === str && completedWorks === str && cancelledWorks === str) ? {} :
-                        (pendingWorks === str && completedWorks === str) ? {
-                            isUserDeleted: false,
-                            isWorkerDeleted: false,
-                        } : (pendingWorks === str && cancelledWorks === str) ? {
-                            isCompleted: false
-                        } : (completedWorks === str && cancelledWorks === str) ? {
-                            $or: [
-                                {
-                                    isCompleted: true
-                                },{
-                                    isUserDeleted: true
-                                },{
-                                    isWorkerDeleted: true
-                                }
-                            ]
-                        } : (pendingWorks === str) ? {
-                            isCompleted: false,
-                            isUserDeleted: false,
-                            isWorkerDeleted: false
-                        } : (completedWorks === str) ? {
-                            isCompleted: true
-                        } : (cancelledWorks === str) ? {
-                            $or: [
-                                {
-                                    isUserDeleted: true
-                                },{
-                                    isWorkerDeleted: true
-                                }
-                            ]
-                        } : {})
+                        proposalDate: {
+                            $gte: parseInt(fromDate),
+                            $lte: parseInt(toDate)
+                        },
+                        // ...(workHistory === 'true' ? {
+                        //     workerId: new mongoose.Types.ObjectId(userId)
+                        // } : {}),
+                        // ...(hiringHistory === 'true' ? {
+                        //     userId: new mongoose.Types.ObjectId(userId)
+                        // } : {}),
+                        // ...((pendingWorks === str && completedWorks === str && cancelledWorks === str) ? {} :
+                        // (pendingWorks === str && completedWorks === str) ? {
+                        //     isUserDeleted: false,
+                        //     isWorkerDeleted: false,
+                        // } : (pendingWorks === str && cancelledWorks === str) ? {
+                        //     isCompleted: false
+                        // } : (completedWorks === str && cancelledWorks === str) ? {
+                        //     $or: [
+                        //         {
+                        //             isCompleted: true
+                        //         },{
+                        //             isUserDeleted: true
+                        //         },{
+                        //             isWorkerDeleted: true
+                        //         }
+                        //     ]
+                        // } : (pendingWorks === str) ? {
+                        //     isCompleted: false,
+                        //     isUserDeleted: false,
+                        //     isWorkerDeleted: false
+                        // } : (completedWorks === str) ? {
+                        //     isCompleted: true
+                        // } : (cancelledWorks === str) ? {
+                        //     $or: [
+                        //         {
+                        //             isUserDeleted: true
+                        //         },{
+                        //             isWorkerDeleted: true
+                        //         }
+                        //     ]
+                        // } : {})
                     }
                 },{
                     $lookup: {
@@ -404,7 +397,7 @@ export const getReportService = ({ fromDate, toDate, workHistory, hiringHistory,
                 },{
                     $skip: (page === undefined || pageSize === undefined) ? 0 : (parseInt(page) * parseInt(pageSize))
                 },{
-                    $limit: pageSize === undefined ? -1 : parseInt(pageSize)
+                    $limit: pageSize === undefined ? 0 : parseInt(pageSize)
                 }
             ]).then((response) => {
                 resolve({data: response})
