@@ -282,15 +282,17 @@ export const getReportService = ({ fromDate, toDate, workHistory, hiringHistory,
             Proposal.aggregate([
                 {
                     $match: {
-                        proposalDate : {
-                            $and: [
-                                {
+                        $and: [
+                            {
+                                proposalDate: {
                                     $gte: parseInt(fromDate)
-                                },{
+                                }
+                            },{
+                                proposalDate: {
                                     $lte: parseInt(toDate)
                                 }
-                            ]
-                        },
+                            }
+                        ],
                         ...(workHistory === 'true' ? {
                             workerId: new mongoose.Types.ObjectId(userId)
                         } : {}),
