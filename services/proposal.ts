@@ -407,6 +407,7 @@ export const getReportService = ({ fromDate, toDate, workHistory, hiringHistory,
             ]).then((response) => {
                 resolve({data: response})
             }).catch((error) => {
+                console.log(error)
                 reject({status: 502, error: "Database error occurred"})
             })
         } catch (error) {
