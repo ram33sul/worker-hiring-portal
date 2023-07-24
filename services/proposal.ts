@@ -284,7 +284,6 @@ export const getReportService = ({ fromDate, toDate, workHistory, hiringHistory,
                     $match: {
                         proposalDate: {
                             $gte: parseInt(fromDate),
-                            $lte: parseInt(toDate)
                         },
                         // ...(workHistory === 'true' ? {
                         //     workerId: new mongoose.Types.ObjectId(userId)
