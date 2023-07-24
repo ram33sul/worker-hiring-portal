@@ -432,8 +432,6 @@ export const getWorkersListService = ({page, pageSize, sort, rating4Plus, previo
                         }: {}),
                         ...(previouslyHired === 'true' ? {
                             previouslyHired: true
-                        } : previouslyHired === 'false' ? {
-                            previouslyHired: false
                         } : {}),
                         ...(isFavourite === 'true' ? {
                             isFavourite: true

@@ -279,8 +279,6 @@ export const getReportService = ({ fromDate, toDate, workHistory, hiringHistory,
     return new Promise(async (resolve, reject) => {
         try {
             const str = 'true'
-
-            console.log(fromDate, userId)
             Proposal.aggregate([
                 {
                     $match: {
