@@ -391,7 +391,7 @@ export const getReportService = ({ fromDate, toDate, workHistory, hiringHistory,
                                 {
                                     $eq: [
                                         "$userId",
-                                        userId
+                                        new mongoose.Types.ObjectId(userId)
                                     ]
                                 },
                                 {
@@ -412,7 +412,7 @@ export const getReportService = ({ fromDate, toDate, workHistory, hiringHistory,
                                 {
                                     $eq: [
                                         "$userId",
-                                        userId
+                                        new mongoose.Types.ObjectId(userId)
                                     ]
                                 },
                                 {
