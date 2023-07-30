@@ -365,8 +365,50 @@ export const getReportService = ({ fromDate, toDate, workHistory, hiringHistory,
                         },
                         workerImageUrl: {
                             $arrayElemAt: [
-                                "$userDetails.profilePicture",
+                                "$workerDetails.profilePicture",
                                 0
+                            ]
+                        },
+                        oppositeFirstName : {
+                            $cond: [
+                                {
+                                    $eq: [
+                                        "$userId",
+                                        userId
+                                    ]
+                                },
+                                {
+                                    $arrayElemAt: [
+                                        "$workerDetails.firstName",
+                                        0
+                                    ]
+                                },{
+                                    $arrayElemAt: [
+                                        "$userDetails.firstName",
+                                        0
+                                    ]
+                                }
+                            ]
+                        },
+                        oppositeLastName : {
+                            $cond: [
+                                {
+                                    $eq: [
+                                        "$userId",
+                                        userId
+                                    ]
+                                },
+                                {
+                                    $arrayElemAt: [
+                                        "$workerDetails.lastName",
+                                        0
+                                    ]
+                                },{
+                                    $arrayElemAt: [
+                                        "$userDetails.lastName",
+                                        0
+                                    ]
+                                }
                             ]
                         },
                         workDescription: 1,
