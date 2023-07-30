@@ -286,43 +286,43 @@ export const getReportService = ({ fromDate, toDate, workHistory, hiringHistory,
                             $gte: parseInt(fromDate),
                             $lte: parseInt(toDate)
                         },
-                        // ...(workHistory === 'true' ? {
-                        //     workerId: new mongoose.Types.ObjectId(userId)
-                        // } : {}),
-                        // ...(hiringHistory === 'true' ? {
-                        //     userId: new mongoose.Types.ObjectId(userId)
-                        // } : {}),
-                        // ...((pendingWorks === str && completedWorks === str && cancelledWorks === str) ? {} :
-                        // (pendingWorks === str && completedWorks === str) ? {
-                        //     isUserDeleted: false,
-                        //     isWorkerDeleted: false,
-                        // } : (pendingWorks === str && cancelledWorks === str) ? {
-                        //     isCompleted: false
-                        // } : (completedWorks === str && cancelledWorks === str) ? {
-                        //     $or: [
-                        //         {
-                        //             isCompleted: true
-                        //         },{
-                        //             isUserDeleted: true
-                        //         },{
-                        //             isWorkerDeleted: true
-                        //         }
-                        //     ]
-                        // } : (pendingWorks === str) ? {
-                        //     isCompleted: false,
-                        //     isUserDeleted: false,
-                        //     isWorkerDeleted: false
-                        // } : (completedWorks === str) ? {
-                        //     isCompleted: true
-                        // } : (cancelledWorks === str) ? {
-                        //     $or: [
-                        //         {
-                        //             isUserDeleted: true
-                        //         },{
-                        //             isWorkerDeleted: true
-                        //         }
-                        //     ]
-                        // } : {})
+                        ...(workHistory === 'true' ? {
+                            workerId: new mongoose.Types.ObjectId(userId)
+                        } : {}),
+                        ...(hiringHistory === 'true' ? {
+                            userId: new mongoose.Types.ObjectId(userId)
+                        } : {}),
+                        ...((pendingWorks === str && completedWorks === str && cancelledWorks === str) ? {} :
+                        (pendingWorks === str && completedWorks === str) ? {
+                            isUserDeleted: false,
+                            isWorkerDeleted: false,
+                        } : (pendingWorks === str && cancelledWorks === str) ? {
+                            isCompleted: false
+                        } : (completedWorks === str && cancelledWorks === str) ? {
+                            $or: [
+                                {
+                                    isCompleted: true
+                                },{
+                                    isUserDeleted: true
+                                },{
+                                    isWorkerDeleted: true
+                                }
+                            ]
+                        } : (pendingWorks === str) ? {
+                            isCompleted: false,
+                            isUserDeleted: false,
+                            isWorkerDeleted: false
+                        } : (completedWorks === str) ? {
+                            isCompleted: true
+                        } : (cancelledWorks === str) ? {
+                            $or: [
+                                {
+                                    isUserDeleted: true
+                                },{
+                                    isWorkerDeleted: true
+                                }
+                            ]
+                        } : {})
                     }
                 },{
                     $lookup: {
@@ -393,6 +393,9 @@ export const getReportService = ({ fromDate, toDate, workHistory, hiringHistory,
                         isCompleted: 1,
                         isUserDeleted: 1,
                         isWorkerDeleted: 1,
+                        isProposalSentByUser: {
+                            $eq: ['$workerId', new mongoose.Types.ObjectId(userId)]
+                        }
                     }
                 }
             ]).then((response) => {
