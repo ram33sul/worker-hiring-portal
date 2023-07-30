@@ -280,6 +280,13 @@ export const getReportService = ({ fromDate, toDate, workHistory, hiringHistory,
         try {
             const str = 'true'
             console.log(fromDate, typeof fromDate)
+            const data = await Proposal.find({
+                proposedDate: {
+                    $gte: parseInt(fromDate)
+                }
+            })
+            console.log(data)
+            resolve({data})
             Proposal.aggregate([
                 {
                     $match: {
