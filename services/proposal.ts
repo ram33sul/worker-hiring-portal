@@ -286,12 +286,29 @@ export const getReportService = ({ fromDate, toDate, workHistory, hiringHistory,
                             $gte: parseInt(fromDate),
                             $lte: parseInt(toDate)
                         },
-                        ...(workHistory === 'true' ? {
-                            workerId: new mongoose.Types.ObjectId(userId)
-                        } : {}),
-                        ...(hiringHistory === 'true' ? {
-                            userId: new mongoose.Types.ObjectId(userId)
-                        } : {}),
+                        ...((workHistory === str && hiringHistory === str) ? {
+                            $or: [
+                                {
+                                    workerId: new mongoose.Types.ObjectId(userId)
+                                },{
+                                    userId: new mongoose.Types.ObjectId(userId)
+                                }
+                            ]
+                        } :
+                            workHistory === 'true' ? {
+                                workerId: new mongoose.Types.ObjectId(userId)
+                            } :
+                            hiringHistory === 'true' ? {
+                                userId: new mongoose.Types.ObjectId(userId)
+                            } : {
+                                $or: [
+                                    {
+                                        workerId: new mongoose.Types.ObjectId(userId)
+                                    },{
+                                        userId: new mongoose.Types.ObjectId(userId)
+                                    }
+                                ]
+                            }),
                         ...((pendingWorks === str && completedWorks === str && cancelledWorks === str) ? {} :
                         (pendingWorks === str && completedWorks === str) ? {
                             isUserDeleted: false,
