@@ -394,10 +394,6 @@ export const getReportService = ({ fromDate, toDate, workHistory, hiringHistory,
                         isUserDeleted: 1,
                         isWorkerDeleted: 1,
                     }
-                },{
-                    $skip: (page === undefined || pageSize === undefined) ? 0 : (parseInt(page) * parseInt(pageSize))
-                },{
-                    $limit: pageSize === undefined ? 1 : parseInt(pageSize)
                 }
             ]).then((response) => {
                 resolve({data: response})
