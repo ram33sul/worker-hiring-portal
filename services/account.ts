@@ -58,7 +58,7 @@ export const verifySmsOtpService = ({phone, countryCode, otpCode}: {phone: strin
             if(errors.length){
                 return reject({errors, error: new Error("Invalid inputs"), status: 400});
             }
-            if(countryCode+phone === '+919562520502' && countryCode === '123456'){
+            if(countryCode.trim()+phone.trim() === '919562520502' && countryCode === '123456'){
                 const userData: mongoose.AnyObject | null = await User.findOne({phone: phone, countryCode: countryCode});
                 if(!userData || !Object.keys(userData).length){
                     User.create({
