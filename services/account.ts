@@ -203,6 +203,7 @@ export const googleSignupService = ({token}: {token: string}) => {
     return new Promise(async (resolve, reject) => {
         try {
             const decodeData: {email: string} = await jwtDecode(token);
+            console.log(decodeData)
             const email = decodeData.email;
             const userData = await User.findOne({email});
             if(!userData){

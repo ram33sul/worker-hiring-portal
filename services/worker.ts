@@ -1,3 +1,4 @@
+import Proposal from "../model/proposalSchema";
 import Worker from "../model/workerCategorySchema";
 import { validate } from "../validation/general";
 import { validateNumber, validateString } from "../validation/types";
@@ -105,6 +106,37 @@ export const getCategorySearchService = ({key, page, pageSize}: {key: string, pa
             })
         } catch (error) {
             reject({status: 500, error: "Internal error occured!"})
+        }
+    })
+}
+
+export const getMostBookedWorkers = ({page, pageSize}: {page: string, pageSize: string}) => {
+    return new Promise((resolve, reject) => {
+        try {
+            Proposal.aggregate([
+                {
+                    $group: {
+                        _id: "$workerId",
+                        countOfWorks: {
+                            $sum: 1
+                        }
+                    }
+                },{
+                    $sort: {
+                        countOfWorks: -1
+                    }
+                },{
+                    $skip: (page === undefined || pageSize === undefined) ? 0 : (parseInt(page) * parseInt(pageSize))
+                },{
+                    $limit: (page === undefined) ? 1 : parseInt(pageSize)
+                }
+            ]).then((response) => {
+                resolve({data: response});
+            }).catch((error) => {
+                reject({status: 502, error: "Database error occured!"})
+            })
+        } catch (error) {
+            reject({status: 500, error: new Error("Internal error occured!")})
         }
     })
 }
