@@ -3,7 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCategorySearchService = exports.getSuggestedCategoriesService = exports.getWorkerCategoriesService = exports.addWorkerCategoryService = void 0;
+exports.getMostBookedWorkers = exports.getCategorySearchService = exports.getSuggestedCategoriesService = exports.getWorkerCategoriesService = exports.addWorkerCategoryService = void 0;
+const proposalSchema_1 = __importDefault(require("../model/proposalSchema"));
 const workerCategorySchema_1 = __importDefault(require("../model/workerCategorySchema"));
 const general_1 = require("../validation/general");
 const types_1 = require("../validation/types");
@@ -107,3 +108,35 @@ const getCategorySearchService = ({ key, page, pageSize }) => {
     });
 };
 exports.getCategorySearchService = getCategorySearchService;
+const getMostBookedWorkers = ({ page, pageSize }) => {
+    return new Promise((resolve, reject) => {
+        try {
+            proposalSchema_1.default.aggregate([
+                {
+                    $group: {
+                        _id: "$workerId",
+                        countOfWorks: {
+                            $sum: 1
+                        }
+                    }
+                }, {
+                    $sort: {
+                        countOfWorks: -1
+                    }
+                }, {
+                    $skip: (page === undefined || pageSize === undefined) ? 0 : (parseInt(page) * parseInt(pageSize))
+                }, {
+                    $limit: (page === undefined) ? 1 : parseInt(pageSize)
+                }
+            ]).then((response) => {
+                resolve({ data: response });
+            }).catch((error) => {
+                reject({ status: 502, error: "Database error occured!" });
+            });
+        }
+        catch (error) {
+            reject({ status: 500, error: new Error("Internal error occured!") });
+        }
+    });
+};
+exports.getMostBookedWorkers = getMostBookedWorkers;

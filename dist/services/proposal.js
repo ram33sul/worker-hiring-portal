@@ -430,6 +430,10 @@ const getReportService = ({ fromDate, toDate, workHistory, hiringHistory, pendin
                             $eq: ['$workerId', new mongoose_1.default.Types.ObjectId(userId)]
                         }
                     }
+                }, {
+                    $skip: (page === undefined || pageSize === undefined) ? 0 : (parseInt(page) * parseInt(pageSize))
+                }, {
+                    $limit: (pageSize === undefined) ? 1 : parseInt(pageSize)
                 }
             ]).then((response) => {
                 resolve({ data: response });

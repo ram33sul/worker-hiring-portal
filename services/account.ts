@@ -199,11 +199,10 @@ export const authenticateService = ({token}:{token: string}) => {
     })
 }
 
-export const googleSignupService = ({token}: {token: string}) => {
+export const googleSignupService = ({googleToken}: {googleToken: string}) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const decodeData: {email: string} = await jwtDecode(token);
-            console.log(decodeData)
+            const decodeData: {email: string} = await jwtDecode(googleToken);
             const email = decodeData.email;
             const userData = await User.findOne({email});
             if(!userData){
@@ -227,7 +226,6 @@ export const googleSignupService = ({token}: {token: string}) => {
             }
         } catch (error) {
             reject({status: 500, error: new Error("Internal error occured!")})
-            console.log(error)
         }
     })
 }

@@ -119,6 +119,8 @@ const events = (action) => {
             return proposal_1.completeProposalService;
         case events_1.GET_REPORT:
             return proposal_1.getReportService;
+        case events_1.GOOGLE_SIGNUP:
+            return account_1.googleSignupService;
         default:
             return () => Promise.reject("Internal error occured!");
     }
