@@ -13,5 +13,7 @@ router.post("/add-proposal", (0, account_1.eventHandler)(events_1.ADD_PROPOSAL))
 router.get("/get-proposals", (0, account_1.eventHandler)(events_1.GET_PROPOSALS));
 router.patch("/accept-proposal", (0, account_1.eventHandler)(events_1.ACCEPT_PROPOSAL));
 router.patch("/reject-proposal", (0, account_1.eventHandler)(events_1.REJECT_PROPOSAL));
+router.patch("/complete-proposal", (0, account_1.eventHandler)(events_1.COMPLETE_PROPOSAL));
+router.get("/get-report", (0, account_1.eventHandler)(events_1.GET_REPORT));
 const proposalRouter = router;
 exports.default = proposalRouter;

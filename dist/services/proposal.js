@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.rejectProposalService = exports.acceptProposalService = exports.getProposalsService = exports.addProposalService = void 0;
+exports.getReportService = exports.completeProposalService = exports.rejectProposalService = exports.acceptProposalService = exports.getProposalsService = exports.addProposalService = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const proposalSchema_1 = __importDefault(require("../model/proposalSchema"));
 const addProposalService = ({ workerId, chosenCategoryId, wage, isFullDay, isBeforeNoon, proposedDate, workDescription, proposedAddressId, userId }) => {
@@ -21,14 +21,11 @@ const addProposalService = ({ workerId, chosenCategoryId, wage, isFullDay, isBef
             if (workerId === userId) {
                 return reject({ status: 400, error: "worker and user cannot be same" });
             }
-            const proposedDateInDate = new Date(proposedDate);
-            const proposalData = yield proposalSchema_1.default.find({
-                workerId: new mongoose_1.default.Types.ObjectId(workerId),
-                isFullDay,
-                isBeforeNoon,
-            });
+            const proposalData = yield proposalSchema_1.default.find(Object.assign({ workerId: new mongoose_1.default.Types.ObjectId(workerId), isFullDay }, (isFullDay ? {} : {
+                isBeforeNoon
+            })));
             const isWorkerBusy = proposalData === null || proposalData === void 0 ? void 0 : proposalData.reduce((acc, curr) => {
-                curr.proposedDate === proposedDate || acc === true;
+                return curr.proposedDate === proposedDate || acc === true;
             }, false);
             if (isWorkerBusy) {
                 return reject({ status: 409, error: "Worker is busy on the given date" });
@@ -69,7 +66,9 @@ const getProposalsService = ({ userId, page, pageSize }) => {
                     $match: {
                         workerId: new mongoose_1.default.Types.ObjectId(userId),
                         isWorkerDeleted: false,
-                        status: true
+                        status: true,
+                        isAccepted: false,
+                        isRejected: false
                     }
                 }, {
                     $lookup: {
@@ -125,16 +124,22 @@ const getProposalsService = ({ userId, page, pageSize }) => {
                                 0
                             ]
                         },
-                        proposedDate: {
-                            $toLong: "$proposedDate"
-                        },
+                        proposedDate: 1,
                         wage: 1,
                         isFullDay: 1,
                         isBeforeNoon: 1,
                         address: {
                             $first: "$addressData"
+                        },
+                        workDescription: 1,
+                        timestamp: {
+                            $toLong: "$timestamp"
                         }
                     }
+                }, {
+                    $skip: (page === undefined || pageSize === undefined) ? 0 : (parseInt(page) * parseInt(pageSize))
+                }, {
+                    $limit: parseInt(pageSize)
                 }
             ]).then((response) => {
                 resolve({ data: response });
@@ -151,13 +156,17 @@ const getProposalsService = ({ userId, page, pageSize }) => {
 exports.getProposalsService = getProposalsService;
 const acceptProposalService = ({ proposalId, userId }) => {
     return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+        var _a;
         try {
             const proposalData = yield proposalSchema_1.default.findOne({ _id: new mongoose_1.default.Types.ObjectId(proposalId) });
-            if (JSON.stringify(proposalData === null || proposalData === void 0 ? void 0 : proposalData.userId) !== userId || !(proposalData === null || proposalData === void 0 ? void 0 : proposalData._id)) {
-                return reject({ status: 400, error: "proposal doesn't exit or the proposal wasn't added by the user" });
+            if (!proposalData) {
+                return reject({ status: 400, error: "proposal doesn't exit" });
+            }
+            if (((_a = proposalData.workerId) === null || _a === void 0 ? void 0 : _a.toString()) !== userId) {
+                return reject({ status: 400, error: "The proposal can't be modified by the worker" });
             }
             proposalSchema_1.default.updateOne({
-                userId: new mongoose_1.default.Types.ObjectId(userId),
+                workerId: new mongoose_1.default.Types.ObjectId(userId),
                 _id: new mongoose_1.default.Types.ObjectId(proposalId)
             }, {
                 $set: {
@@ -178,13 +187,17 @@ const acceptProposalService = ({ proposalId, userId }) => {
 exports.acceptProposalService = acceptProposalService;
 const rejectProposalService = ({ proposalId, userId }) => {
     return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+        var _a;
         try {
             const proposalData = yield proposalSchema_1.default.findOne({ _id: new mongoose_1.default.Types.ObjectId(proposalId) });
-            if (JSON.stringify(proposalData === null || proposalData === void 0 ? void 0 : proposalData.userId) !== userId || !(proposalData === null || proposalData === void 0 ? void 0 : proposalData._id)) {
-                return reject({ status: 400, error: "proposal doesn't exit or the proposal wasn't added by the user" });
+            if (!proposalData) {
+                return reject({ status: 400, error: "proposal doesn't exit" });
+            }
+            if (((_a = proposalData.workerId) === null || _a === void 0 ? void 0 : _a.toString()) !== userId) {
+                return reject({ status: 400, error: "The proposal can't be modified by the worker" });
             }
             proposalSchema_1.default.updateOne({
-                userId: new mongoose_1.default.Types.ObjectId(userId),
+                workerId: new mongoose_1.default.Types.ObjectId(userId),
                 _id: new mongoose_1.default.Types.ObjectId(proposalId)
             }, {
                 $set: {
@@ -203,3 +216,231 @@ const rejectProposalService = ({ proposalId, userId }) => {
     }));
 };
 exports.rejectProposalService = rejectProposalService;
+const completeProposalService = ({ proposalId, userId }) => {
+    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+        var _a, _b;
+        try {
+            const proposalData = yield proposalSchema_1.default.findOne({ _id: new mongoose_1.default.Types.ObjectId(proposalId) });
+            if (!proposalData) {
+                return reject({ status: 400, error: "proposal doesn't exit" });
+            }
+            if (((_a = proposalData.workerId) === null || _a === void 0 ? void 0 : _a.toString()) !== userId && ((_b = proposalData.userId) === null || _b === void 0 ? void 0 : _b.toString()) !== userId) {
+                return reject({ status: 400, error: "The proposal can't be modified by the user" });
+            }
+            proposalSchema_1.default.updateOne({
+                $or: [
+                    {
+                        _id: new mongoose_1.default.Types.ObjectId(proposalId),
+                        userId: new mongoose_1.default.Types.ObjectId(userId)
+                    }, {
+                        _id: new mongoose_1.default.Types.ObjectId(proposalId),
+                        workerId: new mongoose_1.default.Types.ObjectId(userId)
+                    }
+                ]
+            }, {
+                $set: {
+                    isCompleted: true
+                }
+            }).then((response) => {
+                resolve({ data: 'done' });
+            }).catch((error) => {
+                reject({ status: 502, error: "Database error occurred" });
+            });
+        }
+        catch (error) {
+            reject({ status: 500, error: "Internal error occurred" });
+        }
+    }));
+};
+exports.completeProposalService = completeProposalService;
+const getReportService = ({ fromDate, toDate, workHistory, hiringHistory, pendingWorks, completedWorks, cancelledWorks, userId, page, pageSize }) => {
+    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const str = 'true';
+            proposalSchema_1.default.aggregate([
+                {
+                    $match: Object.assign(Object.assign({ proposedDate: {
+                            $gte: parseInt(fromDate),
+                            $lte: parseInt(toDate)
+                        } }, ((workHistory === str && hiringHistory === str) ? {
+                        $or: [
+                            {
+                                workerId: new mongoose_1.default.Types.ObjectId(userId)
+                            }, {
+                                userId: new mongoose_1.default.Types.ObjectId(userId)
+                            }
+                        ]
+                    } :
+                        workHistory === 'true' ? {
+                            workerId: new mongoose_1.default.Types.ObjectId(userId)
+                        } :
+                            hiringHistory === 'true' ? {
+                                userId: new mongoose_1.default.Types.ObjectId(userId)
+                            } : {
+                                $or: [
+                                    {
+                                        workerId: new mongoose_1.default.Types.ObjectId(userId)
+                                    }, {
+                                        userId: new mongoose_1.default.Types.ObjectId(userId)
+                                    }
+                                ]
+                            })), ((pendingWorks === str && completedWorks === str && cancelledWorks === str) ? {} :
+                        (pendingWorks === str && completedWorks === str) ? {
+                            isUserDeleted: false,
+                            isWorkerDeleted: false,
+                        } : (pendingWorks === str && cancelledWorks === str) ? {
+                            isCompleted: false
+                        } : (completedWorks === str && cancelledWorks === str) ? {
+                            $or: [
+                                {
+                                    isCompleted: true
+                                }, {
+                                    isUserDeleted: true
+                                }, {
+                                    isWorkerDeleted: true
+                                }
+                            ]
+                        } : (pendingWorks === str) ? {
+                            isCompleted: false,
+                            isUserDeleted: false,
+                            isWorkerDeleted: false
+                        } : (completedWorks === str) ? {
+                            isCompleted: true
+                        } : (cancelledWorks === str) ? {
+                            $or: [
+                                {
+                                    isUserDeleted: true
+                                }, {
+                                    isWorkerDeleted: true
+                                }
+                            ]
+                        } : {}))
+                }, {
+                    $lookup: {
+                        from: "users",
+                        localField: "userId",
+                        foreignField: "_id",
+                        as: "userDetails"
+                    }
+                }, {
+                    $lookup: {
+                        from: "users",
+                        localField: "workerId",
+                        foreignField: "_id",
+                        as: "workerDetails"
+                    }
+                }, {
+                    $lookup: {
+                        from: "addresses",
+                        localField: "proposedAddressId",
+                        foreignField: "_id",
+                        as: "addressDetails"
+                    }
+                }, {
+                    $lookup: {
+                        from: "workers",
+                        localField: "chosenCategoryId",
+                        foreignField: "_id",
+                        as: "categoryDetails"
+                    }
+                }, {
+                    $project: {
+                        _id: 1,
+                        userId: 1,
+                        workerId: 1,
+                        userImageUrl: {
+                            $arrayElemAt: [
+                                "$userDetails.profilePicture",
+                                0
+                            ]
+                        },
+                        workerImageUrl: {
+                            $arrayElemAt: [
+                                "$workerDetails.profilePicture",
+                                0
+                            ]
+                        },
+                        oppositeFirstName: {
+                            $cond: [
+                                {
+                                    $eq: [
+                                        "$userId",
+                                        new mongoose_1.default.Types.ObjectId(userId)
+                                    ]
+                                },
+                                {
+                                    $arrayElemAt: [
+                                        "$workerDetails.firstName",
+                                        0
+                                    ]
+                                }, {
+                                    $arrayElemAt: [
+                                        "$userDetails.firstName",
+                                        0
+                                    ]
+                                }
+                            ]
+                        },
+                        oppositeLastName: {
+                            $cond: [
+                                {
+                                    $eq: [
+                                        "$userId",
+                                        new mongoose_1.default.Types.ObjectId(userId)
+                                    ]
+                                },
+                                {
+                                    $arrayElemAt: [
+                                        "$workerDetails.lastName",
+                                        0
+                                    ]
+                                }, {
+                                    $arrayElemAt: [
+                                        "$userDetails.lastName",
+                                        0
+                                    ]
+                                }
+                            ]
+                        },
+                        workDescription: 1,
+                        wage: 1,
+                        proposedDate: 1,
+                        proposedAddress: {
+                            $first: "$addressDetails"
+                        },
+                        isFullDay: 1,
+                        isBeforeNoon: 1,
+                        categoryTitle: {
+                            $arrayElemAt: [
+                                "$categoryDetails.title",
+                                0
+                            ]
+                        },
+                        categorySkill: {
+                            $arrayElemAt: [
+                                "$categoryDetails.skill",
+                                0
+                            ]
+                        },
+                        isAccepted: 1,
+                        isCompleted: 1,
+                        isUserDeleted: 1,
+                        isWorkerDeleted: 1,
+                        isProposalSentByUser: {
+                            $eq: ['$workerId', new mongoose_1.default.Types.ObjectId(userId)]
+                        }
+                    }
+                }
+            ]).then((response) => {
+                resolve({ data: response });
+            }).catch((error) => {
+                console.log(error);
+                reject({ status: 502, error: "Database error occurred" });
+            });
+        }
+        catch (error) {
+            reject({ status: 500, error: "Internal error occurred" });
+        }
+    }));
+};
+exports.getReportService = getReportService;

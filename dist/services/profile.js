@@ -266,7 +266,6 @@ const getWorkersListService = ({ page, pageSize, sort, rating4Plus, previouslyHi
             ]);
             notAvailableWorkers = (_c = (_b = notAvailableWorkers === null || notAvailableWorkers === void 0 ? void 0 : notAvailableWorkers[0]) === null || _b === void 0 ? void 0 : _b.workerIds) !== null && _c !== void 0 ? _c : [];
             notAvailableWorkers.push(new mongoose_1.default.Types.ObjectId(userId));
-            console.log(notAvailableWorkers);
             userSchema_1.default.aggregate([
                 {
                     $match: Object.assign({ isWorker: true, _id: {
@@ -371,8 +370,6 @@ const getWorkersListService = ({ page, pageSize, sort, rating4Plus, previouslyHi
                         }
                     } : {})), (previouslyHired === 'true' ? {
                         previouslyHired: true
-                    } : previouslyHired === 'false' ? {
-                        previouslyHired: false
                     } : {})), (isFavourite === 'true' ? {
                         isFavourite: true
                     } : isFavourite === 'false' ? {

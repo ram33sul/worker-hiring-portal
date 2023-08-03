@@ -13,13 +13,14 @@ const proposalSchema = new mongoose_1.default.Schema({
     isBeforeNoon: { type: Boolean, default: true },
     isAccepted: { type: Boolean, default: false },
     isRejected: { type: Boolean, default: false },
-    status: { type: String, default: true },
+    status: { type: Boolean, default: true },
     timestamp: { type: Date, default: new Date() },
     proposedDate: { type: Number, required: true },
     workDescription: { type: String, default: '' },
     proposedAddressId: { type: mongoose_1.default.Types.ObjectId, required: true },
     isUserDeleted: { type: Boolean, default: false },
-    isWorkerDeleted: { type: Boolean, default: false }
+    isWorkerDeleted: { type: Boolean, default: false },
+    isCompleted: { type: Boolean, default: false }
 });
 const Proposal = mongoose_1.default.model("proposals", proposalSchema);
 exports.default = Proposal;

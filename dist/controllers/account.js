@@ -115,6 +115,10 @@ const events = (action) => {
             return proposal_1.acceptProposalService;
         case events_1.REJECT_PROPOSAL:
             return proposal_1.rejectProposalService;
+        case events_1.COMPLETE_PROPOSAL:
+            return proposal_1.completeProposalService;
+        case events_1.GET_REPORT:
+            return proposal_1.getReportService;
         default:
             return () => Promise.reject("Internal error occured!");
     }
