@@ -4,6 +4,7 @@ import database from './config/database';
 import apiRouter from './routes';
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
+import { onConnection } from './socket/onConnection';
 
 dotenv.config();
 database.connect();
@@ -21,6 +22,10 @@ app.use('/api', apiRouter);
 app.use('/', (req, res) => {
     res.status(400).send({error: "Request URL cannot be found, please check the URL again!"})
 });
+
+const clients = {}
+
+io.on('connection', onConnection(clients))
 
 io.on('connection', (socket) => {
     console.log('A user connected!');
