@@ -227,6 +227,7 @@ export const googleSignupService = ({token}: {token: string}) => {
             }
         } catch (error) {
             reject({status: 500, error: new Error("Internal error occured!")})
+            console.log(error)
         }
     })
 }
