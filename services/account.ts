@@ -201,9 +201,26 @@ export const googleSignupService = ({token}: {token: string}) => {
         try {
             const decodeData: {email: string} = await jwtDecode(token);
             const email = decodeData.email;
-            User.findOne({email}).then((res) => {
-                
-            })
+            const userData = await User.findOne({email});
+            if(!userData){
+                User.create({
+                    email: email
+                }).then((response) => {
+                    const accessToken = jwtSignAccess({userId: response._id});
+                    const refreshToken = jwtSignRefresh({userId: response._id});
+                    resolve({data: response, headers: {"access-token":accessToken, "refresh-token":refreshToken}});
+                }).catch((error) => {
+                    reject({status: 502, error: new Error("Database error occured!")})
+                })
+            } else {
+                if(!userData.status){
+                    reject({error: new Error("User is blocked!"), status: 403})
+                } else {
+                    const accessToken = jwtSignAccess({userId: userData._id});
+                    const refreshToken = jwtSignRefresh({userId: userData._id});
+                    resolve({data: userData, headers: {"access-token":accessToken, "refresh-token":refreshToken}});
+                }
+            }
         } catch (error) {
             reject({status: 500, error: new Error("Internal error occured!")})
         }

@@ -1,6 +1,6 @@
-import { authenticateService, refreshTokenService, sendSmsOtpService, verifySmsOtpService, verifyUserService } from "../services/account"
+import { authenticateService, googleSignupService, refreshTokenService, sendSmsOtpService, verifySmsOtpService, verifyUserService } from "../services/account"
 import { Request, Response } from "express";
-import { ACCEPT_PROPOSAL, ADD_ADDRESS, ADD_BANNER, ADD_PROPOSAL, ADD_RATING, ADD_SAMPLE_WORK, ADD_TO_FAVOURITES, ADD_WORKER_CATEGORY, AUTHENTICATE, CATEGORY_SEARCH, COMPLETE_PROPOSAL, DELETE_SAMPLE_WORK, EDIT_PROFILE, GET_ADDRESS, GET_ALL_ADDRESSES, GET_BANNERS, GET_FAVOURITES, GET_PROPOSALS, GET_RATINGS, GET_RATINGS_LIST, GET_REPORT, GET_SAMPLE_WORK, GET_SAMPLE_WORKS, GET_SUGGESTED_CATEGORIES, GET_USER_DETAILS, GET_WORKERS_LIST, GET_WORKER_CATEGORIES, GET_WORKER_DETAILS, OPEN_TO_WORK_OFF, OPEN_TO_WORK_ON, REFRESH_TOKEN, REGISTER_AS_WORKER, REJECT_PROPOSAL, REMOVE_FROM_FAVOURITES, SEND_SMS_OTP, SET_SELECTED_ADDRESS, VERIFY_SMS_OTP, VERIFY_USER } from "./events";
+import { ACCEPT_PROPOSAL, ADD_ADDRESS, ADD_BANNER, ADD_PROPOSAL, ADD_RATING, ADD_SAMPLE_WORK, ADD_TO_FAVOURITES, ADD_WORKER_CATEGORY, AUTHENTICATE, CATEGORY_SEARCH, COMPLETE_PROPOSAL, DELETE_SAMPLE_WORK, EDIT_PROFILE, GET_ADDRESS, GET_ALL_ADDRESSES, GET_BANNERS, GET_FAVOURITES, GET_PROPOSALS, GET_RATINGS, GET_RATINGS_LIST, GET_REPORT, GET_SAMPLE_WORK, GET_SAMPLE_WORKS, GET_SUGGESTED_CATEGORIES, GET_USER_DETAILS, GET_WORKERS_LIST, GET_WORKER_CATEGORIES, GET_WORKER_DETAILS, GOOGLE_SIGNUP, OPEN_TO_WORK_OFF, OPEN_TO_WORK_ON, REFRESH_TOKEN, REGISTER_AS_WORKER, REJECT_PROPOSAL, REMOVE_FROM_FAVOURITES, SEND_SMS_OTP, SET_SELECTED_ADDRESS, VERIFY_SMS_OTP, VERIFY_USER } from "./events";
 import { editProfileService, getRatingsListService, getUserDetailsService, getWorkerDetailsService, getWorkersListService, openToWorkOffService, openToWorkOnService, registerAsWorkerService } from "../services/profile";
 import { addWorkerCategoryService, getCategorySearchService, getSuggestedCategoriesService, getWorkerCategoriesService } from "../services/worker";
 import { addBannerService, getBannersService } from "../services/banner";
@@ -117,6 +117,8 @@ export const events = (action: string) => {
             return completeProposalService;
         case GET_REPORT:
             return getReportService;
+        case GOOGLE_SIGNUP:
+            return googleSignupService;
         default:
             return () => Promise.reject("Internal error occured!")
     }
