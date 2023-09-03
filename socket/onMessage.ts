@@ -5,6 +5,7 @@ import { broadcast } from "./broadcast";
 
 export const onMessage = (userId: string, clients: any) => {
     return async (message: string) => {
+        console.log("A user sent message", message)
         const messages: MessageI = JSON.parse(message)
         const messageData = await Message.create({
             from: new mongoose.Types.ObjectId(userId),

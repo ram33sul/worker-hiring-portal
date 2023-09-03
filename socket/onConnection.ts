@@ -8,6 +8,7 @@ export const onConnection = (clients: any) => {
         // const token = socket.handshake.query.token as string;
         // let decodedData = await verifyUserService({token}) as {data: string}
         // const userId = decodedData.data;
+        console.log("A user connected")
         const userId = socket.handshake.query.userId as string;
         clients[userId] = socket
         socket.on('message', onMessage(userId, clients))
