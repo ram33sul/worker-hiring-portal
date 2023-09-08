@@ -12,22 +12,32 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.onMessage = void 0;
+exports.getOverallMessages = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const messageSchema_1 = __importDefault(require("../model/messageSchema"));
 const broadcast_1 = require("./broadcast");
-const onMessage = (userId, clients) => {
+const getOverallMessages = (userId, clients) => {
     return (message) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log("A user sent message", message);
         const messages = JSON.parse(message);
-        const messageData = yield messageSchema_1.default.create({
-            from: new mongoose_1.default.Types.ObjectId(userId),
-            to: new mongoose_1.default.Types.ObjectId(messages.to),
-            type: messages.type,
-            content: messages.content,
-            sendAt: new Date()
-        });
-        (0, broadcast_1.broadcast)({ data: messageData, from: null, to: messages.to, clients: clients, event: 'message' });
+        console.log(messages);
+        const messageData = yield messageSchema_1.default.aggregate([
+            {
+                $match: {
+                    $or: [
+                        {
+                            from: new mongoose_1.default.Types.ObjectId(userId)
+                        }, {
+                            to: new mongoose_1.default.Types.ObjectId(userId)
+                        }
+                    ]
+                }
+            }, {
+                $sort: {
+                    sendAt: -1
+                }
+            }
+        ]);
+        (0, broadcast_1.broadcast)({ data: messageData, from: null, to: messages.to, clients: clients, event: 'overall-messages' });
     });
 };
-exports.onMessage = onMessage;
+exports.getOverallMessages = getOverallMessages;
