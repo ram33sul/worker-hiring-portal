@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { PaginationRequest } from "../interfaces/interface";
 import { MessageI } from "../interfaces/message"
 import Message from "../model/messageSchema";
+import { broadcast } from "./broadcast";
 
 export const getChatList = (userId: string, clients: any) => {
     return async (message: any) => {
@@ -106,6 +107,6 @@ export const getChatList = (userId: string, clients: any) => {
             }
         ])
 
-        console.log(data)
+        broadcast({data: data, from: null, to: userId, clients: clients, event: 'chat-list'})
     }
 }

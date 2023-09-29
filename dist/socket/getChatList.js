@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getChatList = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const messageSchema_1 = __importDefault(require("../model/messageSchema"));
+const broadcast_1 = require("./broadcast");
 const getChatList = (userId, clients) => {
     return (message) => __awaiter(void 0, void 0, void 0, function* () {
         const messages = JSON.parse(message);
@@ -116,7 +117,7 @@ const getChatList = (userId, clients) => {
                 }
             }
         ]);
-        console.log(data);
+        (0, broadcast_1.broadcast)({ data: data, from: null, to: userId, clients: clients, event: 'chat-list' });
     });
 };
 exports.getChatList = getChatList;
