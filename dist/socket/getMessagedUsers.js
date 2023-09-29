@@ -12,11 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getOverallMessages = void 0;
+exports.onMessage = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
-const messageSchema_1 = __importDefault(require("../model/messageSchema"));
 const broadcast_1 = require("./broadcast");
-const getOverallMessages = (userId, clients) => {
+const messageSchema_1 = __importDefault(require("../model/messageSchema"));
+const onMessage = (userId, clients) => {
     return (message) => __awaiter(void 0, void 0, void 0, function* () {
         const messages = JSON.parse(message);
         const messageData = yield messageSchema_1.default.aggregate([
@@ -30,13 +30,9 @@ const getOverallMessages = (userId, clients) => {
                         }
                     ]
                 }
-            }, {
-                $sort: {
-                    sendAt: -1
-                }
             }
         ]);
-        (0, broadcast_1.broadcast)({ data: messageData, from: null, to: messages.to, clients: clients, event: 'overall-messages' });
+        (0, broadcast_1.broadcast)({ data: messageData, from: null, to: messages.to, clients: clients, event: 'message' });
     });
 };
-exports.getOverallMessages = getOverallMessages;
+exports.onMessage = onMessage;

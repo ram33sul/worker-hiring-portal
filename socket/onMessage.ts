@@ -5,15 +5,19 @@ import { broadcast } from "./broadcast";
 
 export const onMessage = (userId: string, clients: any) => {
     return async (message: string) => {
-        console.log("A user sent message", message)
-        const messages: MessageI = JSON.parse(message)
-        const messageData = await Message.create({
-            from: new mongoose.Types.ObjectId(userId),
-            to: new mongoose.Types.ObjectId(messages.to),
-            type: messages.type,
-            content: messages.content,
-            sendAt: new Date()
-        })
-        broadcast({data: messageData, from: null, to: messages.to, clients: clients, event: 'message'})
+        try {
+            console.log("A user sent message", message, userId)
+            const messages: MessageI = JSON.parse(message)
+            const messageData = await Message.create({
+                from: new mongoose.Types.ObjectId(userId),
+                to: new mongoose.Types.ObjectId(messages.to),
+                type: messages.type,
+                content: messages.content,
+                sendAt: new Date()
+            })
+            broadcast({data: messageData, from: null, to: messages.to, clients: clients, event: 'message'})
+        } catch (error) {
+            console.log("an error occured onMessage", error)
+        }
     }
 }

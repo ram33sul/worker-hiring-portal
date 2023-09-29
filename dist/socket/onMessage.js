@@ -18,16 +18,21 @@ const messageSchema_1 = __importDefault(require("../model/messageSchema"));
 const broadcast_1 = require("./broadcast");
 const onMessage = (userId, clients) => {
     return (message) => __awaiter(void 0, void 0, void 0, function* () {
-        console.log("A user sent message", message);
-        const messages = JSON.parse(message);
-        const messageData = yield messageSchema_1.default.create({
-            from: new mongoose_1.default.Types.ObjectId(userId),
-            to: new mongoose_1.default.Types.ObjectId(messages.to),
-            type: messages.type,
-            content: messages.content,
-            sendAt: new Date()
-        });
-        (0, broadcast_1.broadcast)({ data: messageData, from: null, to: messages.to, clients: clients, event: 'message' });
+        try {
+            console.log("A user sent message", message, userId);
+            const messages = JSON.parse(message);
+            const messageData = yield messageSchema_1.default.create({
+                from: new mongoose_1.default.Types.ObjectId(userId),
+                to: new mongoose_1.default.Types.ObjectId(messages.to),
+                type: messages.type,
+                content: messages.content,
+                sendAt: new Date()
+            });
+            (0, broadcast_1.broadcast)({ data: messageData, from: null, to: messages.to, clients: clients, event: 'message' });
+        }
+        catch (error) {
+            console.log("an error occured onMessage", error);
+        }
     });
 };
 exports.onMessage = onMessage;

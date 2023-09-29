@@ -12,19 +12,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.onConnection = void 0;
 const onMessage_1 = require("./onMessage");
 const getOverallMessages_1 = require("./getOverallMessages");
+const getChatList_1 = require("./getChatList");
 const onConnection = (clients) => {
     return (socket) => __awaiter(void 0, void 0, void 0, function* () {
-        // const token = socket.handshake.query.token as string;
-        // let decodedData = await verifyUserService({token}) as {data: string}
-        // const userId = decodedData.data;
-        console.log("A user connected");
-        const userId = socket.handshake.query.userId;
-        clients[userId] = socket;
-        socket.on('message', (0, onMessage_1.onMessage)(userId, clients));
-        socket.on('overall-messages', (0, getOverallMessages_1.getOverallMessages)(userId, clients));
-        socket.on('disconnect', () => {
-            socket.emit("disconnect");
-        });
+        try {
+            // const token = socket.handshake.query.token as string;
+            // let decodedData = await verifyUserService({token}) as {data: string}
+            // const userId = decodedData.data;
+            console.log("A user connected");
+            const userId = socket.handshake.query.userId;
+            clients[userId] = socket;
+            socket.on('message', (0, onMessage_1.onMessage)(userId, clients));
+            socket.on('overall-messages', (0, getOverallMessages_1.getOverallMessages)(userId, clients));
+            socket.on('chat-list', (0, getChatList_1.getChatList)(userId, clients));
+            // socket.on('disconnect', () => {
+            //     socket.emit("disconnect")
+            // });
+        }
+        catch (err) {
+            console.log("An error occured in websocket onConnection", err);
+        }
     });
 };
 exports.onConnection = onConnection;

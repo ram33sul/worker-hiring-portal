@@ -1,9 +1,9 @@
-import mongoose from "mongoose";
-import { MessageI } from "../interfaces/message";
-import Message from "../model/messageSchema";
-import { broadcast } from "./broadcast";
+import mongoose from "mongoose"
+import { MessageI } from "../interfaces/message"
+import { broadcast } from "./broadcast"
+import Message from "../model/messageSchema"
 
-export const getOverallMessages = (userId: string, clients: any) => {
+export const onMessage = (userId: string, clients: any) => {
     return async (message: string) => {
         const messages: MessageI = JSON.parse(message)
         const messageData = await Message.aggregate([
@@ -17,13 +17,9 @@ export const getOverallMessages = (userId: string, clients: any) => {
                         }
                     ]
                 }
-            },{
-                $sort: {
-                    sendAt: -1
-                }
             }
         ])
 
-        broadcast({data: messageData, from: null, to: messages.to, clients: clients, event: 'overall-messages'})
+        broadcast({data: messageData, from: null, to: messages.to, clients: clients, event: 'message'})
     }
 }
